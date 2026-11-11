@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 340" fill="none" role="img" aria-label="Bicicleta estática: comparativa Inicio con balanceo pendular suave y Final con pedaleo cíclico controlado sin resistencia">
+  <rect width="680" height="340" rx="22" fill="#F7FAFB"/>
+
+  <!-- PANEL IZQUIERDO: INICIO -->
+  <rect x="18" y="18" width="296" height="304" rx="16" fill="#FFFFFF" stroke="#D6F1EE" stroke-width="2"/>
+  <rect x="32" y="32" width="76" height="26" rx="13" fill="#D6F1EE"/>
+  <text x="51" y="49" fill="#173B59" font-family="Inter, sans-serif" font-size="12" font-weight="800">INICIO</text>
+
+  <line x1="46" y1="246" x2="286" y2="246" stroke="#173B59" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Cuadro de bicicleta fija -->
+  <path d="M108 246 L136 154 L214 198 L162 212 Z" stroke="#637783" stroke-width="4.5" stroke-linejoin="round"/>
+  <line x1="126" y1="154" x2="148" y2="154" stroke="#173B59" stroke-width="6" stroke-linecap="round"/>
+  <line x1="214" y1="198" x2="226" y2="122" stroke="#173B59" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="226" cy="218" r="24" fill="#D6F1EE" stroke="#173B59" stroke-width="3.5"/>
+  <circle cx="162" cy="212" r="14" fill="#FFFFFF" stroke="#32A6A4" stroke-width="3"/>
+  <!-- Paciente postura erguida correcta -->
+  <circle cx="144" cy="86" r="12" fill="#173B59"/>
+  <path d="M144 102 L138 150 L222 126" stroke="#173B59" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M138 150 L182 178 L168 224" stroke="#32A6A4" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="182" cy="178" r="6.5" fill="#173B59"/>
+  <text x="40" y="282" fill="#183044" font-family="Inter, sans-serif" font-size="12" font-weight="600">Asiento ajustado · Balanceos suaves</text>
+
+  <!-- FLECHA CENTRAL -->
+  <circle cx="340" cy="170" r="20" fill="#173B59"/>
+  <path d="M332 170 L348 170 M343 164 L349 170 L343 176" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- PANEL DERECHO: FINAL -->
+  <rect x="366" y="18" width="296" height="304" rx="16" fill="#FFFFFF" stroke="#32A6A4" stroke-width="2"/>
+  <rect x="380" y="32" width="76" height="26" rx="13" fill="#32A6A4"/>
+  <text x="400" y="49" fill="#FFFFFF" font-family="Inter, sans-serif" font-size="12" font-weight="800">FINAL</text>
+
+  <line x1="394" y1="246" x2="634" y2="246" stroke="#173B59" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M456 246 L484 154 L562 198 L510 212 Z" stroke="#637783" stroke-width="4.5" stroke-linejoin="round"/>
+  <line x1="474" y1="154" x2="496" y2="154" stroke="#173B59" stroke-width="6" stroke-linecap="round"/>
+  <line x1="562" y1="198" x2="574" y2="122" stroke="#173B59" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="574" cy="218" r="24" fill="#D6F1EE" stroke="#173B59" stroke-width="3.5"/>
+  <circle cx="510" cy="212" r="14" fill="#FFFFFF" stroke="#32A6A4" stroke-width="3"/>
+  <!-- Paciente en flexión superior controlada del pedal -->
+  <circle cx="492" cy="86" r="12" fill="#173B59"/>
+  <path d="M492 102 L486 150 L570 126" stroke="#173B59" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M486 150 L534 156 L516 198" stroke="#32A6A4" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="534" cy="156" r="6.5" fill="#173B59"/>
+  <!-- Arco de giro cíclico sin resistencia -->
+  <path d="M486 212 A 24 24 0 1 1 534 212" stroke="#173B59" stroke-width="2.5" stroke-dasharray="3 3"/>
+  <text x="386" y="282" fill="#173B59" font-family="Inter, sans-serif" font-size="12" font-weight="700">Movilidad cíclica sin resistencia</text>
+</svg>

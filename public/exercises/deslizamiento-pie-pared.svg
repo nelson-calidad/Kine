@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 340" fill="none" role="img" aria-label="Deslizamiento en pared: comparativa Inicio con pie alto en pared y Final con rodilla flexionada al deslizar el pie hacia abajo">
+  <rect width="680" height="340" rx="22" fill="#F7FAFB"/>
+
+  <!-- PANEL IZQUIERDO: INICIO -->
+  <rect x="18" y="18" width="296" height="304" rx="16" fill="#FFFFFF" stroke="#D6F1EE" stroke-width="2"/>
+  <rect x="32" y="32" width="76" height="26" rx="13" fill="#D6F1EE"/>
+  <text x="51" y="49" fill="#173B59" font-family="Inter, sans-serif" font-size="12" font-weight="800">INICIO</text>
+
+  <!-- Suelo y Pared Inicio -->
+  <line x1="36" y1="246" x2="266" y2="246" stroke="#173B59" stroke-width="4" stroke-linecap="round"/>
+  <line x1="266" y1="64" x2="266" y2="246" stroke="#173B59" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="66" cy="216" r="12" fill="#173B59"/>
+  <path d="M80 228 L168 232" stroke="#173B59" stroke-width="17" stroke-linecap="round"/>
+  <!-- Pierna apoyada arriba en la pared -->
+  <path d="M168 232 L216 172 L258 112" stroke="#32A6A4" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="216" cy="172" r="7" fill="#173B59"/>
+  <text x="40" y="282" fill="#183044" font-family="Inter, sans-serif" font-size="12" font-weight="600">Pie apoyado en la pared</text>
+
+  <!-- FLECHA CENTRAL -->
+  <circle cx="340" cy="170" r="20" fill="#173B59"/>
+  <path d="M332 170 L348 170 M343 164 L349 170 L343 176" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- PANEL DERECHO: FINAL -->
+  <rect x="366" y="18" width="296" height="304" rx="16" fill="#FFFFFF" stroke="#32A6A4" stroke-width="2"/>
+  <rect x="380" y="32" width="76" height="26" rx="13" fill="#32A6A4"/>
+  <text x="400" y="49" fill="#FFFFFF" font-family="Inter, sans-serif" font-size="12" font-weight="800">FINAL</text>
+
+  <!-- Suelo y Pared Final -->
+  <line x1="384" y1="246" x2="614" y2="246" stroke="#173B59" stroke-width="4" stroke-linecap="round"/>
+  <line x1="614" y1="64" x2="614" y2="246" stroke="#173B59" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="414" cy="216" r="12" fill="#173B59"/>
+  <path d="M428 228 L516 232" stroke="#173B59" stroke-width="17" stroke-linecap="round"/>
+  <!-- Pierna en flexión controlada mientras el pie desciende por la pared -->
+  <path d="M516 232 L554 156 L606 184" stroke="#32A6A4" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="554" cy="156" r="7.5" fill="#173B59"/>
+
+  <!-- Flecha descendente en pared -->
+  <path d="M636 112 L636 184" stroke="#32A6A4" stroke-width="3.5" stroke-linecap="round"/>
+  <polygon points="636,192 630,180 642,180" fill="#32A6A4"/>
+  <text x="388" y="282" fill="#173B59" font-family="Inter, sans-serif" font-size="12" font-weight="700">El pie baja suave · La rodilla se flexiona</text>
+</svg>

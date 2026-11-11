@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 380" fill="none" role="img" aria-label="Esquema educativo de una rodilla sana mostrando fémur, rótula, tendón rotuliano, ligamento cruzado anterior y tibia">
+  <rect width="480" height="380" rx="20" fill="#F7FAFB" stroke="#D6F1EE" stroke-width="2"/>
+  
+  <!-- Encabezado del esquema -->
+  <rect x="20" y="18" width="160" height="28" rx="14" fill="#D6F1EE"/>
+  <text x="36" y="36" fill="#173B59" font-family="Inter, sans-serif" font-size="12" font-weight="700">1. RODILLA SANA</text>
+
+  <!-- Fémur (vista lateral- oblicua esquemática) -->
+  <path d="M205 60 L205 145 C190 165 195 190 215 195 C235 195 255 195 270 190 C285 182 282 160 268 145 L268 60" fill="#FFFFFF" stroke="#173B59" stroke-width="4" stroke-linejoin="round"/>
+  <text x="115" y="105" fill="#183044" font-family="Inter, sans-serif" font-size="13" font-weight="600">Fémur</text>
+  <line x1="162" y1="101" x2="202" y2="101" stroke="#637783" stroke-width="1.5" stroke-dasharray="3 3"/>
+
+  <!-- Tibia -->
+  <path d="M198 220 C215 215 260 215 276 220 L268 330 L208 330 Z" fill="#FFFFFF" stroke="#173B59" stroke-width="4" stroke-linejoin="round"/>
+  <text x="120" y="295" fill="#183044" font-family="Inter, sans-serif" font-size="13" font-weight="600">Tibia</text>
+  <line x1="158" y1="291" x2="204" y2="291" stroke="#637783" stroke-width="1.5" stroke-dasharray="3 3"/>
+
+  <!-- Ligamento Cruzado Anterior (LCA intacto) -->
+  <path d="M252 178 L222 222" stroke="#32A6A4" stroke-width="8" stroke-linecap="round"/>
+  <text x="295" y="198" fill="#173B59" font-family="Inter, sans-serif" font-size="13" font-weight="700">LCA intacto</text>
+  <text x="295" y="214" fill="#637783" font-family="Inter, sans-serif" font-size="11">(Estabiliza la tibia)</text>
+  <line x1="242" y1="198" x2="290" y2="198" stroke="#32A6A4" stroke-width="1.5"/>
+
+  <!-- Rótula (anterior) -->
+  <ellipse cx="180" cy="182" rx="11" ry="20" fill="#D6F1EE" stroke="#173B59" stroke-width="3"/>
+  <text x="65" y="185" fill="#183044" font-family="Inter, sans-serif" font-size="13" font-weight="600">Rótula</text>
+  <line x1="112" y1="181" x2="166" y2="181" stroke="#637783" stroke-width="1.5" stroke-dasharray="3 3"/>
+
+  <!-- Tendón rotuliano íntegro -->
+  <path d="M180 202 L198 248" stroke="#32A6A4" stroke-width="6" stroke-linecap="round"/>
+  <text x="48" y="236" fill="#183044" font-family="Inter, sans-serif" font-size="12" font-weight="600">Tendón rotuliano</text>
+  <line x1="154" y1="232" x2="186" y2="232" stroke="#637783" stroke-width="1.5" stroke-dasharray="3 3"/>
+
+  <text x="24" y="362" fill="#637783" font-family="Inter, sans-serif" font-size="11">Esquema educativo orientativo. Reemplazable en /public/images/rodilla-sana.svg</text>
+</svg>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 380" fill="none" role="img" aria-label="Extensión suave con apoyo bajo el talón: rollo colocado debajo del talón dejando libre la parte posterior de la rodilla">
+  <rect width="600" height="380" rx="20" fill="#F7FAFB"/>
+  <line x1="60" y1="280" x2="540" y2="280" stroke="#173B59" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Rollo / apoyo EXCLUSIVAMENTE bajo el talón -->
+  <circle cx="475" cy="260" r="18" fill="#32A6A4" fill-opacity="0.3" stroke="#32A6A4" stroke-width="3"/>
+  <text x="415" y="312" fill="#173B59" font-family="Inter, sans-serif" font-size="13" font-weight="700">Apoyo solo bajo el talón</text>
+
+  <!-- Pierna apoyada en cadera y talón, rodilla libre estirándose suavemente -->
+  <path d="M140 258 L315 250 L475 238 L490 210" stroke="#173B59" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="315" cy="250" r="11" fill="#32A6A4"/>
+
+  <!-- Espacio libre bajo la rodilla -->
+  <rect x="275" y="258" width="80" height="18" rx="6" fill="#D6F1EE" stroke="#32A6A4" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="235" y="340" fill="#637783" font-family="Inter, sans-serif" font-size="12" font-weight="600">Espacio libre bajo la rodilla (sin pesos encima)</text>
+
+  <!-- Flecha suave de gravedad -->
+  <path d="M315 190 L315 226" stroke="#32A6A4" stroke-width="3.5" stroke-linecap="round"/>
+  <polygon points="315,234 308,222 322,222" fill="#32A6A4"/>
+  <text x="215" y="176" fill="#173B59" font-family="Inter, sans-serif" font-size="13" font-weight="700">Extensión pasiva suave y gradual</text>
+
+  <rect x="24" y="22" width="235" height="30" rx="15" fill="#D6F1EE"/>
+  <text x="40" y="42" fill="#173B59" font-family="Inter, sans-serif" font-size="12" font-weight="700">COMPLEMENTARIO · EXTENSIÓN</text>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 280" fill="none" role="img" aria-label="Flexión activa en sedestación - Posición Final: el pie se desliza HACIA ATRÁS por debajo de la silla para flexionar la rodilla">
+  <rect width="360" height="280" rx="18" fill="#FFFFFF" stroke="#32A6A4" stroke-width="2"/>
+  <rect x="20" y="20" width="76" height="26" rx="13" fill="#32A6A4"/>
+  <text x="40" y="37" fill="#FFFFFF" font-family="Inter, sans-serif" font-size="12" font-weight="800">FINAL</text>
+  <line x1="36" y1="224" x2="324" y2="224" stroke="#173B59" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M124 84 L124 224 M124 154 L204 154 M196 154 L196 224" stroke="#637783" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="152" cy="64" r="14" fill="#173B59"/>
+  <path d="M152 82 L152 144 L230 146" stroke="#173B59" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M230 146 L252 216" stroke="#637783" stroke-width="6" stroke-dasharray="4 4" stroke-linecap="round" opacity="0.4"/>
+  <!-- Flexión: pie desplazado HACIA ATRÁS debajo de la silla -->
+  <path d="M230 146 L176 216 L196 218" stroke="#32A6A4" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="230" cy="146" r="8" fill="#173B59"/>
+  <path d="M262 238 L178 238" stroke="#173B59" stroke-width="3.5" stroke-linecap="round"/>
+  <polygon points="168,238 181,232 181,244" fill="#173B59"/>
+  <text x="28" y="262" fill="#173B59" font-family="Inter, sans-serif" font-size="12" font-weight="800">Pie deslizado HACIA ATRÁS bajo la silla (Flexión)</text>
+</svg>

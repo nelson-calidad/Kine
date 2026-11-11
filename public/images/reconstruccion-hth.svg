@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 380" fill="none" role="img" aria-label="Esquema educativo de reconstrucción del LCA con autoinjerto Hueso-Tendón-Hueso (HTH) rotuliano">
+  <rect width="480" height="380" rx="20" fill="#F7FAFB" stroke="#D6F1EE" stroke-width="2"/>
+
+  <!-- Encabezado del esquema -->
+  <rect x="20" y="18" width="255" height="28" rx="14" fill="#173B59"/>
+  <text x="34" y="36" fill="#FFFFFF" font-family="Inter, sans-serif" font-size="12" font-weight="700">2. RECONSTRUCCIÓN LCA CON HTH</text>
+
+  <!-- Fémur -->
+  <path d="M205 60 L205 145 C190 165 195 190 215 195 C235 195 255 195 270 190 C285 182 282 160 268 145 L268 60" fill="#FFFFFF" stroke="#173B59" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Tibia -->
+  <path d="M198 220 C215 215 260 215 276 220 L268 330 L208 330 Z" fill="#FFFFFF" stroke="#173B59" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Túnel femoral + bloque óseo superior -->
+  <rect x="246" y="156" width="14" height="22" rx="3" transform="rotate(32 246 156)" fill="#B7791F" stroke="#173B59" stroke-width="2"/>
+  
+  <!-- Porción tendinosa del injerto HTH -->
+  <path d="M248 174 L222 224" stroke="#32A6A4" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- Túnel tibial + bloque óseo inferior -->
+  <rect x="214" y="220" width="14" height="24" rx="3" transform="rotate(32 214 220)" fill="#B7791F" stroke="#173B59" stroke-width="2"/>
+
+  <!-- Rótula y zona dadora anterior -->
+  <ellipse cx="180" cy="182" rx="11" ry="20" fill="#D6F1EE" stroke="#173B59" stroke-width="3"/>
+  <path d="M180 202 L198 248" stroke="#32A6A4" stroke-width="5" stroke-dasharray="4 3" stroke-linecap="round"/>
+  <circle cx="188" cy="224" r="14" fill="#B7791F" fill-opacity="0.18" stroke="#B7791F" stroke-width="1.5" stroke-dasharray="3 3"/>
+
+  <!-- Etiquetas explicativas -->
+  <text x="292" y="166" fill="#173B59" font-family="Inter, sans-serif" font-size="12" font-weight="700">Bloques óseos en túneles</text>
+  <text x="292" y="182" fill="#637783" font-family="Inter, sans-serif" font-size="11">(Fémur y tibia)</text>
+  <line x1="258" y1="165" x2="288" y2="165" stroke="#B7791F" stroke-width="1.5"/>
+
+  <text x="292" y="212" fill="#32A6A4" font-family="Inter, sans-serif" font-size="12" font-weight="700">Injerto HTH colocado</text>
+  <text x="292" y="228" fill="#637783" font-family="Inter, sans-serif" font-size="11">(Hueso–Tendón–Hueso)</text>
+  <line x1="238" y1="204" x2="288" y2="210" stroke="#32A6A4" stroke-width="1.5"/>
+
+  <text x="26" y="222" fill="#B7791F" font-family="Inter, sans-serif" font-size="12" font-weight="700">Zona donante anterior</text>
+  <text x="26" y="238" fill="#637783" font-family="Inter, sans-serif" font-size="11">(Tercio central rotuliano)</text>
+  <line x1="158" y1="224" x2="174" y2="224" stroke="#B7791F" stroke-width="1.5"/>
+
+  <text x="24" y="362" fill="#637783" font-family="Inter, sans-serif" font-size="11">Esquema educativo orientativo. Reemplazable en /public/images/reconstruccion-hth.svg</text>
+</svg>

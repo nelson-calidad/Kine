@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 400" fill="none" role="img" aria-label="Ilustración educativa de la articulación de la rodilla y recuperación progresiva de la movilidad">
+  <rect width="520" height="400" rx="28" fill="#D6F1EE" fill-opacity="0.45"/>
+  <circle cx="260" cy="200" r="145" fill="#FFFFFF" stroke="#32A6A4" stroke-width="2" stroke-dasharray="6 6"/>
+  <circle cx="260" cy="200" r="110" fill="#D6F1EE" fill-opacity="0.5"/>
+
+  <!-- Arco de movilidad progresiva (flexión gradual y segura) -->
+  <path d="M350 220 A 100 100 0 0 1 255 315" stroke="#32A6A4" stroke-width="4" stroke-linecap="round" stroke-dasharray="5 5"/>
+  <polygon points="252,315 262,309 260,321" fill="#32A6A4"/>
+
+  <!-- Segmento Femoral (Muslo) -->
+  <path d="M135 125 L245 185" stroke="#173B59" stroke-width="34" stroke-linecap="round"/>
+  <path d="M135 125 L245 185" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" stroke-opacity="0.85"/>
+
+  <!-- Segmento Tibial (Pierna en flexión suave) -->
+  <path d="M255 200 L295 320" stroke="#173B59" stroke-width="28" stroke-linecap="round"/>
+  <path d="M255 200 L295 320" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" stroke-opacity="0.85"/>
+
+  <!-- Articulación central y Rótula -->
+  <circle cx="252" cy="192" r="24" fill="#32A6A4"/>
+  <circle cx="252" cy="192" r="12" fill="#FFFFFF"/>
+  <!-- Rótula anterior -->
+  <ellipse cx="276" cy="176" rx="7" ry="13" transform="rotate(-22 276 176)" fill="#173B59"/>
+  <!-- Tendón rotuliano -->
+  <path d="M279 188 L274 222" stroke="#32A6A4" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Etiquetas educativas claras -->
+  <rect x="30" y="32" width="215" height="36" rx="18" fill="#FFFFFF" stroke="#D6F1EE" stroke-width="1.5"/>
+  <circle cx="50" cy="50" r="5" fill="#32A6A4"/>
+  <text x="64" y="55" fill="#173B59" font-family="Inter, sans-serif" font-size="13" font-weight="600">Movilidad gradual y segura</text>
+
+  <rect x="285" y="336" width="205" height="36" rx="18" fill="#FFFFFF" stroke="#D6F1EE" stroke-width="1.5"/>
+  <text x="305" y="359" fill="#183044" font-family="Inter, sans-serif" font-size="12" font-weight="600">Flexión controlada sin forzar</text>
+</svg>
