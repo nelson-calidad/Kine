@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
 import { FAQ_DATA } from '../data/faq';
 import { SectionHeader } from '../components/common/SectionHeader';
-import { SafetyNotice } from '../components/common/SafetyNotice';
 
 export const FAQPage: React.FC = () => {
   const [openIds, setOpenIds] = useState<Record<string, boolean>>({
@@ -91,12 +90,6 @@ export const FAQPage: React.FC = () => {
           );
         })}
       </div>
-
-      <SafetyNotice
-        title="¿Tenés otra duda sobre tu evolución?"
-        message="Anotala en la sección Mi seguimiento para conversarla directamente con tu traumatólogo o kinesiólogo en tu próximo control."
-        variant="info"
-      />
     </div>
   );
 };

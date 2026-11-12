@@ -56,8 +56,7 @@ export const CARE_SECTIONS_DATA: CareSectionItem[] = [
       'Respetá el apoyo permitido.',
       'No retires ni modifiques la rodillera por cuenta propia.',
       'Consultá antes de abandonar las muletas.'
-    ],
-    highlightNote: 'Si hubo una sutura meniscal o procedimiento asociado, el apoyo y los grados permitidos en la rodillera pueden tener restricciones específicas.'
+    ]
   },
   {
     id: 'descanso',

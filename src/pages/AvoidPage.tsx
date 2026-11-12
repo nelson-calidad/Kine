@@ -2,7 +2,6 @@ import React from 'react';
 import { Ban, Info } from 'lucide-react';
 import { RESTRICTIONS_DATA } from '../data/restrictions';
 import { SectionHeader } from '../components/common/SectionHeader';
-import { SafetyNotice } from '../components/common/SafetyNotice';
 
 export const AvoidPage: React.FC = () => {
   return (
@@ -11,12 +10,6 @@ export const AvoidPage: React.FC = () => {
         badge="Los NO en casa"
         title="Qué evitar durante tu recuperación"
         subtitle="Conocer qué movimientos y conductas evitar te ayuda a proteger el injerto HTH, evitar dolor innecesario y favorecer una evolución segura."
-      />
-
-      <SafetyNotice
-        title="Precauciones de esta etapa (no son prohibiciones permanentes)"
-        message="Estas pautas corresponden al cuidado posoperatorio para proteger la cicatrización biológica y el control articular. A medida que avances en tu rehabilitación, tu equipo tratante te irá indicando cuándo y cómo retomar cada actividad."
-        variant="warning"
       />
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

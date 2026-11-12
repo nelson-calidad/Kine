@@ -23,8 +23,7 @@ export const EXERCISES_DATA: Exercise[] = [
     ],
     precautions: [
       'Conservá siempre el talón apoyado sobre la superficie durante todo el recorrido.',
-      'Ante dolor intenso, bloqueo, aumento importante de derrame o síntomas nuevos, detené el ejercicio y consultá.',
-      'Las restricciones del cirujano prevalecen sobre cualquier orientación general.'
+      'Ante dolor intenso, bloqueo, aumento importante de derrame o síntomas nuevos, detené el ejercicio y consultá.'
     ],
     stopConditions: [
       'Dolor intenso.',
@@ -65,8 +64,7 @@ export const EXERCISES_DATA: Exercise[] = [
     ],
     precautions: [
       'La toalla acompaña suavemente mientras el talón se desliza hacia el cuerpo; no tracciones toda la pierna hacia el pecho.',
-      'Ante dolor intenso, bloqueo, aumento importante de derrame o síntomas nuevos, detené el ejercicio y consultá.',
-      'Las restricciones del cirujano prevalecen sobre cualquier orientación general.'
+      'Ante dolor intenso, bloqueo, aumento importante de derrame o síntomas nuevos, detené el ejercicio y consultá.'
     ],
     stopConditions: [
       'Dolor intenso en la rodilla o zona anterior del injerto HTH.',
@@ -107,8 +105,7 @@ export const EXERCISES_DATA: Exercise[] = [
     ],
     precautions: [
       'Controlá en todo momento la velocidad del descenso con ayuda de la otra pierna si lo necesitás.',
-      'Ante dolor intenso, bloqueo, aumento importante de derrame o síntomas nuevos, detené el ejercicio y consultá.',
-      'Las restricciones del cirujano prevalecen sobre cualquier orientación general.'
+      'Ante dolor intenso, bloqueo, aumento importante de derrame o síntomas nuevos, detené el ejercicio y consultá.'
     ],
     stopConditions: [
       'Dolor intenso.',
@@ -148,8 +145,7 @@ export const EXERCISES_DATA: Exercise[] = [
     ],
     precautions: [
       'Recordá que para flexionar la rodilla el pie se desplaza HACIA ATRÁS por debajo de la silla (no hacia arriba en extensión).',
-      'Ante dolor intenso, bloqueo, aumento importante de derrame o síntomas nuevos, detené el ejercicio y consultá.',
-      'Las restricciones del cirujano prevalecen sobre cualquier orientación general.'
+      'Ante dolor intenso, bloqueo, aumento importante de derrame o síntomas nuevos, detené el ejercicio y consultá.'
     ],
     stopConditions: [
       'Dolor intenso.',
@@ -176,8 +172,6 @@ export const EXERCISES_DATA: Exercise[] = [
     goal: 'Favorecer la movilidad cíclica y controlada de la rodilla.',
     initialPosition: 'Sentado sobre la bicicleta fija con una posición corporal correcta y los pies sobre los pedales.',
     equipment: 'Bicicleta fija.',
-    whenToPerform: 'Realizar solamente si fue autorizado por el kinesiólogo y existe suficiente movilidad.',
-    specialBadge: 'Realizar solamente si fue autorizado por el kinesiólogo y existe suficiente movilidad',
     steps: [
       'Ajustá correctamente el asiento.',
       'Colocá los pies sobre los pedales.',
@@ -193,8 +187,7 @@ export const EXERCISES_DATA: Exercise[] = [
     ],
     precautions: [
       'Realizar solamente si fue autorizado por el kinesiólogo y existe suficiente movilidad.',
-      'Ante dolor intenso, bloqueo, aumento importante de derrame o síntomas nuevos, detené el ejercicio y consultá.',
-      'Las restricciones del cirujano prevalecen sobre cualquier orientación general.'
+      'Ante dolor intenso, bloqueo, aumento importante de derrame o síntomas nuevos, detené el ejercicio y consultá.'
     ],
     stopConditions: [
       'Dolor intenso.',

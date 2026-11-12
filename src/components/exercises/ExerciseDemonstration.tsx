@@ -160,21 +160,19 @@ export const ExerciseDemonstration: React.FC<{
           finalPose ? exercise.endImageCaption : exercise.startImageCaption
         }`}
       >
-        {/* 2D fallback / print illustration */}
-        <img
-          src={exercise.startImage}
-          alt=""
-          className={`${finalPose ? 'pose pose-hidden' : 'pose'} ${
-            show3D && hasEnteredView ? 'opacity-0 pointer-events-none print:opacity-100' : ''
-          }`}
-        />
-        <img
-          src={exercise.endImage}
-          alt=""
-          className={`${finalPose ? 'pose' : 'pose pose-hidden'} ${
-            show3D && hasEnteredView ? 'opacity-0 pointer-events-none' : ''
-          }`}
-        />
+        {/* 2D fallback / print illustration (hidden on screen when 3D is active) */}
+        <div className={show3D && hasEnteredView ? 'hidden print:block' : 'block'}>
+          <img
+            src={exercise.startImage}
+            alt=""
+            className={finalPose ? 'pose pose-hidden' : 'pose'}
+          />
+          <img
+            src={exercise.endImage}
+            alt=""
+            className={finalPose ? 'pose' : 'pose pose-hidden'}
+          />
+        </div>
 
         {/* Lazy-loaded 3D articulated human demonstration */}
         {show3D && hasEnteredView && (

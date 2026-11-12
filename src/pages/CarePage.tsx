@@ -13,7 +13,6 @@ import {
 import { CARE_SECTIONS_DATA } from '../data/care';
 import { SectionHeader } from '../components/common/SectionHeader';
 import { InfoCard } from '../components/common/InfoCard';
-import { SafetyNotice } from '../components/common/SafetyNotice';
 
 const ICON_MAP: Record<string, React.ReactNode> = {
   ShieldCheck: <ShieldCheck className="h-5 w-5" aria-hidden="true" />,
@@ -31,13 +30,6 @@ export const CarePage: React.FC = () => {
         badge="Cuidados domiciliarios"
         title="Cómo cuidar tu rodilla"
         subtitle="Recomendaciones prácticas para acompañar el posoperatorio en casa con tranquilidad y proteger la evolución de tu cirugía."
-      />
-
-      <SafetyNotice
-        title="Las indicaciones de tu equipo tratante tienen prioridad"
-        message="Seguí siempre las pautas particulares entregadas al alta por tu traumatólogo y kinesiólogo. Si tenés lesiones asociadas (por ejemplo, sutura meniscal), las indicaciones de apoyo y uso de rodillera pueden ser específicas."
-        variant="info"
-        showAlertsLink={true}
       />
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">

@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Stethoscope, Info, ArrowRight } from 'lucide-react';
+import { Stethoscope, ArrowRight } from 'lucide-react';
 import { SectionHeader } from '../components/common/SectionHeader';
-import { SafetyNotice } from '../components/common/SafetyNotice';
 import { ExerciseImage } from '../components/common/ExerciseImage';
 
 export const SurgeryPage: React.FC = () => {
@@ -102,20 +101,7 @@ export const SurgeryPage: React.FC = () => {
             </p>
           </div>
         </div>
-
-        <p className="mt-3 flex items-center gap-2 text-xs text-brand-muted">
-          <Info className="h-4 w-4 shrink-0 text-brand-teal" aria-hidden="true" />
-          <span>
-            Nota docente: Estas ilustraciones esquemáticas pueden reemplazarse directamente en la carpeta <code>/public/images/</code> por láminas anatómicas verificadas de la cátedra.
-          </span>
-        </p>
       </section>
-
-      <SafetyNotice
-        title="¿Qué pasa si hubo procedimientos asociados?"
-        message="Si durante la misma cirugía se realizó una sutura meniscal o el tratamiento de otra estructura articular, tu médico traumatólogo y tu kinesiólogo pueden indicarte límites particulares de flexión o de apoyo con muletas."
-        variant="info"
-      />
 
       <div className="pt-2 no-print">
         <Link

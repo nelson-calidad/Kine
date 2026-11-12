@@ -1,10 +1,18 @@
-﻿import fs from 'node:fs';
+import fs from 'node:fs';
 import { Color } from 'three';
 
-const source = fs.readFileSync('scripts/assets/makehuman-source.glb');
+const sourcePath = fs.existsSync('scripts/assets/makehuman-source.glb')
+  ? 'scripts/assets/makehuman-source.glb'
+  : 'public/models/rehab-human.glb';
+const source = fs.readFileSync(sourcePath);
 const j = JSON.parse(source.subarray(20, 20 + source.readUInt32LE(12)));
 const binStart = 20 + source.readUInt32LE(12) + 8;
 const bin = source.subarray(binStart);
+
+function smoothstep(edge0, edge1, x) {
+  const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
+  return t * t * (3 - 2 * t);
+}
 
 // Remove unused TEXCOORD_0 to reduce size
 for (const m of j.meshes) {
@@ -67,12 +75,11 @@ const wv = j.bufferViews[wa.bufferView];
 const jointNames = j.skins[0].joints.map((idx) => j.nodes[idx].name);
 
 const navy = new Color('#1d425c');
-const shorts = new Color('#2b6777');
-const brace = new Color('#32a6a4');
-const braceTrim = new Color('#bfe8e4');
-const skin = new Color('#dbb79e');
+const shorts = new Color('#285e6d');
+const skin = new Color('#ddb9a0');
 const hair = new Color('#352f2b');
 const shoe = new Color('#e4ecf0');
+const tempColor = new Color();
 
 for (let i = 0; i < pa.count; i++) {
   const o = pv.byteOffset + (pa.byteOffset || 0) + i * (pv.byteStride || 12);
@@ -99,32 +106,35 @@ for (let i = 0; i < pa.count; i++) {
     else if (/spine|clavicle|shoulder|breast|root/.test(jName)) torsoWeight += w;
   }
 
-  let c = skin;
+  tempColor.copy(skin);
 
-  if (forearmHandWeight > 0.35) {
-    c = skin;
-  } else if (upperArmWeight > 0.4) {
-    c = y > 1.27 ? navy : skin;
-  } else if (torsoWeight >= legPelvisWeight && y > 0.95 && y < 1.445) {
-    c = navy;
-  } else if (y > 0.63 && y <= 0.97 && Math.abs(x) < 0.26) {
-    c = shorts;
-  } else if (x < -0.02 && y >= 0.455 && y <= 0.555) {
-    // Operated right knee subtle rehabilitation band
-    c = y < 0.47 || y > 0.54 ? braceTrim : brace;
-  } else if (y < 0.095 && z > -0.08) {
-    // Clean light athletic socks/footwear for clear foot/heel visibility
-    c = shoe;
+  if (forearmHandWeight > 0.3) {
+    tempColor.copy(skin);
+  } else if (upperArmWeight > 0.35) {
+    const sleeveBlend = smoothstep(1.255, 1.29, y) * (1 - smoothstep(0.3, 0.6, forearmHandWeight));
+    tempColor.copy(skin).lerp(navy, sleeveBlend);
+  } else if (torsoWeight >= legPelvisWeight && y > 0.94 && y < 1.46) {
+    const collarBlend = 1 - smoothstep(1.425, 1.455, y);
+    const waistBlend = smoothstep(0.94, 0.975, y);
+    tempColor.copy(shorts).lerp(navy, waistBlend);
+    tempColor.lerp(skin, 1 - collarBlend);
+  } else if (y > 0.615 && y <= 0.975 && Math.abs(x) < 0.26) {
+    const hemBlend = smoothstep(0.615, 0.65, y);
+    tempColor.copy(skin).lerp(shorts, hemBlend);
+  } else if (y < 0.105 && z > -0.09) {
+    const sockBlend = 1 - smoothstep(0.08, 0.105, y);
+    tempColor.copy(skin).lerp(shoe, sockBlend);
   }
 
-  if (y > 1.645 && (z < 0.088 || y > 1.685)) {
-    c = hair;
+  if (y > 1.635 && (z < 0.088 || y > 1.68)) {
+    const hairBlend = smoothstep(1.635, 1.66, y);
+    tempColor.lerp(hair, hairBlend);
   }
 
   const co = cv.byteOffset + (ca.byteOffset || 0) + i * (cv.byteStride || (ca.type === 'VEC4' ? 16 : 12));
-  output.writeFloatLE(c.r, co);
-  output.writeFloatLE(c.g, co + 4);
-  output.writeFloatLE(c.b, co + 8);
+  output.writeFloatLE(tempColor.r, co);
+  output.writeFloatLE(tempColor.g, co + 4);
+  output.writeFloatLE(tempColor.b, co + 8);
   if (ca.type === 'VEC4') output.writeFloatLE(1, co + 12);
 }
 

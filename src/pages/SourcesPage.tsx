@@ -2,7 +2,6 @@ import React from 'react';
 import { BookOpen, ExternalLink, GraduationCap, ShieldCheck } from 'lucide-react';
 import { SCIENTIFIC_SOURCES_DATA, EDITORIAL_SCOPE_INFO } from '../data/sources';
 import { SectionHeader } from '../components/common/SectionHeader';
-import { SafetyNotice } from '../components/common/SafetyNotice';
 
 export const SourcesPage: React.FC = () => {
   return (
@@ -88,12 +87,6 @@ export const SourcesPage: React.FC = () => {
           {EDITORIAL_SCOPE_INFO.clinicalVsDesignNote}
         </p>
       </section>
-
-      <SafetyNotice
-        title="Alcance educativo"
-        message="Material educativo académico. No reemplaza la evaluación ni las indicaciones del equipo de salud."
-        variant="info"
-      />
     </div>
   );
 };

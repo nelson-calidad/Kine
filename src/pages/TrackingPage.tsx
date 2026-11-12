@@ -15,7 +15,6 @@ import {
 } from '../types/exercise';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { SectionHeader } from '../components/common/SectionHeader';
-import { SafetyNotice } from '../components/common/SafetyNotice';
 import { EmptyState } from '../components/common/EmptyState';
 
 const getTodayString = (): string => {
@@ -140,14 +139,6 @@ export const TrackingPage: React.FC = () => {
             </div>
           ) : undefined
         }
-      />
-
-      {/* Mensaje obligatorio */}
-      <SafetyNotice
-        title="Privacidad y alcance del registro"
-        message="No solicitamos tu nombre, DNI ni ningún dato personal, y tus anotaciones se guardan únicamente en este navegador."
-        variant="info"
-        showAlertsLink={true}
       />
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
