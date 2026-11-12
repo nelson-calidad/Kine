@@ -75,7 +75,7 @@ export const TrackingPage: React.FC = () => {
 
     const lines = [
       'MI SEGUIMIENTO DOMICILIARIO — TU RODILLA, PASO A PASO',
-      'Nota: Este registro es personal y no reemplaza la evaluación profesional.',
+      'Registro personal de seguimiento.',
       '========================================================================',
       ''
     ];
@@ -145,7 +145,7 @@ export const TrackingPage: React.FC = () => {
       {/* Mensaje obligatorio */}
       <SafetyNotice
         title="Privacidad y alcance del registro"
-        message="Este registro es personal y no reemplaza la evaluación profesional. No solicitamos tu nombre, DNI ni ningún dato personal, y tus anotaciones se guardan únicamente en este navegador."
+        message="No solicitamos tu nombre, DNI ni ningún dato personal, y tus anotaciones se guardan únicamente en este navegador."
         variant="info"
         showAlertsLink={true}
       />

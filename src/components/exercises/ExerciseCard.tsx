@@ -8,12 +8,10 @@ import {
   ShieldAlert,
   Wrench,
   UserCheck,
-  Stethoscope,
   ListOrdered,
   Maximize2
 } from 'lucide-react';
 import { Exercise } from '../../types/exercise';
-import { ExerciseImage } from '../common/ExerciseImage';
 import { ExerciseInstructions } from './ExerciseInstructions';
 import { ExerciseDemonstration } from './ExerciseDemonstration';
 
@@ -36,18 +34,7 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
   };
 
   return (
-    <article className="flex flex-col rounded-card-lg bg-white border border-slate-200/90 shadow-soft overflow-hidden transition-all duration-200 hover:shadow-soft-lg">
-      {/* 1. IMAGEN GRANDE DEL EJERCICIO */}
-      <div className="p-4 sm:p-5 pb-0">
-        <ExerciseImage
-          src={exercise.image}
-          alt={exercise.imageAlt}
-          title={exercise.title}
-          category={exercise.category}
-          className="h-56 sm:h-64 w-full"
-        />
-      </div>
-
+    <article className="exercise-card flex flex-col rounded-3xl bg-white shadow-soft overflow-hidden transition-shadow duration-200 hover:shadow-soft-lg">
       <div className="flex flex-1 flex-col p-5 sm:p-6">
         {/* 4. CATEGORÍA + Número de ejercicio */}
         <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
@@ -66,45 +53,15 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
           </Link>
         </h2>
 
+        <div className="my-5"><ExerciseDemonstration exercise={exercise} compact /></div>
+
         {/* 3. OBJETIVO EN UNA ORACIÓN */}
         <p className="mt-2 text-base text-brand-text leading-relaxed">
           {exercise.goal}
         </p>
 
-        {/* 5. POSICIÓN INICIAL y 6. MATERIAL NECESARIO */}
-        <div className="mt-4 grid grid-cols-1 gap-2.5 rounded-2xl bg-brand-bg border border-slate-200/75 p-4 text-sm">
-          <div className="flex items-start gap-2.5">
-            <UserCheck className="h-4 w-4 shrink-0 text-brand-teal mt-1" aria-hidden="true" />
-            <div>
-              <span className="font-bold text-brand-navy">Posición inicial: </span>
-              <span className="text-brand-text">{exercise.initialPosition}</span>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-2.5 border-t border-slate-200/60 pt-2.5">
-            <Wrench className="h-4 w-4 shrink-0 text-brand-teal mt-1" aria-hidden="true" />
-            <div>
-              <span className="font-bold text-brand-navy">Material necesario: </span>
-              <span className="text-brand-text">{exercise.equipment}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Condición especial si aplica (ej. Bicicleta estática) */}
-        {exercise.specialBadge && (
-          <div className="mt-3 rounded-xl bg-amber-50/90 border border-brand-warning/35 px-3.5 py-2.5 text-xs sm:text-sm font-bold text-brand-warning">
-            {exercise.specialBadge}
-          </div>
-        )}
-
-        {/* AVISO DE SEGURIDAD CLÍNICA OBLIGATORIO EN TODAS LAS TARJETAS */}
-        <div className="mt-3 flex items-center gap-2 rounded-xl bg-brand-soft/55 border border-brand-teal/30 px-3.5 py-2.5 text-xs sm:text-sm font-bold text-brand-navy">
-          <Stethoscope className="h-4 w-4 shrink-0 text-brand-teal" aria-hidden="true" />
-          <span>Realizá únicamente los ejercicios autorizados por tu kinesiólogo.</span>
-        </div>
-
         {/* 7. BOTÓN "Ver cómo hacerlo" */}
-        <div className="mt-5 pt-4 border-t border-slate-100 flex flex-wrap items-center gap-2.5">
+        <div className="mt-auto pt-5 flex flex-wrap items-center gap-2.5">
           <button
             type="button"
             onClick={() => setIsOpen((prev) => !prev)}
@@ -133,7 +90,33 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
         {isOpen && (
           <div className="mt-5 space-y-3 border-t border-slate-200/80 pt-5">
             {/* Componente de demostración Inicio -> Flecha -> Final */}
-            <ExerciseDemonstration exercise={exercise} />
+        {/* 5. POSICIÓN INICIAL y 6. MATERIAL NECESARIO */}
+        <div className="mt-4 grid grid-cols-1 gap-2.5 rounded-2xl bg-brand-bg border border-slate-200/75 p-4 text-sm">
+          <div className="flex items-start gap-2.5">
+            <UserCheck className="h-4 w-4 shrink-0 text-brand-teal mt-1" aria-hidden="true" />
+            <div>
+              <span className="font-bold text-brand-navy">Posición inicial: </span>
+              <span className="text-brand-text">{exercise.initialPosition}</span>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-2.5 border-t border-slate-200/60 pt-2.5">
+            <Wrench className="h-4 w-4 shrink-0 text-brand-teal mt-1" aria-hidden="true" />
+            <div>
+              <span className="font-bold text-brand-navy">Material necesario: </span>
+              <span className="text-brand-text">{exercise.equipment}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Condición especial si aplica (ej. Bicicleta estática) */}
+        {exercise.specialBadge && (
+          <div className="mt-3 rounded-xl bg-amber-50/90 border border-brand-warning/35 px-3.5 py-2.5 text-xs sm:text-sm font-bold text-brand-warning">
+            {exercise.specialBadge}
+          </div>
+        )}
+
+
 
             {/* Acordeón 1: Instrucciones paso a paso */}
             <div className="rounded-2xl border border-slate-200/90 bg-white overflow-hidden">
@@ -235,6 +218,8 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
                 </div>
               )}
             </div>
+
+            <p className="text-sm text-brand-muted"><strong>Detener el ejercicio:</strong> {exercise.stopConditions.join(" ")}</p>
 
             {/* Indicaciones del profesional si existen (desplegable) */}
             <ExerciseInstructions exerciseId={exercise.id} exerciseTitle={exercise.title} />

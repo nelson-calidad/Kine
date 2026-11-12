@@ -3,7 +3,6 @@ import { Printer } from 'lucide-react';
 import { EXERCISES_DATA } from '../data/exercises';
 import { ExerciseFilterCategory } from '../types/exercise';
 import { SectionHeader } from '../components/common/SectionHeader';
-import { SafetyNotice } from '../components/common/SafetyNotice';
 import { ExerciseFilters } from '../components/exercises/ExerciseFilters';
 import { ExerciseCard } from '../components/exercises/ExerciseCard';
 import { EmptyState } from '../components/common/EmptyState';
@@ -44,13 +43,6 @@ export const ExercisesPage: React.FC = () => {
             <span>Imprimir cartilla</span>
           </button>
         }
-      />
-
-      <SafetyNotice
-        title="Realizá únicamente los ejercicios autorizados por tu kinesiólogo"
-        message="No todos los ejercicios se indican en el mismo momento ni deben realizarse juntos en una misma sesión. Ante dolor intenso, bloqueo, aumento importante de derrame o síntomas nuevos, detené el ejercicio y consultá. Las restricciones del cirujano prevalecen sobre cualquier orientación general."
-        variant="info"
-        className="mb-6"
       />
 
       <ExerciseFilters

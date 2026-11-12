@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'prompt',
-      includeAssets: ['favicon.svg', 'icons/icon-192.svg', 'icons/icon-512.svg'],
+      includeAssets: ['favicon.svg', 'icons/icon-192.svg', 'icons/icon-512.svg', 'models/rehab-human.glb'],
       manifest: {
         name: 'Tu rodilla, paso a paso - Guía posoperatoria LCA (HTH)',
         short_name: 'Tu Rodilla LCA',
@@ -34,7 +34,8 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,webp,woff2}']
+        maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
+        globPatterns: ['**/*.{js,css,html,svg,png,webp,woff2,glb}']
       }
     })
   ],

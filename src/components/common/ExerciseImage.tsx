@@ -35,14 +35,14 @@ export const ExerciseImage: React.FC<ExerciseImageProps> = ({
         )}
         <p className="text-base font-bold text-brand-navy">{title}</p>
         <p className="mt-1 text-xs text-brand-muted">
-          Espacio preparado para ilustración clínica verificada ({src || '/public/exercises/'})
+          Ilustración no disponible
         </p>
       </div>
     );
   }
 
   return (
-    <div className={`overflow-hidden rounded-2xl bg-brand-bg border border-slate-200/70 ${className}`}>
+    <div className={`overflow-hidden rounded-2xl bg-transparent ${className}`}>
       <img
         src={src}
         alt={alt}

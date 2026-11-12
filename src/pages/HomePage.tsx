@@ -1,293 +1,229 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Dumbbell,
   HeartHandshake,
   Ban,
-  Footprints,
+  ClipboardList,
   AlertTriangle,
   HelpCircle,
-  ArrowRight,
-  Move,
-  ThermometerSnowflake,
-  Zap,
-  ShieldCheck,
+  Footprints,
   Stethoscope,
-  ClipboardList,
-  BookOpen
+  BookOpen,
+  Printer,
+  ChevronRight
 } from 'lucide-react';
-import { SafetyNotice } from '../components/common/SafetyNotice';
+import { EXERCISES_DATA } from '../data/exercises';
+import { ExerciseFilterCategory } from '../types/exercise';
+import { ExerciseFilters } from '../components/exercises/ExerciseFilters';
+import { ExerciseCard } from '../components/exercises/ExerciseCard';
 
-const MAIN_CONSULTATION_CARDS = [
-  {
-    to: '/ejercicios',
-    title: 'Mis ejercicios',
-    description: 'Movilidad inicial, asistida, progresión autorizada y ejercicios complementarios.',
-    icon: Dumbbell,
-    accent: 'bg-brand-soft text-brand-navy'
-  },
+const SECONDARY_SHORTCUTS = [
   {
     to: '/cuidados',
     title: 'Cuidados en casa',
-    description: 'Cuidado de la herida, manejo de hinchazón, posicionamiento, muletas y descanso.',
+    summary: 'Herida, hielo, elevación y muletas',
     icon: HeartHandshake,
-    accent: 'bg-brand-soft text-brand-navy'
+    danger: false
   },
   {
     to: '/que-evitar',
     title: 'Qué evitar',
-    description: 'Los NO en casa durante tu recuperación y por qué es importante respetarlos.',
+    summary: 'Los NO durante tu recuperación',
     icon: Ban,
-    accent: 'bg-amber-100/80 text-brand-warning'
+    danger: false
   },
   {
-    to: '/actividades',
-    title: 'Caminar y descansar',
-    description: 'Cómo levantarte de la cama, sentarte, usar muletas, escaleras, dormir y bañarte.',
-    icon: Footprints,
-    accent: 'bg-brand-soft text-brand-navy'
+    to: '/seguimiento',
+    title: 'Seguimiento',
+    summary: 'Registro diario en tu dispositivo',
+    icon: ClipboardList,
+    danger: false
   },
   {
     to: '/alertas',
-    title: 'Señales de alarma',
-    description: 'Pautas claras para diferenciar cuándo realizar una consulta médica urgente o de emergencia.',
+    title: 'Alertas',
+    summary: 'Señales para consulta urgente',
     icon: AlertTriangle,
-    accent: 'bg-rose-100 text-brand-danger',
-    isDanger: true
+    danger: true
   },
   {
     to: '/preguntas',
-    title: 'Mis preguntas',
-    description: 'Respuestas claras y breves a las dudas más frecuentes en el posoperatorio.',
+    title: 'Preguntas frecuentes',
+    summary: 'Dudas habituales del posoperatorio',
     icon: HelpCircle,
-    accent: 'bg-brand-soft text-brand-navy'
+    danger: false
   }
 ];
 
-const STAGE_GOALS = [
+const COMPLEMENTARY_LINKS = [
   {
-    title: 'Recuperar movilidad',
-    description: 'Mejorar gradualmente la flexión y la extensión dentro del rango autorizado.',
-    icon: Move
+    to: '/actividades',
+    label: 'Caminar y actividades cotidianas',
+    icon: Footprints
   },
   {
-    title: 'Controlar la hinchazón',
-    description: 'Acompañar el reposo, la elevación y las pautas indicadas para desinflamar.',
-    icon: ThermometerSnowflake
+    to: '/mi-cirugia',
+    label: 'Conocé tu cirugía (Injerto HTH)',
+    icon: Stethoscope
   },
   {
-    title: 'Activar los músculos',
-    description: 'Despertar suavemente el cuádriceps y movilizar el tobillo sin sobrecargar.',
-    icon: Zap
-  },
-  {
-    title: 'Caminar con seguridad',
-    description: 'Desplazarte con muletas y rodillera respetando el apoyo prescripto.',
-    icon: ShieldCheck
+    to: '/fuentes',
+    label: 'Fuentes y respaldo científico',
+    icon: BookOpen
   }
 ];
 
 export const HomePage: React.FC = () => {
+  const [selectedCategory, setSelectedCategory] = useState<ExerciseFilterCategory>('todos');
+
+  const counts = useMemo(
+    () => ({
+      todos: EXERCISES_DATA.length,
+      'movilidad-inicial': EXERCISES_DATA.filter((e) => e.filterCategory === 'movilidad-inicial')
+        .length,
+      'movilidad-asistida': EXERCISES_DATA.filter((e) => e.filterCategory === 'movilidad-asistida')
+        .length,
+      'movilidad-activa': EXERCISES_DATA.filter((e) => e.filterCategory === 'movilidad-activa')
+        .length,
+      'progresion-autorizada': EXERCISES_DATA.filter(
+        (e) => e.filterCategory === 'progresion-autorizada'
+      ).length
+    }),
+    []
+  );
+
+  const filteredExercises = useMemo(() => {
+    if (selectedCategory === 'todos') return EXERCISES_DATA;
+    return EXERCISES_DATA.filter((exercise) => exercise.filterCategory === selectedCategory);
+  }, [selectedCategory]);
+
   return (
-    <div className="space-y-10 sm:space-y-12">
-      {/* 1. HERO VISUAL DE ALTA CALIDAD */}
-      <section className="rounded-card-lg bg-brand-navy text-white p-6 sm:p-10 shadow-soft-lg overflow-hidden">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-center">
-          <div className="lg:col-span-7 space-y-4">
-            <span className="inline-block rounded-full bg-brand-teal/25 border border-brand-soft/30 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-brand-soft">
-              Guía de recuperación en casa · LCA (HTH)
-            </span>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
-              Tu rodilla, paso a paso
+    <div className="space-y-12">
+      {/* 1. CABECERA MINIMALISTA PROTAGONISTA: MIS EJERCICIOS */}
+      <section aria-labelledby="home-exercises-heading">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1
+              id="home-exercises-heading"
+              className="text-3xl sm:text-4xl font-extrabold tracking-tight text-brand-navy"
+            >
+              Mis ejercicios
             </h1>
-            <p className="text-base sm:text-lg text-brand-soft/95 leading-relaxed max-w-2xl">
-              Aprendé a cuidar tu rodilla y conocé los ejercicios que pueden formar parte de tu recuperación.
+            <p className="mt-1.5 text-base sm:text-lg text-brand-muted">
+              Recuperá tu movilidad, paso a paso
             </p>
-            <p className="text-xs sm:text-sm text-brand-soft/80">
-              Guía de recuperación en casa después de una reconstrucción del ligamento cruzado anterior (LCA).
-            </p>
-
-            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <Link
-                to="/ejercicios"
-                className="inline-flex min-h-[50px] items-center justify-center gap-2 rounded-2xl bg-brand-teal px-6 py-3.5 text-base font-bold text-white shadow-sm hover:bg-brand-teal/90 transition-colors"
-              >
-                <span>Explorar mis ejercicios</span>
-                <ArrowRight className="h-5 w-5" aria-hidden="true" />
-              </Link>
-              <Link
-                to="/cuidados"
-                className="inline-flex min-h-[50px] items-center justify-center gap-2 rounded-2xl bg-white/10 border border-brand-soft/35 px-6 py-3.5 text-base font-bold text-white hover:bg-white/20 transition-colors"
-              >
-                <span>Cuidados en casa</span>
-              </Link>
-            </div>
           </div>
 
-          <div className="lg:col-span-5">
-            <div className="rounded-2xl bg-white p-3 shadow-soft">
-              <img
-                src="/images/hero-rodilla.svg"
-                alt="Ilustración educativa de la articulación de la rodilla mostrando movilidad gradual y controlada"
-                className="w-full h-auto rounded-xl"
+          <div className="flex items-center gap-2 no-print">
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="inline-flex min-h-[42px] items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs sm:text-sm font-semibold text-brand-navy shadow-sm hover:bg-brand-soft/40 transition-colors"
+            >
+              <Printer className="h-4 w-4" aria-hidden="true" />
+              <span>Imprimir cartilla</span>
+            </button>
+          </div>
+        </div>
+
+        <ExerciseFilters
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+          counts={counts}
+        />
+
+        {/* Cinco ejercicios principales con demostración 3D articulada */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {filteredExercises.map((exercise) => {
+            const globalIndex = EXERCISES_DATA.findIndex((item) => item.id === exercise.id);
+            const nextExercise = EXERCISES_DATA[(globalIndex + 1) % EXERCISES_DATA.length];
+
+            return (
+              <ExerciseCard
+                key={exercise.id}
+                exercise={exercise}
+                indexNumber={globalIndex + 1}
+                nextExerciseId={nextExercise?.id}
               />
-            </div>
-          </div>
+            );
+          })}
         </div>
       </section>
 
-      {/* 2. TARJETA INFORMATIVA DE SEGURIDAD CLÍNICA */}
-      <SafetyNotice
-        title="Información importante antes de comenzar"
-        message="Cada recuperación es diferente. Esta guía es educativa y no reemplaza las indicaciones de tu traumatólogo y kinesiólogo. Realizá solamente los ejercicios que te hayan autorizado."
-        variant="info"
-      />
-
-      {/* 3. BLOQUE: ¿QUÉ QUERÉS CONSULTAR HOY? (6 TARJETAS PRINCIPALES) */}
-      <section aria-labelledby="heading-consultar-hoy">
-        <div className="mb-5">
-          <h2 id="heading-consultar-hoy" className="text-2xl sm:text-3xl font-extrabold text-brand-navy">
-            ¿Qué querés consultar hoy?
+      {/* 2. CONTENIDO SECUNDARIO COMPACTO */}
+      <section
+        aria-labelledby="secondary-resources-heading"
+        className="pt-4 border-t border-slate-200/80 no-print"
+      >
+        <div className="mb-4 flex items-center justify-between">
+          <h2
+            id="secondary-resources-heading"
+            className="text-base sm:text-lg font-extrabold text-brand-navy"
+          >
+            Guía de acompañamiento y consulta rápida
           </h2>
-          <p className="mt-1 text-sm sm:text-base text-brand-muted">
-            Elegí un apartado para acceder rápidamente a la información clara y ordenada.
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {MAIN_CONSULTATION_CARDS.map((card) => {
-            const Icon = card.icon;
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          {SECONDARY_SHORTCUTS.map((item) => {
+            const Icon = item.icon;
             return (
               <Link
-                key={card.to}
-                to={card.to}
-                className={`group flex flex-col justify-between rounded-card border p-5 sm:p-6 shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-soft-lg ${
-                  card.isDanger
-                    ? 'bg-rose-50/70 border-brand-danger/30 hover:border-brand-danger'
+                key={item.to}
+                to={item.to}
+                className={`group flex items-center justify-between gap-3 rounded-2xl border p-3.5 shadow-sm transition-all hover:-translate-y-0.5 ${
+                  item.danger
+                    ? 'bg-rose-50/70 dark:bg-rose-950/30 border-brand-danger/30 hover:border-brand-danger'
                     : 'bg-white border-slate-200/85 hover:border-brand-teal/50'
                 }`}
               >
-                <div>
-                  <div className="flex items-center justify-between gap-3 mb-4">
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${card.accent}`}>
-                      <Icon className="h-6 w-6" aria-hidden="true" />
-                    </div>
-                    <ArrowRight
-                      className={`h-5 w-5 transition-transform group-hover:translate-x-1 ${
-                        card.isDanger ? 'text-brand-danger' : 'text-brand-teal'
-                      }`}
-                      aria-hidden="true"
-                    />
-                  </div>
-                  <h3
-                    className={`text-lg font-extrabold ${
-                      card.isDanger ? 'text-brand-danger' : 'text-brand-navy'
+                <div className="flex items-center gap-3 min-w-0">
+                  <div
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                      item.danger
+                        ? 'bg-rose-100 dark:bg-rose-900/50 text-brand-danger'
+                        : 'bg-brand-soft text-brand-navy'
                     }`}
                   >
-                    {card.title}
-                  </h3>
-                  <p className="mt-1.5 text-sm text-brand-muted leading-relaxed">
-                    {card.description}
-                  </p>
+                    <Icon className="h-4 w-4" aria-hidden="true" />
+                  </div>
+                  <div className="min-w-0">
+                    <h3
+                      className={`text-sm font-extrabold truncate ${
+                        item.danger ? 'text-brand-danger' : 'text-brand-navy'
+                      }`}
+                    >
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-brand-muted truncate">{item.summary}</p>
+                  </div>
                 </div>
+                <ChevronRight
+                  className={`h-4 w-4 shrink-0 transition-transform group-hover:translate-x-0.5 ${
+                    item.danger ? 'text-brand-danger' : 'text-brand-muted'
+                  }`}
+                  aria-hidden="true"
+                />
               </Link>
             );
           })}
         </div>
-      </section>
 
-      {/* 4. SEGUNDA SECCIÓN: OBJETIVOS DE ESTA ETAPA */}
-      <section
-        aria-labelledby="heading-objetivos-etapa"
-        className="rounded-card-lg bg-white border border-slate-200/85 p-6 sm:p-8 shadow-soft"
-      >
-        <div className="mb-6">
-          <span className="inline-block mb-1.5 rounded-full bg-brand-soft px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-navy">
-            Posoperatorio temprano
-          </span>
-          <h2 id="heading-objetivos-etapa" className="text-2xl sm:text-3xl font-extrabold text-brand-navy">
-            Objetivos de esta etapa
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {STAGE_GOALS.map((goal) => {
-            const Icon = goal.icon;
+        {/* Enlaces complementarios discretos */}
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          {COMPLEMENTARY_LINKS.map((link) => {
+            const Icon = link.icon;
             return (
-              <div
-                key={goal.title}
-                className="rounded-2xl bg-brand-bg border border-slate-200/75 p-4 sm:p-5 flex flex-col"
+              <Link
+                key={link.to}
+                to={link.to}
+                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/80 bg-white px-3.5 py-1.5 text-xs font-semibold text-brand-muted hover:text-brand-navy hover:border-brand-teal/40 transition-colors"
               >
-                <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-brand-soft text-brand-navy">
-                  <Icon className="h-5 w-5" aria-hidden="true" />
-                </div>
-                <h3 className="text-base font-extrabold text-brand-navy">{goal.title}</h3>
-                <p className="mt-1.5 text-xs sm:text-sm text-brand-muted leading-relaxed">
-                  {goal.description}
-                </p>
-              </div>
+                <Icon className="h-3.5 w-3.5 text-brand-teal" aria-hidden="true" />
+                <span>{link.label}</span>
+              </Link>
             );
           })}
-        </div>
-
-        {/* Bloque explicativo destacado */}
-        <div className="mt-6 rounded-2xl bg-brand-soft/65 border border-brand-teal/35 p-4 sm:p-5">
-          <p className="text-sm sm:text-base font-bold text-brand-navy leading-relaxed">
-            &ldquo;Lo importante no es doblar la rodilla a la fuerza. El objetivo es mejorar el movimiento de forma gradual y segura&rdquo;.
-          </p>
-        </div>
-      </section>
-
-      {/* 5. ACCESOS COMPLEMENTARIOS DESDE EL INICIO (Cirugía HTH, Seguimiento voluntario y Fuentes) */}
-      <section aria-labelledby="heading-mas-recursos">
-        <h2 id="heading-mas-recursos" className="text-xl sm:text-2xl font-extrabold text-brand-navy mb-4">
-          Más herramientas para tu recuperación
-        </h2>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <Link
-            to="/mi-cirugia"
-            className="flex items-start gap-4 rounded-card bg-white border border-slate-200/85 p-5 shadow-soft hover:border-brand-teal/50 transition-all"
-          >
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand-navy">
-              <Stethoscope className="h-5 w-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h3 className="font-extrabold text-brand-navy">Conocé tu cirugía (HTH)</h3>
-              <p className="mt-1 text-xs sm:text-sm text-brand-muted leading-relaxed">
-                Explicación sencilla de qué es el autoinjerto hueso–tendón–hueso rotuliano.
-              </p>
-            </div>
-          </Link>
-
-          <Link
-            to="/seguimiento"
-            className="flex items-start gap-4 rounded-card bg-white border border-slate-200/85 p-5 shadow-soft hover:border-brand-teal/50 transition-all"
-          >
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand-navy">
-              <ClipboardList className="h-5 w-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h3 className="font-extrabold text-brand-navy">Mi seguimiento voluntario</h3>
-              <p className="mt-1 text-xs sm:text-sm text-brand-muted leading-relaxed">
-                Anotá en tu dispositivo cómo sentís la rodilla para conversarlo en la consulta.
-              </p>
-            </div>
-          </Link>
-
-          <Link
-            to="/fuentes"
-            className="flex items-start gap-4 rounded-card bg-white border border-slate-200/85 p-5 shadow-soft hover:border-brand-teal/50 transition-all"
-          >
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand-navy">
-              <BookOpen className="h-5 w-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h3 className="font-extrabold text-brand-navy">Fuentes y respaldo científico</h3>
-              <p className="mt-1 text-xs sm:text-sm text-brand-muted leading-relaxed">
-                Bibliografía clínica verificada y alcance académico de esta guía.
-              </p>
-            </div>
-          </Link>
         </div>
       </section>
     </div>

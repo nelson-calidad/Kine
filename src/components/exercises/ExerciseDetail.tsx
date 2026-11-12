@@ -11,17 +11,14 @@ import {
   Wrench,
   UserCheck,
   Check,
-  Stethoscope,
   ChevronDown,
   ChevronUp,
   ListOrdered,
   ShieldAlert
 } from 'lucide-react';
 import { Exercise } from '../../types/exercise';
-import { ExerciseImage } from '../common/ExerciseImage';
 import { ExerciseInstructions } from './ExerciseInstructions';
 import { ExerciseDemonstration } from './ExerciseDemonstration';
-import { SafetyNotice } from '../common/SafetyNotice';
 
 interface ExerciseDetailProps {
   exercise: Exercise;
@@ -145,10 +142,7 @@ export const ExerciseDetail: React.FC<ExerciseDetailProps> = ({
           <span className="rounded-full bg-brand-soft px-3.5 py-1 text-xs sm:text-sm font-bold text-brand-navy">
             {exercise.category}
           </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-soft/60 border border-brand-teal/35 px-3 py-1 text-xs sm:text-sm font-bold text-brand-navy">
-            <Stethoscope className="h-4 w-4 text-brand-teal" aria-hidden="true" />
-            Realizá únicamente los ejercicios autorizados por tu kinesiólogo
-          </span>
+
         </div>
 
         {/* Título y Objetivo */}
@@ -164,20 +158,6 @@ export const ExerciseDetail: React.FC<ExerciseDetailProps> = ({
             Condición: {exercise.specialBadge}
           </div>
         )}
-
-        {/* Imagen principal grande */}
-        <div className="my-6">
-          <ExerciseImage
-            src={exercise.image}
-            alt={exercise.imageAlt}
-            title={exercise.title}
-            category={exercise.category}
-            className="h-64 sm:h-80 md:h-96 w-full"
-          />
-          <p className="mt-2 text-xs text-brand-muted text-center">
-            {exercise.imageAlt}
-          </p>
-        </div>
 
         {/* COMPONENTE DE DEMOSTRACIÓN (Inicio -> Flecha de movimiento -> Final + Botón "Ver video" si existe archivo real) */}
         <div className="mb-6">
@@ -327,13 +307,6 @@ export const ExerciseDetail: React.FC<ExerciseDetailProps> = ({
             defaultOpen={false}
           />
         </section>
-
-        <SafetyNotice
-          title="Seguridad clínica en tu recuperación"
-          message="Ante dolor intenso, bloqueo, aumento importante de derrame o síntomas nuevos, detené el ejercicio y consultá. Las restricciones del cirujano prevalecen sobre cualquier orientación general."
-          variant="info"
-          showAlertsLink={true}
-        />
 
         {/* Navegación Anterior / Siguiente */}
         <nav

@@ -6,21 +6,6 @@ export const Footer: React.FC = () => {
   return (
     <footer className="mt-16 border-t border-slate-200/80 bg-white pb-24 lg:pb-12 pt-10 text-brand-text">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        {/* Mensaje obligatorio de responsabilidad académica y clínica */}
-        <div className="rounded-card bg-brand-bg border border-slate-200/90 p-5 sm:p-6 mb-8">
-          <p className="text-sm sm:text-base font-bold text-brand-navy">
-            Material educativo académico. No reemplaza la evaluación ni las indicaciones del equipo de salud.
-          </p>
-          <p className="mt-1.5 text-xs sm:text-sm text-brand-muted leading-relaxed">
-            Recurso educativo domiciliario vinculado a cátedra de Kinefisiatría Traumatológica y Reumatológica:
-            <em>
-              {' '}
-              &ldquo;Recuperación de la flexión de rodilla durante el postoperatorio temprano de reconstrucción del LCA mediante autoinjerto hueso–tendón–hueso (HTH) rotuliano&rdquo;
-            </em>
-            . Cada paciente puede tener restricciones particulares según el procedimiento quirúrgico, las lesiones asociadas (como reparaciones meniscales) y el criterio del traumatólogo y kinesiólogo tratante.
-          </p>
-        </div>
-
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 text-sm">
           <div>
             <h2 className="font-bold text-brand-navy mb-2.5">Tu rodilla, paso a paso</h2>
