@@ -72,7 +72,6 @@ export const ExerciseDemonstration: React.FC<{
     return () => query.removeEventListener('change', sync);
   }, []);
 
-  // Pause offscreen viewers and lazy-mount 3D canvas when approaching viewport
   useEffect(() => {
     const node = stageRef.current;
     if (!node || typeof IntersectionObserver === 'undefined') {
@@ -99,7 +98,6 @@ export const ExerciseDemonstration: React.FC<{
     return () => observer.disconnect();
   }, []);
 
-  // Ensure only one exercise viewer plays continuously at a time
   useEffect(() => {
     const handleOtherPlay = (event: Event) => {
       const custom = event as CustomEvent<string>;
@@ -111,7 +109,6 @@ export const ExerciseDemonstration: React.FC<{
     return () => window.removeEventListener(ACTIVE_PLAY_EVENT, handleOtherPlay);
   }, [exercise.id]);
 
-  // Fallback 2D interval when in 2D mode
   useEffect(() => {
     if (!playing || reduced || (webglSupported && use3D)) return;
     const intervalMs = slowMode ? 3800 : 2400;
@@ -192,18 +189,18 @@ export const ExerciseDemonstration: React.FC<{
           </div>
         )}
 
-        {/* Top-left subtle status badge & 3D/2D toggle */}
-        <div className="pointer-events-none absolute left-3 right-3 top-3 flex items-center justify-between gap-2 no-print">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/85 dark:bg-slate-900/80 backdrop-blur-sm px-2.5 py-1 text-[11px] font-bold text-brand-navy dark:text-slate-100 shadow-sm">
+        {/* Subtle top status pill & 3D/2D switch */}
+        <div className="pointer-events-none absolute left-2.5 right-2.5 top-2.5 flex items-center justify-between gap-2 no-print">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 dark:bg-slate-900/75 backdrop-blur-md px-2.5 py-0.5 text-[11px] font-semibold text-brand-navy dark:text-slate-100 border border-slate-200/50 dark:border-slate-700/50">
             <span
-              className={`h-2 w-2 rounded-full ${
-                playing ? 'bg-brand-teal animate-pulse' : 'bg-brand-navy/60 dark:bg-slate-400'
+              className={`h-1.5 w-1.5 rounded-full ${
+                playing ? 'bg-brand-teal animate-pulse' : 'bg-brand-navy/50 dark:bg-slate-400'
               }`}
             />
             {playing
               ? slowMode
-                ? 'Movimiento 3D · Lento'
-                : 'Movimiento 3D activo'
+                ? 'En movimiento · 0.5x'
+                : 'En movimiento'
               : finalPose
               ? 'Posición final'
               : 'Posición inicial'}
@@ -214,28 +211,28 @@ export const ExerciseDemonstration: React.FC<{
               type="button"
               onClick={() => setUse3D((v) => !v)}
               aria-pressed={use3D}
-              title={use3D ? 'Cambiar a vista ilustrada 2D' : 'Cambiar a modelo humano 3D'}
-              className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-white/85 dark:bg-slate-900/80 backdrop-blur-sm px-2.5 py-1 text-[11px] font-bold text-brand-navy dark:text-slate-100 shadow-sm hover:bg-white transition-colors"
+              title={use3D ? 'Ver esquema 2D' : 'Ver demostración 3D'}
+              className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-white/80 dark:bg-slate-900/75 backdrop-blur-md px-2.5 py-0.5 text-[11px] font-bold text-brand-navy dark:text-slate-100 border border-slate-200/50 dark:border-slate-700/50 hover:bg-white transition-colors"
             >
-              {use3D ? <Box size={13} /> : <ImageIcon size={13} />}
+              {use3D ? <Box size={12} /> : <ImageIcon size={12} />}
               <span>{use3D ? '3D' : '2D'}</span>
             </button>
           )}
         </div>
       </div>
 
-      {/* Control bar: Inicio / Final, Repetición lenta, Reiniciar, Reproducir / Pausar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 sm:px-4 pb-3.5 pt-2 no-print">
-        <div className="flex items-center gap-1 rounded-full bg-white/85 dark:bg-slate-800/90 p-1 shadow-sm">
+      {/* Unified docked control bar */}
+      <div className="flex items-center justify-between gap-1.5 border-t border-slate-200/55 dark:border-slate-800/80 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md px-2.5 py-2 sm:px-3.5 no-print">
+        <div className="inline-flex items-center rounded-full bg-slate-100/90 dark:bg-slate-800 p-0.5">
           {[false, true].map((value) => (
             <button
               key={String(value)}
               type="button"
               aria-pressed={!playing && finalPose === value}
               onClick={() => selectPose(value)}
-              className={`min-h-[38px] rounded-full px-3.5 text-xs font-bold transition-colors ${
+              className={`min-h-[30px] rounded-full px-2.5 sm:px-3 text-[11px] sm:text-xs font-bold transition-all ${
                 !playing && finalPose === value
-                  ? 'bg-brand-navy text-white'
+                  ? 'bg-brand-navy text-white shadow-sm'
                   : 'text-brand-muted hover:text-brand-navy dark:text-slate-300'
               }`}
             >
@@ -244,7 +241,7 @@ export const ExerciseDemonstration: React.FC<{
           ))}
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
           {!reduced && (
             <button
               type="button"
@@ -253,16 +250,16 @@ export const ExerciseDemonstration: React.FC<{
                 if (!playing) startPlayback();
               }}
               aria-pressed={slowMode}
-              aria-label={slowMode ? 'Velocidad normal' : 'Repetición lenta del movimiento'}
+              aria-label={slowMode ? 'Velocidad normal' : 'Repetición lenta'}
               title={slowMode ? 'Volver a velocidad normal' : 'Repetición lenta (0.5x)'}
-              className={`inline-flex min-h-[38px] items-center gap-1 rounded-full px-3 text-xs font-bold transition-colors shadow-sm ${
+              className={`inline-flex min-h-[32px] items-center gap-1 rounded-full px-2.5 text-[11px] sm:text-xs font-semibold transition-colors ${
                 slowMode
                   ? 'bg-brand-teal text-white'
-                  : 'bg-white/90 dark:bg-slate-800/90 text-brand-navy dark:text-slate-200 hover:bg-white'
+                  : 'bg-slate-100/90 dark:bg-slate-800 text-brand-navy dark:text-slate-200 hover:bg-slate-200/70'
               }`}
             >
-              <Gauge size={14} aria-hidden="true" />
-              <span>Lenta</span>
+              <Gauge size={13} aria-hidden="true" />
+              <span>0.5x</span>
             </button>
           )}
 
@@ -270,10 +267,10 @@ export const ExerciseDemonstration: React.FC<{
             type="button"
             onClick={handleRestart}
             aria-label="Reiniciar movimiento"
-            title="Reiniciar desde posición inicial"
-            className="inline-flex h-[38px] w-[38px] items-center justify-center rounded-full bg-white/90 dark:bg-slate-800/90 text-brand-navy dark:text-slate-200 shadow-sm hover:bg-white transition-colors"
+            title="Reiniciar desde el inicio"
+            className="inline-flex h-[32px] w-[32px] items-center justify-center rounded-full bg-slate-100/90 dark:bg-slate-800 text-brand-navy dark:text-slate-200 hover:bg-slate-200/70 transition-colors"
           >
-            <RotateCcw size={16} />
+            <RotateCcw size={14} />
           </button>
 
           {!reduced && (
@@ -283,28 +280,19 @@ export const ExerciseDemonstration: React.FC<{
               title={playing ? 'Pausar demostración' : 'Reproducir demostración'}
               aria-pressed={playing}
               onClick={togglePlayback}
-              className="inline-flex min-h-[38px] items-center gap-1.5 rounded-full bg-brand-navy px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-brand-navy/90 transition-colors"
+              className="inline-flex min-h-[32px] items-center gap-1.5 rounded-full bg-brand-navy px-3 py-1.5 text-[11px] sm:text-xs font-bold text-white shadow-sm hover:bg-brand-navy/90 transition-colors"
             >
-              {playing ? <Pause size={15} /> : <Play size={15} />}
-              <span>{playing ? 'Pausar' : 'Reproducir'}</span>
+              {playing ? <Pause size={13} /> : <Play size={13} />}
+              <span>{playing ? 'Pausar' : 'Animar'}</span>
             </button>
           )}
         </div>
       </div>
 
       {!compact && (
-        <p className="border-t border-white/70 dark:border-slate-700/60 px-5 py-3.5 text-sm text-brand-text dark:text-slate-200">
+        <p className="border-t border-slate-200/60 dark:border-slate-800 px-4 py-3 text-xs sm:text-sm text-brand-text dark:text-slate-200 bg-white/60 dark:bg-slate-900/50">
           {exercise.movementCue}
         </p>
-      )}
-      {!compact && exercise.video && (
-        <video
-          className="w-full rounded-xl"
-          controls
-          playsInline
-          preload="metadata"
-          src={exercise.video}
-        />
       )}
     </div>
   );

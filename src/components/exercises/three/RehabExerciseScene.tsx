@@ -79,29 +79,29 @@ const CAMERA_CONFIG: Record<
   { position: [number, number, number]; target: [number, number, number]; fov: number }
 > = {
   'deslizamiento-del-talon': {
-    position: [0.06, 0.56, 1.62],
-    target: [0.08, 0.16, 0.04],
-    fov: 35
+    position: [0.05, 0.42, 1.48],
+    target: [0.06, 0.17, 0.04],
+    fov: 32
   },
   'flexion-asistida-con-toalla': {
-    position: [0.06, 0.58, 1.64],
-    target: [0.06, 0.18, 0.04],
-    fov: 35
+    position: [0.05, 0.45, 1.5],
+    target: [0.05, 0.19, 0.04],
+    fov: 32
   },
   'deslizamiento-del-pie-en-pared': {
-    position: [0.02, 0.64, 1.68],
-    target: [0.04, 0.25, 0.04],
-    fov: 36
+    position: [0.0, 0.52, 1.56],
+    target: [0.03, 0.3, 0.04],
+    fov: 34
   },
   'flexion-activa-en-sedestacion': {
-    position: [0.42, 0.68, 1.58],
-    target: [0.04, 0.44, 0.02],
-    fov: 36
+    position: [0.36, 0.74, 1.86],
+    target: [0.04, 0.61, 0.02],
+    fov: 37
   },
   'bicicleta-estatica-sin-resistencia': {
-    position: [0.36, 0.78, 1.72],
-    target: [0.04, 0.54, 0.0],
-    fov: 37
+    position: [0.38, 0.84, 2.06],
+    target: [0.06, 0.71, 0.0],
+    fov: 38
   }
 };
 

@@ -31,15 +31,15 @@ export const ExercisesPage: React.FC = () => {
     <div>
       <SectionHeader
         badge="Recuperación de la flexión · LCA (HTH)"
-        title="Mis ejercicios domiciliarios"
-        subtitle="Conocé los cinco ejercicios de movilidad de rodilla que pueden formar parte de tu recuperación domiciliaria."
+        title="Mis ejercicios"
+        subtitle="Recuperá tu movilidad, paso a paso."
         rightSlot={
           <button
             type="button"
             onClick={() => window.print()}
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs sm:text-sm font-semibold text-brand-navy shadow-sm hover:bg-brand-soft/40 transition-colors"
+            className="inline-flex min-h-[38px] items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-brand-navy shadow-sm hover:bg-brand-soft/40 transition-colors"
           >
-            <Printer className="h-4 w-4" aria-hidden="true" />
+            <Printer className="h-3.5 w-3.5 text-brand-teal" aria-hidden="true" />
             <span>Imprimir cartilla</span>
           </button>
         }
@@ -59,11 +59,15 @@ export const ExercisesPage: React.FC = () => {
           onAction={() => setSelectedCategory('todos')}
         />
       ) : (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {filteredExercises.map((exercise) => {
+        <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-2">
+          {filteredExercises.map((exercise, idx) => {
             const globalIndex = EXERCISES_DATA.findIndex((item) => item.id === exercise.id);
             const nextExercise =
               EXERCISES_DATA[(globalIndex + 1) % EXERCISES_DATA.length];
+            const isOddLast =
+              filteredExercises.length > 1 &&
+              filteredExercises.length % 2 === 1 &&
+              idx === filteredExercises.length - 1;
 
             return (
               <ExerciseCard
@@ -71,6 +75,7 @@ export const ExercisesPage: React.FC = () => {
                 exercise={exercise}
                 indexNumber={globalIndex + 1}
                 nextExerciseId={nextExercise?.id}
+                featured={isOddLast}
               />
             );
           })}

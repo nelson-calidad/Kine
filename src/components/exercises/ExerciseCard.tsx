@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowRight,
   ChevronDown,
   ChevronUp,
   AlertCircle,
@@ -9,7 +8,7 @@ import {
   Wrench,
   UserCheck,
   ListOrdered,
-  Maximize2
+  ArrowUpRight
 } from 'lucide-react';
 import { Exercise } from '../../types/exercise';
 import { ExerciseInstructions } from './ExerciseInstructions';
@@ -19,225 +18,209 @@ interface ExerciseCardProps {
   exercise: Exercise;
   indexNumber: number;
   nextExerciseId?: string;
+  featured?: boolean;
 }
 
 export const ExerciseCard: React.FC<ExerciseCardProps> = ({
   exercise,
   indexNumber,
-  nextExerciseId
+  featured = false
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [openAccordion, setOpenAccordion] = useState<'steps' | 'avoid' | 'precautions' | null>('steps');
+  const [isOpen, setIsOpen] = useState(featured);
+  const [activeTab, setActiveTab] = useState<'steps' | 'avoid' | 'precautions'>('steps');
 
-  const toggleAccordion = (section: 'steps' | 'avoid' | 'precautions') => {
-    setOpenAccordion((prev) => (prev === section ? null : section));
-  };
+  const stepNumberLabel = String(indexNumber).padStart(2, '0');
 
   return (
-    <article className="exercise-card flex flex-col rounded-3xl bg-white shadow-soft overflow-hidden transition-shadow duration-200 hover:shadow-soft-lg">
-      <div className="flex flex-1 flex-col p-5 sm:p-6">
-        {/* 4. CATEGORÍA + Número de ejercicio */}
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-          <span className="inline-flex items-center rounded-full bg-brand-soft px-3.5 py-1 text-xs font-extrabold text-brand-navy">
-            {exercise.category}
-          </span>
-          <span className="text-xs font-bold uppercase tracking-wider text-brand-muted">
-            Ejercicio {indexNumber} de 5
-          </span>
+    <article
+      className={`exercise-card group relative flex flex-col rounded-2xl sm:rounded-3xl bg-white border border-slate-200/80 shadow-soft overflow-hidden transition-all duration-200 hover:border-brand-teal/40 hover:shadow-soft-lg ${
+        featured ? 'lg:col-span-2 lg:grid lg:grid-cols-12 lg:items-stretch' : ''
+      }`}
+    >
+      {/* Bloque izquierdo / superior: Cabecera + Demostración 3D */}
+      <div className={featured ? 'lg:col-span-7 flex flex-col justify-between lg:border-r lg:border-slate-100' : 'flex flex-col'}>
+        {/* Cabecera en sinergia: Número + Categoría + Título + Acceso directo */}
+        <div className="px-4 pt-4 pb-3 sm:px-5 sm:pt-5">
+          <div className="flex items-center justify-between gap-2 mb-1.5">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex h-6 min-w-[26px] items-center justify-center rounded-lg bg-brand-navy text-[11px] font-extrabold tracking-tight text-white px-1.5">
+                {stepNumberLabel}
+              </span>
+              <span className="inline-flex items-center rounded-full bg-brand-soft/75 px-2.5 py-0.5 text-[11px] font-bold text-brand-navy">
+                {exercise.category}
+              </span>
+            </div>
+
+            <Link
+              to={`/ejercicios/${exercise.id}`}
+              className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold text-brand-muted hover:text-brand-navy hover:bg-slate-100 transition-colors"
+              title={`Abrir ficha individual de ${exercise.title}`}
+            >
+              <span>Ficha</span>
+              <ArrowUpRight className="h-3.5 w-3.5 text-brand-teal" aria-hidden="true" />
+            </Link>
+          </div>
+
+          <h2 className="text-lg sm:text-xl font-extrabold text-brand-navy leading-snug tracking-tight">
+            <Link
+              to={`/ejercicios/${exercise.id}`}
+              className="hover:text-brand-teal transition-colors"
+            >
+              {exercise.title}
+            </Link>
+          </h2>
+          <p className="mt-1 text-xs sm:text-sm text-brand-muted leading-relaxed">
+            {exercise.goal}
+          </p>
         </div>
 
-        {/* 2. NOMBRE */}
-        <h2 className="text-xl sm:text-2xl font-extrabold text-brand-navy leading-snug">
-          <Link to={`/ejercicios/${exercise.id}`} className="hover:text-brand-teal transition-colors">
-            {exercise.title}
-          </Link>
-        </h2>
+        {/* Escenario 3D integrado sin márgenes muertos */}
+        <div className="px-3 pb-3 sm:px-4 sm:pb-4">
+          <ExerciseDemonstration exercise={exercise} compact />
+        </div>
+      </div>
 
-        <div className="my-5"><ExerciseDemonstration exercise={exercise} compact /></div>
+      {/* Bloque derecho / inferior: Metadatos compactos + Guía paso a paso */}
+      <div className={featured ? 'lg:col-span-5 flex flex-col justify-between p-4 sm:p-5 bg-brand-bg/30' : 'flex flex-col px-4 pb-4 sm:px-5 sm:pb-5'}>
+        {/* Píldoras sintéticas de Posición y Elemento */}
+        <div className="grid grid-cols-1 gap-1.5 rounded-xl bg-brand-bg/80 border border-slate-200/60 px-3 py-2.5 text-xs mb-3">
+          <div className="flex items-start gap-2">
+            <UserCheck className="h-3.5 w-3.5 shrink-0 text-brand-teal mt-0.5" aria-hidden="true" />
+            <p className="text-brand-text leading-snug">
+              <span className="font-bold text-brand-navy">Posición: </span>
+              {exercise.initialPosition}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 border-t border-slate-200/50 pt-1.5">
+            <Wrench className="h-3.5 w-3.5 shrink-0 text-brand-teal" aria-hidden="true" />
+            <p className="text-brand-text truncate">
+              <span className="font-bold text-brand-navy">Elemento: </span>
+              {exercise.equipment}
+            </p>
+          </div>
+        </div>
 
-        {/* 3. OBJETIVO EN UNA ORACIÓN */}
-        <p className="mt-2 text-base text-brand-text leading-relaxed">
-          {exercise.goal}
-        </p>
+        {/* Botón desplegable en móvil y tarjetas normales */}
+        <button
+          type="button"
+          onClick={() => setIsOpen((prev) => !prev)}
+          aria-expanded={isOpen}
+          className={`flex w-full min-h-[42px] items-center justify-between rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold transition-all ${
+            isOpen
+              ? 'bg-brand-soft/70 text-brand-navy'
+              : 'bg-brand-navy text-white shadow-sm hover:bg-brand-navy/90'
+          } ${featured ? 'lg:hidden' : ''}`}
+        >
+          <span>{isOpen ? 'Ocultar guía del ejercicio' : 'Ver cómo hacerlo paso a paso'}</span>
+          {isOpen ? (
+            <ChevronUp className="h-4 w-4 shrink-0" aria-hidden="true" />
+          ) : (
+            <ChevronDown className="h-4 w-4 shrink-0" aria-hidden="true" />
+          )}
+        </button>
 
-        {/* 7. BOTÓN "Ver cómo hacerlo" */}
-        <div className="mt-auto pt-5 flex flex-wrap items-center gap-2.5">
-          <button
-            type="button"
-            onClick={() => setIsOpen((prev) => !prev)}
-            aria-expanded={isOpen}
-            className="inline-flex flex-1 min-h-[48px] items-center justify-center gap-2 rounded-xl bg-brand-navy px-5 py-3 text-sm sm:text-base font-bold text-white shadow-sm hover:bg-brand-navy/90 transition-colors"
+        {/* Contenido guiado por pestañas compactas (sin acordeones gigantes) */}
+        <div className={`${isOpen ? 'block mt-3' : 'hidden'} ${featured ? 'lg:block lg:mt-0 lg:flex-1' : ''}`}>
+          {/* Selector de pestañas delicado */}
+          <div
+            role="tablist"
+            aria-label="Detalles del ejercicio"
+            className="grid grid-cols-3 gap-1 rounded-xl bg-slate-100/90 dark:bg-slate-800 p-1 mb-3"
           >
-            <span>{isOpen ? 'Ocultar cómo hacerlo' : 'Ver cómo hacerlo'}</span>
-            {isOpen ? (
-              <ChevronUp className="h-5 w-5" aria-hidden="true" />
-            ) : (
-              <ChevronDown className="h-5 w-5" aria-hidden="true" />
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'steps'}
+              onClick={() => setActiveTab('steps')}
+              className={`flex items-center justify-center gap-1 rounded-lg py-1.5 text-[11px] sm:text-xs font-bold transition-all ${
+                activeTab === 'steps'
+                  ? 'bg-white dark:bg-slate-900 text-brand-navy shadow-sm'
+                  : 'text-brand-muted hover:text-brand-navy'
+              }`}
+            >
+              <ListOrdered className="h-3.5 w-3.5 text-brand-teal" aria-hidden="true" />
+              <span>Pasos</span>
+            </button>
+
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'avoid'}
+              onClick={() => setActiveTab('avoid')}
+              className={`flex items-center justify-center gap-1 rounded-lg py-1.5 text-[11px] sm:text-xs font-bold transition-all ${
+                activeTab === 'avoid'
+                  ? 'bg-white dark:bg-slate-900 text-brand-warning shadow-sm'
+                  : 'text-brand-muted hover:text-brand-navy'
+              }`}
+            >
+              <AlertCircle className="h-3.5 w-3.5 text-brand-warning" aria-hidden="true" />
+              <span>Evitar</span>
+            </button>
+
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'precautions'}
+              onClick={() => setActiveTab('precautions')}
+              className={`flex items-center justify-center gap-1 rounded-lg py-1.5 text-[11px] sm:text-xs font-bold transition-all ${
+                activeTab === 'precautions'
+                  ? 'bg-white dark:bg-slate-900 text-brand-danger shadow-sm'
+                  : 'text-brand-muted hover:text-brand-navy'
+              }`}
+            >
+              <ShieldAlert className="h-3.5 w-3.5 text-brand-danger" aria-hidden="true" />
+              <span>Cuidados</span>
+            </button>
+          </div>
+
+          {/* Panel de la pestaña activa */}
+          <div className="rounded-xl border border-slate-200/70 bg-white p-3.5 text-xs sm:text-sm">
+            {activeTab === 'steps' && (
+              <ol className="space-y-2">
+                {exercise.steps.map((step, idx) => (
+                  <li key={idx} className="flex items-start gap-2.5 text-brand-text">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-soft text-[11px] font-extrabold text-brand-navy mt-0.5">
+                      {idx + 1}
+                    </span>
+                    <span className="leading-relaxed">{step}</span>
+                  </li>
+                ))}
+              </ol>
             )}
-          </button>
 
-          <Link
-            to={`/ejercicios/${exercise.id}`}
-            className="inline-flex min-h-[48px] items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs sm:text-sm font-bold text-brand-navy hover:bg-brand-soft/50 transition-colors"
-            title={`Abrir vista completa de ${exercise.title}`}
-          >
-            <Maximize2 className="h-4 w-4 text-brand-teal" aria-hidden="true" />
-            <span>Ficha completa</span>
-          </Link>
-        </div>
+            {activeTab === 'avoid' && (
+              <ul className="space-y-1.5 text-brand-text">
+                {exercise.commonMistakes.map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-2">
+                    <span className="font-bold text-brand-warning">✕</span>
+                    <span className="leading-relaxed">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
 
-        {/* CONTENIDO DESPLEGABLE AL ABRIR LA TARJETA (Acordeones de detalles + Demostración Inicio/Final) */}
-        {isOpen && (
-          <div className="mt-5 space-y-3 border-t border-slate-200/80 pt-5">
-            {/* Componente de demostración Inicio -> Flecha -> Final */}
-        {/* 5. POSICIÓN INICIAL y 6. MATERIAL NECESARIO */}
-        <div className="mt-4 grid grid-cols-1 gap-2.5 rounded-2xl bg-brand-bg border border-slate-200/75 p-4 text-sm">
-          <div className="flex items-start gap-2.5">
-            <UserCheck className="h-4 w-4 shrink-0 text-brand-teal mt-1" aria-hidden="true" />
-            <div>
-              <span className="font-bold text-brand-navy">Posición inicial: </span>
-              <span className="text-brand-text">{exercise.initialPosition}</span>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-2.5 border-t border-slate-200/60 pt-2.5">
-            <Wrench className="h-4 w-4 shrink-0 text-brand-teal mt-1" aria-hidden="true" />
-            <div>
-              <span className="font-bold text-brand-navy">Material necesario: </span>
-              <span className="text-brand-text">{exercise.equipment}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Condición especial si aplica (ej. Bicicleta estática) */}
-        {exercise.specialBadge && (
-          <div className="mt-3 rounded-xl bg-amber-50/90 border border-brand-warning/35 px-3.5 py-2.5 text-xs sm:text-sm font-bold text-brand-warning">
-            {exercise.specialBadge}
-          </div>
-        )}
-
-
-
-            {/* Acordeón 1: Instrucciones paso a paso */}
-            <div className="rounded-2xl border border-slate-200/90 bg-white overflow-hidden">
-              <button
-                type="button"
-                onClick={() => toggleAccordion('steps')}
-                aria-expanded={openAccordion === 'steps'}
-                className="flex w-full min-h-[48px] items-center justify-between gap-3 px-4 py-3 text-left font-extrabold text-brand-navy hover:bg-brand-bg/60 transition-colors"
-              >
-                <span className="flex items-center gap-2 text-sm sm:text-base">
-                  <ListOrdered className="h-4 w-4 text-brand-teal" aria-hidden="true" />
-                  Cómo realizarlo (paso a paso)
-                </span>
-                {openAccordion === 'steps' ? (
-                  <ChevronUp className="h-4 w-4 shrink-0" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 shrink-0" />
-                )}
-              </button>
-
-              {openAccordion === 'steps' && (
-                <div className="border-t border-slate-100 px-4 py-3.5 bg-brand-bg/40">
-                  <ol className="space-y-2.5">
-                    {exercise.steps.map((step, idx) => (
-                      <li key={idx} className="flex items-start gap-3 text-sm sm:text-base text-brand-text">
-                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-navy text-xs font-extrabold text-white mt-0.5">
-                          {idx + 1}
-                        </span>
-                        <span className="leading-relaxed">{step}</span>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              )}
-            </div>
-
-            {/* Acordeón 2: Qué evitar */}
-            <div className="rounded-2xl border border-brand-warning/35 bg-amber-50/45 overflow-hidden">
-              <button
-                type="button"
-                onClick={() => toggleAccordion('avoid')}
-                aria-expanded={openAccordion === 'avoid'}
-                className="flex w-full min-h-[48px] items-center justify-between gap-3 px-4 py-3 text-left font-extrabold text-brand-navy hover:bg-amber-50 transition-colors"
-              >
-                <span className="flex items-center gap-2 text-sm sm:text-base">
-                  <AlertCircle className="h-4 w-4 text-brand-warning" aria-hidden="true" />
-                  Qué evitar
-                </span>
-                {openAccordion === 'avoid' ? (
-                  <ChevronUp className="h-4 w-4 shrink-0" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 shrink-0" />
-                )}
-              </button>
-
-              {openAccordion === 'avoid' && (
-                <div className="border-t border-brand-warning/20 px-4 py-3.5 bg-white">
-                  <ul className="space-y-2 text-sm sm:text-base text-brand-text">
-                    {exercise.commonMistakes.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5">
-                        <span className="font-bold text-brand-warning">✕</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-
-            {/* Acordeón 3: Precauciones y cuándo detenerse */}
-            <div className="rounded-2xl border border-brand-danger/30 bg-rose-50/40 overflow-hidden">
-              <button
-                type="button"
-                onClick={() => toggleAccordion('precautions')}
-                aria-expanded={openAccordion === 'precautions'}
-                className="flex w-full min-h-[48px] items-center justify-between gap-3 px-4 py-3 text-left font-extrabold text-brand-navy hover:bg-rose-50/70 transition-colors"
-              >
-                <span className="flex items-center gap-2 text-sm sm:text-base">
-                  <ShieldAlert className="h-4 w-4 text-brand-danger" aria-hidden="true" />
-                  Precauciones y cuándo detener el ejercicio
-                </span>
-                {openAccordion === 'precautions' ? (
-                  <ChevronUp className="h-4 w-4 shrink-0" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 shrink-0" />
-                )}
-              </button>
-
-              {openAccordion === 'precautions' && (
-                <div className="border-t border-brand-danger/20 px-4 py-3.5 bg-white space-y-2">
-                  <ul className="space-y-2 text-sm sm:text-base text-brand-text">
-                    {exercise.precautions.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5">
-                        <span className="font-bold text-brand-danger">•</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-
-            <p className="text-sm text-brand-muted"><strong>Detener el ejercicio:</strong> {exercise.stopConditions.join(" ")}</p>
-
-            {/* Indicaciones del profesional si existen (desplegable) */}
-            <ExerciseInstructions exerciseId={exercise.id} exerciseTitle={exercise.title} />
-
-            {/* Botones inferiores para abrir ficha o pasar al siguiente ejercicio */}
-            {nextExerciseId && (
-              <div className="pt-2 flex justify-end">
-                <Link
-                  to={`/ejercicios/${nextExerciseId}`}
-                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-xl bg-brand-soft/70 px-4 py-2 text-xs sm:text-sm font-bold text-brand-navy hover:bg-brand-soft transition-colors"
-                >
-                  <span>Pasar al siguiente ejercicio</span>
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
+            {activeTab === 'precautions' && (
+              <div className="space-y-2 text-brand-text">
+                <ul className="space-y-1.5">
+                  {exercise.precautions.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="font-bold text-brand-danger">•</span>
+                      <span className="leading-relaxed">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="pt-2 border-t border-slate-100 text-[11px] sm:text-xs text-brand-muted">
+                  <strong className="text-brand-danger">Detener si aparece:</strong>{' '}
+                  {exercise.stopConditions.join(' ')}
+                </p>
               </div>
             )}
           </div>
-        )}
+
+          <div className="mt-2.5">
+            <ExerciseInstructions exerciseId={exercise.id} exerciseTitle={exercise.title} />
+          </div>
+        </div>
       </div>
     </article>
   );

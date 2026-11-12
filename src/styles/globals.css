@@ -85,14 +85,22 @@ h1, h2, h3, h4 {
 }
 
 /* Exercise library: quiet surfaces, 3D scene + vector fallback. */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 .exercise-card {
   align-self: start;
 }
 .exercise-demonstration {
-  background: linear-gradient(180deg, #eef7f6 0%, #e4f0ef 100%);
-  border-radius: 20px;
+  background: linear-gradient(180deg, #eff7f6 0%, #e5f1f0 100%);
+  border-radius: 16px;
   overflow: hidden;
-  border: 1px solid rgba(23, 59, 89, 0.06);
+  border: 1px solid rgba(23, 59, 89, 0.08);
 }
 .exercise-card:nth-child(2) .exercise-demonstration {
   background: linear-gradient(180deg, #f6f3ed 0%, #ede8df 100%);
@@ -115,6 +123,7 @@ html.dark .bg-white {
   background-color: #111C2A;
 }
 html.dark .border-slate-200,
+html.dark .border-slate-200\/75,
 html.dark .border-slate-200\/80,
 html.dark .border-slate-200\/85,
 html.dark .border-slate-200\/90 {
@@ -123,8 +132,13 @@ html.dark .border-slate-200\/90 {
 
 .exercise-stage {
   position: relative;
-  aspect-ratio: 580 / 340;
+  aspect-ratio: 16 / 10;
   width: 100%;
+}
+@media (min-width: 640px) {
+  .exercise-stage {
+    aspect-ratio: 580 / 330;
+  }
 }
 .exercise-stage .pose {
   position: absolute;
