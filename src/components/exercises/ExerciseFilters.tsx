@@ -34,17 +34,17 @@ export const ExerciseFilters: React.FC<ExerciseFiltersProps> = ({
             type="button"
             onClick={() => onSelectCategory(option.id)}
             aria-pressed={active}
-            className={`inline-flex shrink-0 min-h-[36px] items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs sm:text-sm font-semibold transition-all ${
+            className={`inline-flex shrink-0 min-h-[36px] items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all ${
               active
-                ? 'bg-brand-navy text-white shadow-sm'
-                : 'bg-white text-brand-muted border border-slate-200/85 hover:text-brand-navy hover:border-brand-teal/40'
+                ? 'bg-electric-iris text-bone-white shadow-[0_0_20px_rgba(128,82,255,0.4)]'
+                : 'bg-white/[0.03] text-ash-gray border border-white/10 hover:text-bone-white hover:border-white/25'
             }`}
           >
             <span className="sm:hidden">{option.shortLabel}</span>
             <span className="hidden sm:inline">{option.label}</span>
             <span
-              className={`inline-flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[10px] font-extrabold ${
-                active ? 'bg-white/20 text-white' : 'bg-brand-soft/80 text-brand-navy'
+              className={`inline-flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[10px] font-bold ${
+                active ? 'bg-white/20 text-white' : 'bg-white/10 text-saffron-spark'
               }`}
             >
               {counts[option.id]}

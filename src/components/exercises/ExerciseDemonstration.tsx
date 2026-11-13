@@ -45,7 +45,8 @@ export const ExerciseDemonstration: React.FC<{
   exercise: Exercise;
   compact?: boolean;
   defaultPlaying?: boolean;
-}> = ({ exercise, compact = false, defaultPlaying = false }) => {
+  heroStage?: boolean;
+}> = ({ exercise, compact = false, defaultPlaying = false, heroStage = false }) => {
   const stageRef = useRef<HTMLDivElement>(null);
   const [playing, setPlaying] = useState(defaultPlaying);
   const [finalPose, setFinalPose] = useState(false);
@@ -60,6 +61,11 @@ export const ExerciseDemonstration: React.FC<{
   useEffect(() => {
     setWebglSupported(isWebGLAvailable());
   }, []);
+
+  useEffect(() => {
+    setPlaying(defaultPlaying);
+    setFinalPose(false);
+  }, [exercise.id, defaultPlaying]);
 
   useEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -151,7 +157,9 @@ export const ExerciseDemonstration: React.FC<{
     <div className="exercise-demonstration">
       <div
         ref={stageRef}
-        className="exercise-stage"
+        className={`exercise-stage ${
+          heroStage ? '!min-h-[290px] sm:!min-h-[380px] lg:!min-h-[430px]' : ''
+        }`}
         role="img"
         aria-label={`${exercise.title}. ${
           finalPose ? exercise.endImageCaption : exercise.startImageCaption
@@ -190,17 +198,19 @@ export const ExerciseDemonstration: React.FC<{
         )}
 
         {/* Subtle top status pill & 3D/2D switch */}
-        <div className="pointer-events-none absolute left-2.5 right-2.5 top-2.5 flex items-center justify-between gap-2 no-print">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 dark:bg-slate-900/75 backdrop-blur-md px-2.5 py-0.5 text-[11px] font-semibold text-brand-navy dark:text-slate-100 border border-slate-200/50 dark:border-slate-700/50">
+        <div className="pointer-events-none absolute left-3 right-3 top-3 flex items-center justify-between gap-2 no-print">
+          <span className="inline-flex items-center gap-2 rounded-full bg-black/70 backdrop-blur-md px-3 py-1 text-[11px] font-semibold tracking-wider uppercase text-bone-white border border-white/10">
             <span
-              className={`h-1.5 w-1.5 rounded-full ${
-                playing ? 'bg-brand-teal animate-pulse' : 'bg-brand-navy/50 dark:bg-slate-400'
+              className={`h-2 w-2 rounded-full ${
+                playing
+                  ? 'bg-electric-iris shadow-[0_0_10px_#8052ff] animate-pulse'
+                  : 'bg-saffron-spark'
               }`}
             />
             {playing
               ? slowMode
-                ? 'En movimiento · 0.5x'
-                : 'En movimiento'
+                ? '3D Activo · 0.5x'
+                : '3D En movimiento'
               : finalPose
               ? 'Posición final'
               : 'Posición inicial'}
@@ -212,28 +222,28 @@ export const ExerciseDemonstration: React.FC<{
               onClick={() => setUse3D((v) => !v)}
               aria-pressed={use3D}
               title={use3D ? 'Ver esquema 2D' : 'Ver demostración 3D'}
-              className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-white/80 dark:bg-slate-900/75 backdrop-blur-md px-2.5 py-0.5 text-[11px] font-bold text-brand-navy dark:text-slate-100 border border-slate-200/50 dark:border-slate-700/50 hover:bg-white transition-colors"
+              className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full bg-black/70 backdrop-blur-md px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-bone-white border border-white/15 hover:border-electric-iris hover:text-white transition-colors"
             >
-              {use3D ? <Box size={12} /> : <ImageIcon size={12} />}
+              {use3D ? <Box size={12} className="text-electric-iris" /> : <ImageIcon size={12} />}
               <span>{use3D ? '3D' : '2D'}</span>
             </button>
           )}
         </div>
       </div>
 
-      {/* Unified docked control bar */}
-      <div className="flex items-center justify-between gap-1.5 border-t border-slate-200/55 dark:border-slate-800/80 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md px-2.5 py-2 sm:px-3.5 no-print">
-        <div className="inline-flex items-center rounded-full bg-slate-100/90 dark:bg-slate-800 p-0.5">
+      {/* Unified docked control bar (Dala Dark Void style) */}
+      <div className="flex items-center justify-between gap-2 border-t border-white/10 bg-[#050508]/95 backdrop-blur-md px-3 py-2.5 sm:px-4 no-print">
+        <div className="inline-flex items-center rounded-full bg-white/[0.05] border border-white/10 p-0.5">
           {[false, true].map((value) => (
             <button
               key={String(value)}
               type="button"
               aria-pressed={!playing && finalPose === value}
               onClick={() => selectPose(value)}
-              className={`min-h-[30px] rounded-full px-2.5 sm:px-3 text-[11px] sm:text-xs font-bold transition-all ${
+              className={`min-h-[30px] rounded-full px-3 text-[11px] sm:text-xs font-semibold transition-all ${
                 !playing && finalPose === value
-                  ? 'bg-brand-navy text-white shadow-sm'
-                  : 'text-brand-muted hover:text-brand-navy dark:text-slate-300'
+                  ? 'bg-bone-white text-void shadow-sm'
+                  : 'text-ash-gray hover:text-bone-white'
               }`}
             >
               {value ? 'Final' : 'Inicio'}
@@ -241,7 +251,7 @@ export const ExerciseDemonstration: React.FC<{
           ))}
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           {!reduced && (
             <button
               type="button"
@@ -252,10 +262,10 @@ export const ExerciseDemonstration: React.FC<{
               aria-pressed={slowMode}
               aria-label={slowMode ? 'Velocidad normal' : 'Repetición lenta'}
               title={slowMode ? 'Volver a velocidad normal' : 'Repetición lenta (0.5x)'}
-              className={`inline-flex min-h-[32px] items-center gap-1 rounded-full px-2.5 text-[11px] sm:text-xs font-semibold transition-colors ${
+              className={`inline-flex min-h-[32px] items-center gap-1 rounded-full px-3 text-[11px] sm:text-xs font-semibold transition-all border ${
                 slowMode
-                  ? 'bg-brand-teal text-white'
-                  : 'bg-slate-100/90 dark:bg-slate-800 text-brand-navy dark:text-slate-200 hover:bg-slate-200/70'
+                  ? 'bg-saffron-spark/20 border-saffron-spark text-saffron-spark'
+                  : 'bg-white/[0.04] border-white/10 text-silver-mist hover:text-bone-white hover:border-white/25'
               }`}
             >
               <Gauge size={13} aria-hidden="true" />
@@ -268,7 +278,7 @@ export const ExerciseDemonstration: React.FC<{
             onClick={handleRestart}
             aria-label="Reiniciar movimiento"
             title="Reiniciar desde el inicio"
-            className="inline-flex h-[32px] w-[32px] items-center justify-center rounded-full bg-slate-100/90 dark:bg-slate-800 text-brand-navy dark:text-slate-200 hover:bg-slate-200/70 transition-colors"
+            className="inline-flex h-[32px] w-[32px] items-center justify-center rounded-full bg-white/[0.04] border border-white/10 text-silver-mist hover:text-bone-white hover:border-white/25 transition-colors"
           >
             <RotateCcw size={14} />
           </button>
@@ -280,17 +290,17 @@ export const ExerciseDemonstration: React.FC<{
               title={playing ? 'Pausar demostración' : 'Reproducir demostración'}
               aria-pressed={playing}
               onClick={togglePlayback}
-              className="inline-flex min-h-[32px] items-center gap-1.5 rounded-full bg-brand-navy px-3 py-1.5 text-[11px] sm:text-xs font-bold text-white shadow-sm hover:bg-brand-navy/90 transition-colors"
+              className="inline-flex min-h-[34px] items-center gap-1.5 rounded-full bg-electric-iris px-4 py-1.5 text-[11px] sm:text-xs font-semibold text-white shadow-[0_0_20px_rgba(128,82,255,0.45)] hover:bg-[#9168ff] transition-all"
             >
               {playing ? <Pause size={13} /> : <Play size={13} />}
-              <span>{playing ? 'Pausar' : 'Animar'}</span>
+              <span>{playing ? 'Pausar' : 'Animar 3D'}</span>
             </button>
           )}
         </div>
       </div>
 
       {!compact && (
-        <p className="border-t border-slate-200/60 dark:border-slate-800 px-4 py-3 text-xs sm:text-sm text-brand-text dark:text-slate-200 bg-white/60 dark:bg-slate-900/50">
+        <p className="border-t border-white/10 px-4 py-3 text-xs sm:text-sm font-light text-silver-mist bg-[#07070c]">
           {exercise.movementCue}
         </p>
       )}

@@ -8,6 +8,13 @@ export default {
   theme: {
     extend: {
       colors: {
+        void: '#000000',
+        'bone-white': '#ffffff',
+        'ash-gray': '#9a9a9a',
+        'silver-mist': '#bdbdbd',
+        'electric-iris': '#8052ff',
+        'saffron-spark': '#ffb829',
+        'deep-verdant': '#15846e',
         brand: {
           navy: 'var(--color-navy)',
           teal: 'var(--color-teal)',
@@ -21,15 +28,16 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'Manrope', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        sans: ['PPNeueMontreal', 'Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
       borderRadius: {
-        'card': '1.25rem',
+        'card': '1.5rem',
         'card-lg': '1.5rem',
+        '3xl': '1.5rem',
       },
       boxShadow: {
-        'soft': '0 4px 20px -2px rgba(23, 59, 89, 0.06), 0 2px 6px -1px rgba(23, 59, 89, 0.04)',
-        'soft-lg': '0 10px 30px -4px rgba(23, 59, 89, 0.09), 0 4px 10px -2px rgba(23, 59, 89, 0.04)',
+        'soft': 'none',
+        'soft-lg': 'none',
       }
     },
   },

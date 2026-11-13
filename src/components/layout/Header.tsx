@@ -5,8 +5,6 @@ import {
   Menu,
   X,
   Type,
-  Moon,
-  Sun,
   Dumbbell,
   HeartHandshake,
   Ban,
@@ -25,7 +23,7 @@ interface HeaderProps {
 }
 
 const MENU_ITEMS = [
-  { to: '/', label: 'Mis ejercicios', icon: Dumbbell },
+  { to: '/', label: 'Mis ejercicios 3D', icon: Dumbbell },
   { to: '/cuidados', label: 'Cuidados en casa', icon: HeartHandshake },
   { to: '/que-evitar', label: 'Qué evitar (Los NO)', icon: Ban },
   { to: '/actividades', label: 'Actividades cotidianas', icon: Footprints },
@@ -38,9 +36,7 @@ const MENU_ITEMS = [
 
 export const Header: React.FC<HeaderProps> = ({
   largeText,
-  onToggleLargeText,
-  darkMode = false,
-  onToggleDarkMode
+  onToggleLargeText
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
@@ -52,60 +48,57 @@ export const Header: React.FC<HeaderProps> = ({
   }, [location.pathname]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md no-print">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-2.5 sm:px-6">
-        {/* Marca / Regreso al inicio (Ejercicios) */}
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-black/85 backdrop-blur-xl no-print">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-3 sm:px-6">
+        {/* Marca Dala: Prisma Geométrico (#8052ff -> #15846e) + Tipografía Escultural */}
         <Link
           to="/"
-          className="flex items-center gap-2.5 rounded-xl py-1 pr-2 focus-visible:outline-brand-teal"
+          className="flex items-center gap-3 rounded-xl py-1 pr-2 focus-visible:outline-electric-iris"
           aria-label="Ir a Mis ejercicios — Tu rodilla, paso a paso"
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-navy text-white shadow-sm">
-            <svg className="h-6 w-6" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-              <path
-                d="M12 6C12 6 13 11 13.5 13C14 14.5 18 14.5 18.5 13C19 11 20 6 20 6"
-                stroke="#D6F1EE"
-                strokeWidth="2.5"
-                strokeLinecap="round"
+          <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.04] border border-white/15">
+            <svg className="h-5 w-5" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="dalaPrismGrad" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#8052ff" />
+                  <stop offset="55%" stopColor="#ffb829" />
+                  <stop offset="100%" stopColor="#15846e" />
+                </linearGradient>
+              </defs>
+              <polygon
+                points="16,4 28,25 4,25"
+                stroke="url(#dalaPrismGrad)"
+                strokeWidth="2.2"
+                fill="rgba(128,82,255,0.16)"
               />
-              <path
-                d="M13.5 19C13 21 12 26 12 26M18.5 19C19 21 20 26 20 26"
-                stroke="#D6F1EE"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              />
-              <circle cx="16" cy="16" r="3" fill="#32A6A4" stroke="#FFFFFF" strokeWidth="1.5" />
+              <circle cx="16" cy="17" r="2.8" fill="#ffffff" />
             </svg>
           </div>
           <div className="leading-tight">
-            <span className="block text-sm sm:text-base font-extrabold text-brand-navy tracking-tight">
+            <span className="block text-sm sm:text-base font-normal text-bone-white tracking-[-0.03em]">
               Tu rodilla, paso a paso
             </span>
-            <span className="hidden sm:block text-xs text-brand-muted">
-              Recuperación posoperatoria LCA (HTH)
+            <span className="hidden sm:block text-[11px] font-semibold uppercase tracking-wider text-ash-gray">
+              LCA (HTH) · 3D Studio
             </span>
           </div>
         </Link>
 
-        {/* Navegación rápida en escritorio centrada en ejercicios */}
-        <nav className="hidden lg:flex items-center gap-1" aria-label="Navegación principal">
+        {/* Navegación rápida en escritorio (Dala 12px-13px Uppercase Weight 600 #9a9a9a -> #ffffff) */}
+        <nav className="hidden lg:flex items-center gap-6" aria-label="Navegación principal">
           <Link
             to="/"
-            className={`rounded-xl px-3.5 py-2 text-sm font-bold transition-colors ${
-              isExercisesActive
-                ? 'bg-brand-navy text-white shadow-sm'
-                : 'text-brand-text hover:bg-slate-100 dark:hover:bg-slate-800'
+            className={`text-xs font-semibold uppercase tracking-wider transition-colors ${
+              isExercisesActive ? 'text-bone-white' : 'text-ash-gray hover:text-bone-white'
             }`}
           >
-            Mis ejercicios
+            Ejercicios 3D
           </Link>
           <NavLink
             to="/cuidados"
             className={({ isActive }) =>
-              `rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
-                isActive
-                  ? 'bg-brand-soft text-brand-navy'
-                  : 'text-brand-text hover:bg-slate-100 dark:hover:bg-slate-800'
+              `text-xs font-semibold uppercase tracking-wider transition-colors ${
+                isActive ? 'text-bone-white' : 'text-ash-gray hover:text-bone-white'
               }`
             }
           >
@@ -114,10 +107,8 @@ export const Header: React.FC<HeaderProps> = ({
           <NavLink
             to="/que-evitar"
             className={({ isActive }) =>
-              `rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
-                isActive
-                  ? 'bg-brand-soft text-brand-navy'
-                  : 'text-brand-text hover:bg-slate-100 dark:hover:bg-slate-800'
+              `text-xs font-semibold uppercase tracking-wider transition-colors ${
+                isActive ? 'text-bone-white' : 'text-ash-gray hover:text-bone-white'
               }`
             }
           >
@@ -126,10 +117,8 @@ export const Header: React.FC<HeaderProps> = ({
           <NavLink
             to="/seguimiento"
             className={({ isActive }) =>
-              `rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
-                isActive
-                  ? 'bg-brand-soft text-brand-navy'
-                  : 'text-brand-text hover:bg-slate-100 dark:hover:bg-slate-800'
+              `text-xs font-semibold uppercase tracking-wider transition-colors ${
+                isActive ? 'text-bone-white' : 'text-ash-gray hover:text-bone-white'
               }`
             }
           >
@@ -138,10 +127,8 @@ export const Header: React.FC<HeaderProps> = ({
           <NavLink
             to="/preguntas"
             className={({ isActive }) =>
-              `rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
-                isActive
-                  ? 'bg-brand-soft text-brand-navy'
-                  : 'text-brand-text hover:bg-slate-100 dark:hover:bg-slate-800'
+              `text-xs font-semibold uppercase tracking-wider transition-colors ${
+                isActive ? 'text-bone-white' : 'text-ash-gray hover:text-bone-white'
               }`
             }
           >
@@ -149,46 +136,33 @@ export const Header: React.FC<HeaderProps> = ({
           </NavLink>
         </nav>
 
-        {/* Controles siempre visibles: Señales de alarma + Modo oscuro + Texto grande + Menú */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        {/* Controles siempre visibles */}
+        <div className="flex items-center gap-2">
           <Link
             to="/alertas"
-            className="inline-flex min-h-[42px] items-center gap-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 px-2.5 sm:px-3.5 py-2 text-xs sm:text-sm font-bold text-brand-danger border border-brand-danger/30 hover:bg-rose-100/80 transition-colors"
+            className="inline-flex min-h-[38px] items-center gap-1.5 rounded-full bg-rose-500/15 px-3.5 py-1.5 text-xs font-semibold text-rose-300 border border-rose-500/35 hover:bg-rose-500/25 transition-colors"
             title="Ver señales de alarma médica"
           >
-            <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden="true" />
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-rose-400" aria-hidden="true" />
             <span>Alertas</span>
           </Link>
-
-          {onToggleDarkMode && (
-            <button
-              type="button"
-              onClick={onToggleDarkMode}
-              aria-pressed={darkMode}
-              className="inline-flex min-h-[42px] min-w-[42px] items-center justify-center rounded-xl border border-slate-200 bg-white text-brand-navy hover:bg-brand-soft/40 transition-colors"
-              title={darkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-              aria-label={darkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-            >
-              {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
-          )}
 
           <button
             type="button"
             onClick={onToggleLargeText}
             aria-pressed={largeText}
-            className={`inline-flex min-h-[42px] items-center gap-1.5 rounded-xl border px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-semibold transition-colors ${
+            className={`inline-flex min-h-[38px] items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all ${
               largeText
-                ? 'bg-brand-navy text-white border-brand-navy'
-                : 'bg-white text-brand-navy border-slate-200 hover:bg-brand-soft/40'
+                ? 'bg-electric-iris text-white border-electric-iris'
+                : 'bg-white/[0.03] text-silver-mist border-white/15 hover:text-bone-white hover:border-white/30'
             }`}
             title={largeText ? 'Desactivar modo de texto grande' : 'Activar modo de texto grande'}
             aria-label={
               largeText ? 'Desactivar modo de texto grande' : 'Activar modo de texto grande'
             }
           >
-            <Type className="h-4 w-4 shrink-0" aria-hidden="true" />
-            <span className="hidden md:inline">{largeText ? 'Texto normal' : 'A+'}</span>
+            <Type className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            <span className="hidden md:inline">{largeText ? 'Normal' : 'A+'}</span>
           </button>
 
           <button
@@ -196,31 +170,31 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => setMenuOpen((prev) => !prev)}
             aria-expanded={menuOpen}
             aria-controls="accessible-drawer-menu"
-            className="inline-flex min-h-[42px] min-w-[42px] items-center justify-center rounded-xl border border-slate-200 bg-white text-brand-navy hover:bg-brand-soft/40 transition-colors"
+            className="inline-flex min-h-[38px] min-w-[38px] items-center justify-center rounded-full border border-white/15 bg-white/[0.03] text-bone-white hover:border-electric-iris transition-colors"
             aria-label={menuOpen ? 'Cerrar menú de secciones' : 'Abrir menú de secciones'}
           >
-            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {menuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
         </div>
       </div>
 
-      {/* Menú desplegable accesible con todas las pantallas */}
+      {/* Menú desplegable sobre terciopelo negro */}
       {menuOpen && (
         <div
           id="accessible-drawer-menu"
-          className="border-t border-slate-200 bg-white shadow-soft-lg"
+          className="border-t border-white/10 bg-[#050508]/95 backdrop-blur-2xl"
           role="region"
           aria-label="Menú completo de la guía"
         >
-          <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6">
+          <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6">
             <div className="mb-3 flex items-center justify-between">
-              <p className="text-xs font-bold uppercase tracking-wider text-brand-muted">
-                Todas las secciones de la guía
+              <p className="dala-label text-saffron-spark">
+                TODAS LAS SECCIONES DE LA GUÍA
               </p>
               <button
                 type="button"
                 onClick={onToggleLargeText}
-                className="text-xs font-semibold text-brand-teal underline"
+                className="text-xs font-semibold text-electric-iris underline"
               >
                 {largeText
                   ? 'Volver a tamaño de letra estándar'
@@ -236,12 +210,12 @@ export const Header: React.FC<HeaderProps> = ({
                     to={item.to}
                     end={item.to === '/'}
                     className={({ isActive }) =>
-                      `flex min-h-[48px] items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition-colors ${
+                      `flex min-h-[46px] items-center gap-3 rounded-2xl px-4 py-2.5 text-sm font-medium transition-all border ${
                         item.danger
-                          ? 'bg-rose-50 dark:bg-rose-950/40 text-brand-danger border border-brand-danger/25 hover:bg-rose-100/70'
+                          ? 'bg-rose-950/30 text-rose-300 border-rose-500/30 hover:border-rose-400'
                           : isActive
-                          ? 'bg-brand-navy text-white'
-                          : 'bg-brand-bg text-brand-text hover:bg-brand-soft/60'
+                          ? 'bg-electric-iris text-bone-white border-electric-iris shadow-[0_0_20px_rgba(128,82,255,0.4)]'
+                          : 'bg-white/[0.02] text-silver-mist border-white/10 hover:border-white/25 hover:text-bone-white'
                       }`
                     }
                   >

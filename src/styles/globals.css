@@ -3,39 +3,118 @@
 @tailwind utilities;
 
 :root {
-  --color-navy: #173B59;
-  --color-teal: #32A6A4;
-  --color-turquoise-soft: #D6F1EE;
-  --color-bg-main: #F7FAFB;
-  --color-white: #FFFFFF;
-  --color-text-main: #183044;
-  --color-text-secondary: #637783;
-  --color-warning: #B7791F;
-  --color-danger: #B83A42;
-}
+  /* Dala Design System Tokens — Constellation Floating on Black Velvet */
+  --color-void: #000000;
+  --color-bone-white: #ffffff;
+  --color-ash-gray: #9a9a9a;
+  --color-silver-mist: #bdbdbd;
+  --color-electric-iris: #8052ff;
+  --color-saffron-spark: #ffb829;
+  --color-deep-verdant: #15846e;
 
-html.dark {
-  --color-navy: #38BDF8;
-  --color-teal: #2DD4BF;
-  --color-turquoise-soft: #1E293B;
-  --color-bg-main: #0B131E;
-  --color-white: #111C2A;
-  --color-text-main: #E2E8F0;
-  --color-text-secondary: #94A3B8;
-  --color-warning: #F59E0B;
-  --color-danger: #F87171;
+  /* Mapped Brand Tokens for Seamless Dark-Void Experience across all routes */
+  --color-navy: #ffffff;
+  --color-teal: #8052ff;
+  --color-turquoise-soft: rgba(128, 82, 255, 0.14);
+  --color-bg-main: #000000;
+  --color-white: #070709;
+  --color-text-main: #ffffff;
+  --color-text-secondary: #9a9a9a;
+  --color-warning: #ffb829;
+  --color-danger: #ff5c6c;
+
+  /* Typography — Font Families */
+  --font-ppneuemontreal: 'PPNeueMontreal', 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Typography — Scale */
+  --text-caption: 12px;
+  --leading-caption: 1.5;
+  --text-nav-label: 14px;
+  --leading-nav-label: 1.2;
+  --tracking-nav-label: 0.35px;
+  --text-body: 18px;
+  --leading-body: 1.5;
+  --text-heading-2xs: 24px;
+  --leading-heading-2xs: 1.25;
+  --tracking-heading-2xs: -0.48px;
+  --text-heading-xs: 27px;
+  --leading-heading-xs: 1;
+  --text-subheading: 36px;
+  --leading-subheading: 1.2;
+  --text-heading-sm: 42px;
+  --leading-heading-sm: 1.2;
+  --tracking-heading-sm: -1.68px;
+  --text-heading: 48px;
+  --leading-heading: 1.1;
+  --tracking-heading: -1.68px;
+  --text-heading-lg: 78px;
+  --leading-heading-lg: 1.1;
+  --tracking-heading-lg: -3.12px;
+  --text-display: 113px;
+  --leading-display: 1.1;
+  --tracking-display: -4.52px;
+
+  /* Spacing */
+  --spacing-unit: 6px;
+  --spacing-6: 6px;
+  --spacing-12: 12px;
+  --spacing-18: 18px;
+  --spacing-24: 24px;
+  --spacing-30: 30px;
+  --spacing-36: 36px;
+  --spacing-60: 60px;
+  --spacing-96: 96px;
+  --spacing-120: 120px;
+
+  /* Radii */
+  --radius-3xl: 24px;
+  --radius-full: 9999px;
 }
 
 html {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: var(--color-bg-main);
-  color: var(--color-text-main);
+  font-family: var(--font-ppneuemontreal);
+  background-color: var(--color-void);
+  color: var(--color-bone-white);
   scroll-behavior: smooth;
+  font-feature-settings: "ss01" on;
+}
+
+body {
+  background-color: #000000;
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+/* Sculptural Weight-400 Display Headlines & Ultra-Light Weight-200 Copy */
+h1, h2, h3, h4 {
+  font-family: var(--font-ppneuemontreal);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  color: #ffffff;
+}
+
+.dala-display {
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+}
+
+.dala-body {
+  font-weight: 200;
+  line-height: 1.5;
+  color: #bdbdbd;
+}
+
+.dala-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 /* Modo de texto grande / lectura sencilla accesible */
 html.large-text {
-  font-size: 112.5%; /* 18px base */
+  font-size: 112.5%;
 }
 
 html.large-text p,
@@ -43,15 +122,40 @@ html.large-text li {
   line-height: 1.75;
 }
 
-h1, h2, h3, h4 {
-  font-family: 'Manrope', 'Inter', system-ui, sans-serif;
-  letter-spacing: -0.015em;
+/* Accesibilidad: foco visible en Electric Iris */
+:focus-visible {
+  outline: 2px solid var(--color-electric-iris);
+  outline-offset: 3px;
 }
 
-/* Accesibilidad: foco visible claro */
-:focus-visible {
-  outline: 3px solid var(--color-teal);
-  outline-offset: 2px;
+/* Unify legacy inner-page surfaces onto pure black void */
+.bg-white {
+  background-color: #050508 !important;
+}
+.bg-brand-bg {
+  background-color: #000000 !important;
+}
+.border-slate-200,
+.border-slate-200\/60,
+.border-slate-200\/70,
+.border-slate-200\/75,
+.border-slate-200\/80,
+.border-slate-200\/85,
+.border-slate-200\/90,
+.border-slate-100 {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+.bg-amber-50,
+.bg-amber-50\/45,
+.bg-amber-50\/70,
+.bg-amber-50\/90 {
+  background-color: rgba(255, 184, 41, 0.08) !important;
+}
+.bg-rose-50,
+.bg-rose-50\/40,
+.bg-rose-50\/70,
+.bg-rose-50\/80 {
+  background-color: rgba(255, 92, 108, 0.09) !important;
 }
 
 /* Respeto por prefers-reduced-motion */
@@ -66,7 +170,7 @@ h1, h2, h3, h4 {
   }
 }
 
-/* Estilos limpios de impresión de cartilla o seguimiento */
+/* Estilos limpios de impresión */
 @media print {
   header,
   nav,
@@ -74,7 +178,7 @@ h1, h2, h3, h4 {
     display: none !important;
   }
 
-  body {
+  body, html {
     background: #FFFFFF !important;
     color: #000000 !important;
   }
@@ -84,7 +188,6 @@ h1, h2, h3, h4 {
   }
 }
 
-/* Exercise library: quiet surfaces, 3D scene + vector fallback. */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -93,41 +196,15 @@ h1, h2, h3, h4 {
   scrollbar-width: none;
 }
 
+/* 3D Exercise Stage on Void Velvet */
 .exercise-card {
   align-self: start;
 }
 .exercise-demonstration {
-  background: linear-gradient(180deg, #eff7f6 0%, #e5f1f0 100%);
-  border-radius: 16px;
+  background: radial-gradient(circle at 50% 42%, rgba(128, 82, 255, 0.14) 0%, rgba(21, 132, 110, 0.06) 45%, #030305 100%);
+  border-radius: 24px;
   overflow: hidden;
-  border: 1px solid rgba(23, 59, 89, 0.08);
-}
-.exercise-card:nth-child(2) .exercise-demonstration {
-  background: linear-gradient(180deg, #f6f3ed 0%, #ede8df 100%);
-}
-.exercise-card:nth-child(3) .exercise-demonstration {
-  background: linear-gradient(180deg, #edf3f8 0%, #e2ebf3 100%);
-}
-.exercise-card:nth-child(4) .exercise-demonstration {
-  background: linear-gradient(180deg, #f0f3f9 0%, #e4eaf4 100%);
-}
-.exercise-card:nth-child(5) .exercise-demonstration {
-  background: linear-gradient(180deg, #eff5ed 0%, #e3ede0 100%);
-}
-
-html.dark .exercise-demonstration {
-  background: linear-gradient(180deg, #162436 0%, #0f1a28 100%) !important;
-  border-color: rgba(148, 163, 184, 0.14);
-}
-html.dark .bg-white {
-  background-color: #111C2A;
-}
-html.dark .border-slate-200,
-html.dark .border-slate-200\/75,
-html.dark .border-slate-200\/80,
-html.dark .border-slate-200\/85,
-html.dark .border-slate-200\/90 {
-  border-color: rgba(148, 163, 184, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .exercise-stage {
@@ -137,7 +214,7 @@ html.dark .border-slate-200\/90 {
 }
 @media (min-width: 640px) {
   .exercise-stage {
-    aspect-ratio: 580 / 330;
+    aspect-ratio: 16 / 9.5;
   }
 }
 .exercise-stage .pose {

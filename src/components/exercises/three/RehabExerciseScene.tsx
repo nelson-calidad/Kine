@@ -470,7 +470,12 @@ const AnimatedPhysioActor: React.FC<{
       {/* Smooth 3D Knee Support Band on Operated Right Knee */}
       <mesh ref={kneeBandRef} castShadow>
         <cylinderGeometry args={[0.062, 0.055, 0.075, 32]} />
-        <meshStandardMaterial color="#32a6a4" roughness={0.6} />
+        <meshStandardMaterial
+          color="#8052ff"
+          emissive="#8052ff"
+          emissiveIntensity={0.22}
+          roughness={0.45}
+        />
       </mesh>
 
       {/* 1, 2, 3: Supine Rehabilitation Plinth / Mat + Head Pillow */}
@@ -478,15 +483,15 @@ const AnimatedPhysioActor: React.FC<{
         <group>
           <mesh position={[0.04, -0.03, 0]} receiveShadow castShadow>
             <boxGeometry args={[1.82, 0.06, 0.68]} />
-            <meshStandardMaterial color="#dce9ec" roughness={0.85} />
+            <meshStandardMaterial color="#1a1f2e" roughness={0.75} metalness={0.15} />
           </mesh>
           <mesh position={[0.04, -0.075, 0]} receiveShadow>
             <boxGeometry args={[1.84, 0.03, 0.7]} />
-            <meshStandardMaterial color="#9bb2bd" roughness={0.7} />
+            <meshStandardMaterial color="#0f131d" roughness={0.6} metalness={0.3} />
           </mesh>
           <mesh position={[-0.68, 0.022, 0]} receiveShadow castShadow>
             <boxGeometry args={[0.28, 0.048, 0.42]} />
-            <meshStandardMaterial color="#f8fbfc" roughness={0.8} />
+            <meshStandardMaterial color="#283044" roughness={0.7} />
           </mesh>
         </group>
       )}
@@ -497,11 +502,11 @@ const AnimatedPhysioActor: React.FC<{
         <group>
           <mesh position={[0.61, 0.002, 0.125]} rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[0.42, 0.035]} />
-            <meshBasicMaterial color="#32a6a4" transparent opacity={0.28} />
+            <meshBasicMaterial color="#8052ff" transparent opacity={0.42} />
           </mesh>
           <mesh ref={heelMarkerRef} position={[0.76, 0.006, 0.125]} rotation={[-Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[0.025, 0.042, 24]} />
-            <meshBasicMaterial color="#173b59" transparent opacity={0.65} side={THREE.DoubleSide} />
+            <ringGeometry args={[0.025, 0.044, 28]} />
+            <meshBasicMaterial color="#ffb829" transparent opacity={0.85} side={THREE.DoubleSide} />
           </mesh>
         </group>
       )}
@@ -511,15 +516,30 @@ const AnimatedPhysioActor: React.FC<{
         <group>
           <mesh ref={strapRightRef} castShadow>
             <boxGeometry args={[0.024, 0.007, 1]} />
-            <meshStandardMaterial color="#32a6a4" roughness={0.6} />
+            <meshStandardMaterial
+              color="#8052ff"
+              emissive="#8052ff"
+              emissiveIntensity={0.18}
+              roughness={0.5}
+            />
           </mesh>
           <mesh ref={strapLeftRef} castShadow>
             <boxGeometry args={[0.024, 0.007, 1]} />
-            <meshStandardMaterial color="#32a6a4" roughness={0.6} />
+            <meshStandardMaterial
+              color="#8052ff"
+              emissive="#8052ff"
+              emissiveIntensity={0.18}
+              roughness={0.5}
+            />
           </mesh>
           <mesh ref={strapLoopRef} rotation={[0, Math.PI / 2, 0]}>
             <torusGeometry args={[0.042, 0.008, 10, 24]} />
-            <meshStandardMaterial color="#173b59" roughness={0.6} />
+            <meshStandardMaterial
+              color="#ffb829"
+              emissive="#ffb829"
+              emissiveIntensity={0.25}
+              roughness={0.4}
+            />
           </mesh>
         </group>
       )}
@@ -529,19 +549,19 @@ const AnimatedPhysioActor: React.FC<{
         <group>
           <mesh position={[0.565, 0.38, 0]} receiveShadow castShadow>
             <boxGeometry args={[0.045, 0.88, 0.72]} />
-            <meshStandardMaterial color="#e3edf2" roughness={0.85} />
+            <meshStandardMaterial color="#1e2436" roughness={0.75} metalness={0.15} />
           </mesh>
           <mesh position={[0.538, 0.015, 0]}>
             <boxGeometry args={[0.015, 0.03, 0.72]} />
-            <meshStandardMaterial color="#9bb2bd" roughness={0.7} />
+            <meshStandardMaterial color="#2e3750" roughness={0.6} />
           </mesh>
           <mesh position={[0.541, 0.42, 0.075]} rotation={[0, -Math.PI / 2, 0]}>
             <planeGeometry args={[0.04, 0.36]} />
-            <meshBasicMaterial color="#32a6a4" transparent opacity={0.3} />
+            <meshBasicMaterial color="#8052ff" transparent opacity={0.45} />
           </mesh>
           <mesh ref={heelMarkerRef} position={[0.542, 0.52, 0.075]} rotation={[0, -Math.PI / 2, 0]}>
-            <ringGeometry args={[0.026, 0.044, 24]} />
-            <meshBasicMaterial color="#173b59" transparent opacity={0.65} side={THREE.DoubleSide} />
+            <ringGeometry args={[0.026, 0.045, 28]} />
+            <meshBasicMaterial color="#ffb829" transparent opacity={0.85} side={THREE.DoubleSide} />
           </mesh>
         </group>
       )}
@@ -551,11 +571,11 @@ const AnimatedPhysioActor: React.FC<{
         <group>
           <mesh position={[-0.08, 0.42, 0]} receiveShadow castShadow>
             <boxGeometry args={[0.44, 0.04, 0.46]} />
-            <meshStandardMaterial color="#d5e4e8" roughness={0.8} />
+            <meshStandardMaterial color="#1f2537" roughness={0.7} metalness={0.15} />
           </mesh>
           <mesh position={[-0.28, 0.68, 0]} rotation={[0, 0, 0.05]} receiveShadow castShadow>
             <boxGeometry args={[0.04, 0.48, 0.44]} />
-            <meshStandardMaterial color="#d5e4e8" roughness={0.8} />
+            <meshStandardMaterial color="#1f2537" roughness={0.7} metalness={0.15} />
           </mesh>
           {[
             [-0.26, 0.205, 0.19],
@@ -565,16 +585,16 @@ const AnimatedPhysioActor: React.FC<{
           ].map(([lx, ly, lz], idx) => (
             <mesh key={idx} position={[lx, ly, lz]} receiveShadow castShadow>
               <cylinderGeometry args={[0.016, 0.014, 0.41, 12]} />
-              <meshStandardMaterial color="#5c7686" roughness={0.5} metalness={0.2} />
+              <meshStandardMaterial color="#495672" roughness={0.4} metalness={0.45} />
             </mesh>
           ))}
           <mesh position={[0.21, 0.003, 0.075]} rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[0.34, 0.045]} />
-            <meshBasicMaterial color="#32a6a4" transparent opacity={0.28} />
+            <meshBasicMaterial color="#8052ff" transparent opacity={0.42} />
           </mesh>
           <mesh ref={heelMarkerRef} position={[0.32, 0.006, 0.075]} rotation={[-Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[0.028, 0.046, 24]} />
-            <meshBasicMaterial color="#173b59" transparent opacity={0.65} side={THREE.DoubleSide} />
+            <ringGeometry args={[0.028, 0.046, 28]} />
+            <meshBasicMaterial color="#ffb829" transparent opacity={0.85} side={THREE.DoubleSide} />
           </mesh>
         </group>
       )}
@@ -584,72 +604,72 @@ const AnimatedPhysioActor: React.FC<{
         <group>
           <mesh position={[0.08, 0.018, 0]} receiveShadow castShadow>
             <boxGeometry args={[0.92, 0.032, 0.06]} />
-            <meshStandardMaterial color="#425b6d" roughness={0.5} metalness={0.3} />
+            <meshStandardMaterial color="#262e42" roughness={0.45} metalness={0.45} />
           </mesh>
           <mesh position={[-0.28, 0.018, 0]} receiveShadow castShadow>
             <boxGeometry args={[0.06, 0.032, 0.46]} />
-            <meshStandardMaterial color="#425b6d" roughness={0.5} metalness={0.3} />
+            <meshStandardMaterial color="#262e42" roughness={0.45} metalness={0.45} />
           </mesh>
           <mesh position={[0.46, 0.018, 0]} receiveShadow castShadow>
             <boxGeometry args={[0.06, 0.032, 0.46]} />
-            <meshStandardMaterial color="#425b6d" roughness={0.5} metalness={0.3} />
+            <meshStandardMaterial color="#262e42" roughness={0.45} metalness={0.45} />
           </mesh>
 
           <mesh position={[-0.12, 0.36, 0]} rotation={[0, 0, 0.24]} castShadow>
             <cylinderGeometry args={[0.022, 0.026, 0.68, 14]} />
-            <meshStandardMaterial color="#5c7686" roughness={0.45} metalness={0.3} />
+            <meshStandardMaterial color="#495672" roughness={0.4} metalness={0.45} />
           </mesh>
           <mesh position={[-0.2, 0.675, 0]} receiveShadow castShadow>
             <boxGeometry args={[0.22, 0.045, 0.18]} />
-            <meshStandardMaterial color="#173b59" roughness={0.7} />
+            <meshStandardMaterial color="#161924" roughness={0.65} />
           </mesh>
 
           <mesh position={[0.31, 0.44, 0]} rotation={[0, 0, -0.18]} castShadow>
             <cylinderGeometry args={[0.022, 0.026, 0.84, 14]} />
-            <meshStandardMaterial color="#5c7686" roughness={0.45} metalness={0.3} />
+            <meshStandardMaterial color="#495672" roughness={0.4} metalness={0.45} />
           </mesh>
           <mesh position={[0.275, 0.835, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
             <cylinderGeometry args={[0.015, 0.015, 0.44, 12]} />
-            <meshStandardMaterial color="#173b59" roughness={0.6} />
+            <meshStandardMaterial color="#161924" roughness={0.55} />
           </mesh>
           <mesh position={[0.33, 0.88, 0]} rotation={[0, 0, -0.5]} castShadow>
             <boxGeometry args={[0.1, 0.025, 0.14]} />
-            <meshStandardMaterial color="#294b60" roughness={0.5} />
+            <meshStandardMaterial color="#8052ff" emissive="#8052ff" emissiveIntensity={0.15} roughness={0.4} />
           </mesh>
 
           <mesh position={[0.165, 0.282, 0]} rotation={[Math.PI / 2, 0, 0]} receiveShadow castShadow>
             <cylinderGeometry args={[0.15, 0.15, 0.07, 28]} />
-            <meshStandardMaterial color="#d5e4e8" roughness={0.6} />
+            <meshStandardMaterial color="#1e2436" roughness={0.5} metalness={0.35} />
           </mesh>
           <mesh position={[0.165, 0.282, 0]} rotation={[Math.PI / 2, 0, 0]}>
             <cylinderGeometry args={[0.04, 0.04, 0.14, 18]} />
-            <meshStandardMaterial color="#173b59" roughness={0.5} />
+            <meshStandardMaterial color="#8052ff" roughness={0.4} />
           </mesh>
 
           <mesh position={[0.165, 0.282, 0.095]}>
             <ringGeometry args={[0.136, 0.148, 36]} />
-            <meshBasicMaterial color="#32a6a4" transparent opacity={0.35} side={THREE.DoubleSide} />
+            <meshBasicMaterial color="#ffb829" transparent opacity={0.65} side={THREE.DoubleSide} />
           </mesh>
 
           <mesh ref={crankArmRightRef} position={[0.22, 0.282, 0.065]}>
             <boxGeometry args={[0.15, 0.022, 0.012]} />
-            <meshStandardMaterial color="#425b6d" metalness={0.4} roughness={0.4} />
+            <meshStandardMaterial color="#647494" metalness={0.5} roughness={0.35} />
           </mesh>
           <mesh ref={crankArmLeftRef} position={[0.1, 0.282, -0.065]}>
             <boxGeometry args={[0.15, 0.022, 0.012]} />
-            <meshStandardMaterial color="#425b6d" metalness={0.4} roughness={0.4} />
+            <meshStandardMaterial color="#647494" metalness={0.5} roughness={0.35} />
           </mesh>
 
           <group ref={pedalRightRef} position={[0.3, 0.28, 0.095]}>
             <mesh castShadow>
               <boxGeometry args={[0.11, 0.02, 0.075]} />
-              <meshStandardMaterial color="#173b59" roughness={0.6} />
+              <meshStandardMaterial color="#ffb829" roughness={0.5} />
             </mesh>
           </group>
           <group ref={pedalLeftRef} position={[0.03, 0.28, -0.095]}>
             <mesh castShadow>
               <boxGeometry args={[0.11, 0.02, 0.075]} />
-              <meshStandardMaterial color="#173b59" roughness={0.6} />
+              <meshStandardMaterial color="#262e42" roughness={0.5} />
             </mesh>
           </group>
         </group>
@@ -677,17 +697,18 @@ export const RehabExerciseScene: React.FC<RehabExerciseSceneProps> = ({
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
       style={{ width: '100%', height: '100%' }}
     >
-      <ambientLight intensity={0.85} />
-      <hemisphereLight args={['#ffffff', '#cbe2e0', 0.65]} />
+      <ambientLight intensity={0.95} />
+      <hemisphereLight args={['#ffffff', '#8052ff', 0.65]} />
       <directionalLight
         position={[1.8, 2.8, 2.2]}
-        intensity={1.15}
+        intensity={1.35}
         castShadow
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
         shadow-bias={-0.0005}
       />
-      <directionalLight position={[-1.6, 1.4, -1.2]} intensity={0.35} />
+      <directionalLight position={[-1.8, 1.6, -1.4]} intensity={0.55} color="#a78bfa" />
+      <directionalLight position={[0.5, 1.2, -2.0]} intensity={0.35} color="#34d399" />
 
       <Suspense fallback={null}>
         <AnimatedPhysioActor
@@ -699,10 +720,11 @@ export const RehabExerciseScene: React.FC<RehabExerciseSceneProps> = ({
         />
         <ContactShadows
           position={[0, -0.002, 0]}
-          opacity={0.28}
+          opacity={0.55}
           scale={2.8}
-          blur={2.2}
+          blur={2.4}
           far={1.4}
+          color="#000000"
         />
       </Suspense>
 
