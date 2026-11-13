@@ -16,32 +16,32 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   subtitle,
   badge,
   backTo = '/',
-  backLabel = 'Volver al inicio',
+  backLabel = 'Inicio',
   rightSlot
 }) => {
   return (
-    <div className="mb-6 sm:mb-8">
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-3 no-print">
+    <div className="mb-5 sm:mb-7">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-3 no-print">
         <Link
           to={backTo}
-          className="inline-flex min-h-[44px] items-center gap-2 rounded-xl bg-white px-3.5 py-2 text-sm font-semibold text-brand-navy border border-slate-200/90 shadow-sm hover:bg-brand-soft/50 transition-colors"
+          className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-white/[0.04] px-3.5 py-1.5 text-xs font-semibold text-silver-mist border border-white/10 hover:border-electric-iris hover:text-bone-white transition-colors"
         >
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
           <span>{backLabel}</span>
         </Link>
         {rightSlot && <div className="flex items-center gap-2">{rightSlot}</div>}
       </div>
 
       {badge && (
-        <span className="inline-block mb-2 rounded-full bg-brand-soft px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-navy">
+        <span className="block mb-1 text-[10px] font-bold uppercase tracking-widest text-saffron-spark">
           {badge}
         </span>
       )}
-      <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-brand-navy leading-tight">
+      <h1 className="dala-display text-2xl sm:text-4xl text-bone-white">
         {title}
       </h1>
       {subtitle && (
-        <p className="mt-2.5 text-base sm:text-lg text-brand-muted max-w-3xl leading-relaxed">
+        <p className="mt-1.5 text-xs sm:text-sm font-extralight text-silver-mist max-w-2xl leading-relaxed">
           {subtitle}
         </p>
       )}

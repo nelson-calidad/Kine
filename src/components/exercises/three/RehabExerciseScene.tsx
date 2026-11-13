@@ -357,6 +357,19 @@ const AnimatedPhysioActor: React.FC<{
       }
     }
 
+    // Subtle organic breathing micro-motion so the 3D human feels alive
+    const breath = Math.sin(crankPhase) * 0.015;
+    if (
+      exerciseId === 'deslizamiento-del-talon' ||
+      exerciseId === 'flexion-asistida-con-toalla' ||
+      exerciseId === 'deslizamiento-del-pie-en-pared'
+    ) {
+      setBoneLocalEuler(bones, 'spine02', 0.04 + breath, 0, 0);
+      setBoneLocalEuler(bones, 'neck01', 0.14 - breath * 0.5, 0, 0);
+    } else if (exerciseId === 'flexion-activa-en-sedestacion') {
+      setBoneLocalEuler(bones, 'spine02', 0.02 + breath, 0, 0);
+    }
+
     group.updateMatrixWorld(true);
 
     // Position smooth 3D knee band directly on operated right knee (lowerleg01R)
@@ -437,7 +450,8 @@ const AnimatedPhysioActor: React.FC<{
 
     if (playing) {
       phaseRef.current += clampedDelta * speedFactor;
-      const t = 0.5 - 0.5 * Math.cos(phaseRef.current * Math.PI * 2);
+      const rawT = 0.5 - 0.5 * Math.cos(phaseRef.current * Math.PI * 2);
+      const t = THREE.MathUtils.smoothstep(rawT, 0.06, 0.94);
       smoothTRef.current = t;
       const crankAngle = -phaseRef.current * Math.PI * 2;
       applyPose(t, crankAngle);

@@ -11,10 +11,8 @@ import {
   BookOpen,
   Printer,
   ChevronRight,
-  Sparkles,
   Layers,
-  LayoutGrid,
-  ArrowDownRight
+  LayoutGrid
 } from 'lucide-react';
 import { EXERCISES_DATA } from '../data/exercises';
 import { ExerciseFilterCategory } from '../types/exercise';
@@ -29,57 +27,57 @@ const ConstellationHero3D = lazy(
 const SECONDARY_SECTIONS = [
   {
     to: '/cuidados',
-    title: 'Cuidados en casa',
-    summary: 'Herida, hielo, elevación y muletas',
+    title: 'Cuidados',
+    summary: 'Hielo, herida y muletas',
     icon: HeartHandshake,
     danger: false
   },
   {
     to: '/que-evitar',
     title: 'Qué evitar',
-    summary: 'Los NO durante tu recuperación',
+    summary: 'Los NO en casa',
     icon: Ban,
     danger: false
   },
   {
     to: '/seguimiento',
-    title: 'Mi seguimiento',
-    summary: 'Registro diario en tu dispositivo',
+    title: 'Seguimiento',
+    summary: 'Registro diario',
     icon: ClipboardList,
     danger: false
   },
   {
     to: '/alertas',
-    title: 'Señales de alarma',
-    summary: 'Pautas para consulta urgente',
+    title: 'Alertas',
+    summary: 'Pautas urgentes',
     icon: AlertTriangle,
     danger: true
   },
   {
     to: '/actividades',
-    title: 'Vida cotidiana',
-    summary: 'Caminar, escaleras, dormir y aseo',
+    title: 'Vida diaria',
+    summary: 'Caminar y dormir',
     icon: Footprints,
     danger: false
   },
   {
     to: '/preguntas',
-    title: 'Preguntas frecuentes',
-    summary: 'Dudas habituales del posoperatorio',
+    title: 'Preguntas',
+    summary: 'Dudas frecuentes',
     icon: HelpCircle,
     danger: false
   },
   {
     to: '/mi-cirugia',
-    title: 'Cirugía LCA (HTH)',
-    summary: 'Cómo funciona el injerto rotuliano',
+    title: 'Cirugía HTH',
+    summary: 'Injerto rotuliano',
     icon: Stethoscope,
     danger: false
   },
   {
     to: '/fuentes',
-    title: 'Fuentes científicas',
-    summary: 'Bibliografía clínica verificada',
+    title: 'Fuentes',
+    summary: 'Base científica',
     icon: BookOpen,
     danger: false
   }
@@ -111,43 +109,23 @@ export const HomePage: React.FC = () => {
     return EXERCISES_DATA.filter((exercise) => exercise.filterCategory === selectedCategory);
   }, [selectedCategory]);
 
-  const scrollToCarousel = () => {
-    const el = document.getElementById('ejercicios-carrusel');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
   return (
-    <div className="space-y-12 sm:space-y-20">
-      {/* 1. ENTRADA 3D CONSTELACIÓN NEURO-ARTICULAR (ESTILO DALA VOID) */}
-      <section
-        aria-labelledby="dala-hero-heading"
-        className="relative overflow-hidden rounded-[28px] sm:rounded-[36px] border border-white/10 bg-void px-5 py-7 sm:px-10 sm:py-12 lg:py-14 shadow-[0_30px_100px_rgba(0,0,0,0.95)] no-print"
-      >
-        {/* Subtle atmospheric glow */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -top-36 right-1/4 h-80 w-80 rounded-full bg-electric-iris/15 blur-[110px]"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -bottom-36 right-10 h-80 w-80 rounded-full bg-deep-verdant/15 blur-[110px]"
-        />
-
-        <div className="relative grid grid-cols-1 lg:grid-cols-12 lg:items-center gap-6 lg:gap-8">
-          {/* Left Column (5 cols): Sculptural Display Headline + Ultra-Light Body + Electric Iris Pill CTA */}
-          <div className="lg:col-span-5 flex flex-col justify-center z-10">
-            <div className="inline-flex items-center gap-2 mb-4">
-              <span className="h-2 w-2 rounded-full bg-saffron-spark shadow-[0_0_10px_#ffb829]" />
-              <span className="dala-label text-saffron-spark">
-                REHABILITACIÓN NEURO-MOTORA 3D · LCA (HTH)
+    <div className="space-y-7 sm:space-y-12">
+      {/* 1. ENTRADA 3D MINIMALISTA FLOTANDO EN TERCIOPELO NEGRO */}
+      <section aria-labelledby="dala-hero-heading" className="relative no-print">
+        <div className="grid grid-cols-1 lg:grid-cols-12 lg:items-center gap-3 sm:gap-6">
+          {/* Columna izquierda: Título escultural + 1 sola línea limpia */}
+          <div className="lg:col-span-5 flex flex-col justify-center">
+            <div className="inline-flex items-center gap-2 mb-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-saffron-spark shadow-[0_0_8px_#ffb829]" />
+              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-saffron-spark">
+                LCA · HTH · GUÍA 3D
               </span>
             </div>
 
             <h1
               id="dala-hero-heading"
-              className="dala-display text-4xl sm:text-5xl lg:text-[60px] text-bone-white"
+              className="dala-display text-3xl sm:text-5xl text-bone-white"
             >
               Tu rodilla,{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-bone-white via-bone-white to-electric-iris">
@@ -155,42 +133,32 @@ export const HomePage: React.FC = () => {
               </span>
             </h1>
 
-            <p className="mt-4 sm:mt-5 dala-body text-base sm:text-lg max-w-md">
-              Explorá tus 5 ejercicios posoperatorios en un carrusel biomecánico 3D interactivo.
-              Control motor, propiocepción y movilidad progresiva en casa.
+            <p className="mt-1.5 text-xs sm:text-sm font-extralight text-silver-mist">
+              5 movimientos guiados en 3D para recuperar tu flexión en casa.
             </p>
+          </div>
 
-            {/* Primary CTA Pill (#8052ff Electric Iris) + Quick Actions */}
-            <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                onClick={scrollToCarousel}
-                className="inline-flex items-center gap-2 rounded-full bg-electric-iris px-6 py-3 text-xs sm:text-sm font-semibold text-bone-white shadow-[0_0_30px_rgba(128,82,255,0.5)] hover:bg-[#9168ff] transition-all"
-              >
-                <span>Explorar carrusel 3D</span>
-                <ArrowDownRight className="h-4 w-4" />
-              </button>
+          {/* Columna derecha: Constelación 3D flotante (compacta en móvil) */}
+          <div className="lg:col-span-7 relative h-[185px] sm:h-[270px] lg:h-[310px] w-full">
+            <Suspense
+              fallback={
+                <div className="flex h-full w-full items-center justify-center">
+                  <span className="text-[11px] uppercase tracking-widest text-ash-gray animate-pulse">
+                    3D...
+                  </span>
+                </div>
+              }
+            >
+              <ConstellationHero3D mode={heroShape} />
+            </Suspense>
 
-              <Link
-                to="/seguimiento"
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-5 py-3 text-xs sm:text-sm font-medium text-silver-mist hover:border-white/35 hover:text-bone-white transition-all"
-              >
-                <span>Mi seguimiento</span>
-              </Link>
-            </div>
-
-            {/* Interactive 3D Constellation Mode Selector (Cerebro <-> Rodilla) */}
-            <div className="mt-7 pt-5 border-t border-white/10 flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-ash-gray mr-1">
-                <Sparkles className="h-3.5 w-3.5 text-saffron-spark" />
-                <span>Constelación 3D:</span>
-              </span>
-
+            {/* Selector mínimo flotante (Auto · Cerebro · Rodilla) */}
+            <div className="absolute bottom-1 right-1 flex items-center gap-1 rounded-full bg-black/75 backdrop-blur-md border border-white/10 p-0.5">
               {(
                 [
-                  { id: 'auto', label: 'Ciclo neuronal ↔ articular' },
-                  { id: 'brain', label: 'Corteza motora 3D' },
-                  { id: 'knee', label: 'Rodilla LCA 3D' }
+                  { id: 'auto', label: 'Auto' },
+                  { id: 'brain', label: 'Cerebro' },
+                  { id: 'knee', label: 'Rodilla' }
                 ] as const
               ).map((item) => {
                 const active = heroShape === item.id;
@@ -200,10 +168,10 @@ export const HomePage: React.FC = () => {
                     type="button"
                     onClick={() => setHeroShape(item.id)}
                     aria-pressed={active}
-                    className={`rounded-full px-3 py-1 text-[11px] font-semibold transition-all ${
+                    className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold transition-all ${
                       active
-                        ? 'bg-white text-void shadow-sm'
-                        : 'bg-white/[0.04] text-ash-gray border border-white/10 hover:text-bone-white'
+                        ? 'bg-electric-iris text-white'
+                        : 'text-ash-gray hover:text-bone-white'
                     }`}
                   >
                     {item.label}
@@ -212,72 +180,45 @@ export const HomePage: React.FC = () => {
               })}
             </div>
           </div>
-
-          {/* Right Column (7 cols): Massive 3D Particle Constellation Visualization */}
-          <div className="lg:col-span-7 relative h-[290px] sm:h-[390px] lg:h-[460px] w-full">
-            <Suspense
-              fallback={
-                <div className="flex h-full w-full items-center justify-center rounded-3xl border border-white/5 bg-void">
-                  <span className="dala-label text-ash-gray animate-pulse">
-                    Inicializando constelación 3D...
-                  </span>
-                </div>
-              }
-            >
-              <ConstellationHero3D mode={heroShape} />
-            </Suspense>
-
-            {/* Floating minimal caption on bottom-right of 3D canvas */}
-            <div className="pointer-events-none absolute bottom-2 right-3 flex items-center gap-2 rounded-full bg-black/70 backdrop-blur-md border border-white/10 px-3 py-1 text-[11px] text-silver-mist">
-              <span className="h-1.5 w-1.5 rounded-full bg-electric-iris animate-pulse" />
-              <span>2.800 micro-prismas 3D · Girá con tu dedo o cursor</span>
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* 2. CARRUSEL 3D DE EJERCICIOS POSOPERATORIOS */}
-      <section id="ejercicios-carrusel" aria-labelledby="home-exercises-heading" className="scroll-mt-20">
-        <div className="mb-5 sm:mb-6 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <span className="dala-label text-saffron-spark block mb-1.5">
-              DEMOSTRACIÓN BIOMECÁNICA INTERACTIVA
-            </span>
-            <h2
-              id="home-exercises-heading"
-              className="dala-display text-3xl sm:text-4xl lg:text-5xl text-bone-white"
-            >
-              Mis ejercicios en 3D
-            </h2>
-          </div>
+      {/* 2. CARRUSEL 3D DE EJERCICIOS (COMPACTO Y DIVIDIDO) */}
+      <section id="ejercicios-carrusel" aria-labelledby="home-exercises-heading">
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <h2
+            id="home-exercises-heading"
+            className="dala-display text-xl sm:text-2xl text-bone-white"
+          >
+            Mis ejercicios
+          </h2>
 
-          {/* View Mode Switcher (Carrusel 3D vs Grilla) + Print */}
-          <div className="flex items-center gap-2 no-print">
-            <div className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.03] p-1">
+          <div className="flex items-center gap-1.5 no-print">
+            <div className="inline-flex items-center rounded-full border border-white/10 bg-[#08080e] p-0.5">
               <button
                 type="button"
                 onClick={() => setViewMode('carousel')}
                 aria-pressed={viewMode === 'carousel'}
-                className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all ${
+                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all ${
                   viewMode === 'carousel'
-                    ? 'bg-electric-iris text-bone-white shadow-[0_0_16px_rgba(128,82,255,0.45)]'
+                    ? 'bg-electric-iris text-bone-white'
                     : 'text-ash-gray hover:text-bone-white'
                 }`}
               >
-                <Layers className="h-3.5 w-3.5" />
-                <span>Carrusel 3D</span>
+                <Layers className="h-3 w-3" />
+                <span>Carrusel</span>
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
                 aria-pressed={viewMode === 'grid'}
-                className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all ${
+                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all ${
                   viewMode === 'grid'
-                    ? 'bg-electric-iris text-bone-white shadow-[0_0_16px_rgba(128,82,255,0.45)]'
+                    ? 'bg-electric-iris text-bone-white'
                     : 'text-ash-gray hover:text-bone-white'
                 }`}
               >
-                <LayoutGrid className="h-3.5 w-3.5" />
+                <LayoutGrid className="h-3 w-3" />
                 <span>Grilla</span>
               </button>
             </div>
@@ -285,7 +226,8 @@ export const HomePage: React.FC = () => {
             <button
               type="button"
               onClick={() => window.print()}
-              className="inline-flex min-h-[38px] shrink-0 items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.03] px-3.5 py-1.5 text-xs font-semibold text-bone-white hover:border-electric-iris transition-colors"
+              aria-label="Imprimir cartilla"
+              className="inline-flex h-7 w-7 sm:h-8 sm:w-auto sm:px-3 items-center justify-center gap-1.5 rounded-full border border-white/10 bg-[#08080e] text-[11px] font-semibold text-bone-white hover:border-electric-iris transition-colors"
             >
               <Printer className="h-3.5 w-3.5 text-saffron-spark" aria-hidden="true" />
               <span className="hidden sm:inline">Imprimir</span>
@@ -293,24 +235,26 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
 
-        <ExerciseFilters
-          selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
-          counts={counts}
-        />
+        {/* Filtros sólo cuando está en modo Grilla para mantener el carrusel súper limpio */}
+        {viewMode === 'grid' && (
+          <ExerciseFilters
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+            counts={counts}
+          />
+        )}
 
         {viewMode === 'carousel' ? (
           <div className="no-print">
-            <ExerciseCarousel exercises={filteredExercises} />
+            <ExerciseCarousel exercises={EXERCISES_DATA} />
           </div>
         ) : null}
 
-        {/* Grid view (also used automatically when printing) */}
         <div
           className={
             viewMode === 'grid'
-              ? 'grid grid-cols-1 gap-5 lg:grid-cols-2'
-              : 'hidden print:grid print:grid-cols-1 print:gap-5'
+              ? 'grid grid-cols-1 gap-4 lg:grid-cols-2'
+              : 'hidden print:grid print:grid-cols-1 print:gap-4'
           }
         >
           {filteredExercises.map((exercise, idx) => {
@@ -334,63 +278,56 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 3. ACCESOS RÁPIDOS COMPLEMENTARIOS (ESTILO DALA MINIMALISTA EN EL VACÍO) */}
+      {/* 3. TARJETAS COMPACTAS DE CUIDADOS Y GUÍA (DIVIDIDAS EN PARES) */}
       <section
         aria-labelledby="secondary-resources-heading"
-        className="pt-8 border-t border-white/10 no-print"
+        className="pt-5 border-t border-white/10 no-print"
       >
-        <div className="mb-5 flex items-baseline justify-between">
-          <div>
-            <span className="dala-label text-saffron-spark block mb-1">
-              GUÍA CLÍNICA COMPLEMENTARIA
-            </span>
-            <h2
-              id="secondary-resources-heading"
-              className="dala-display text-2xl sm:text-3xl text-bone-white"
-            >
-              Acompañamiento y cuidados
-            </h2>
-          </div>
-        </div>
+        <h2
+          id="secondary-resources-heading"
+          className="text-xs font-bold uppercase tracking-widest text-ash-gray mb-3"
+        >
+          Guía rápida en casa
+        </h2>
 
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
           {SECONDARY_SECTIONS.map((item) => {
             const Icon = item.icon;
             return (
               <Link
                 key={item.to}
                 to={item.to}
-                className={`group flex items-center justify-between gap-3 rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-0.5 ${
+                className={`group flex items-center justify-between gap-2 rounded-2xl border px-3 py-2.5 sm:p-3.5 transition-all ${
                   item.danger
-                    ? 'bg-rose-950/25 border-rose-500/30 hover:border-rose-400'
-                    : 'bg-[#07070c] border-white/10 hover:border-electric-iris/60'
+                    ? 'bg-rose-950/20 border-rose-500/30 hover:border-rose-400'
+                    : 'bg-[#07070c] border-white/10 hover:border-electric-iris/50'
                 }`}
               >
-                <div className="flex items-center gap-3 min-w-0">
+                <div className="flex items-center gap-2.5 min-w-0">
                   <div
-                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border ${
                       item.danger
                         ? 'bg-rose-500/15 border-rose-500/30 text-rose-400'
                         : 'bg-electric-iris/15 border-electric-iris/30 text-electric-iris'
                     }`}
                   >
-                    <Icon className="h-4 w-4" aria-hidden="true" />
+                    <Icon className="h-3.5 w-3.5" aria-hidden="true" />
                   </div>
                   <div className="min-w-0">
                     <h3
-                      className={`text-xs sm:text-sm font-semibold truncate ${
+                      className={`text-xs font-semibold truncate ${
                         item.danger ? 'text-rose-300' : 'text-bone-white'
                       }`}
                     >
                       {item.title}
                     </h3>
-                    <p className="text-[11px] font-light text-ash-gray truncate hidden sm:block">
+                    <p className="text-[10px] font-light text-ash-gray truncate">
                       {item.summary}
                     </p>
                   </div>
                 </div>
                 <ChevronRight
-                  className={`h-4 w-4 shrink-0 transition-transform group-hover:translate-x-0.5 ${
+                  className={`h-3.5 w-3.5 shrink-0 ${
                     item.danger ? 'text-rose-400' : 'text-ash-gray group-hover:text-bone-white'
                   }`}
                   aria-hidden="true"

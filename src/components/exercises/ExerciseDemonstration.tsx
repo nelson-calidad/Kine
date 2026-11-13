@@ -158,7 +158,7 @@ export const ExerciseDemonstration: React.FC<{
       <div
         ref={stageRef}
         className={`exercise-stage ${
-          heroStage ? '!min-h-[290px] sm:!min-h-[380px] lg:!min-h-[430px]' : ''
+          heroStage ? '!min-h-[225px] sm:!min-h-[340px] lg:!min-h-[390px]' : ''
         }`}
         role="img"
         aria-label={`${exercise.title}. ${

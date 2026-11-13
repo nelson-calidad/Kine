@@ -4,12 +4,10 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowUpRight,
-  ListOrdered,
-  AlertCircle,
   ShieldAlert,
   SlidersHorizontal,
-  UserCheck,
-  Wrench
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { Exercise } from '../../types/exercise';
 import { ExerciseDemonstration } from './ExerciseDemonstration';
@@ -17,12 +15,78 @@ import { ExerciseInstructions } from './ExerciseInstructions';
 
 interface ExerciseCarouselProps {
   exercises: Exercise[];
-  allExercisesCount?: number;
 }
+
+const MICRO_META: Record<
+  string,
+  {
+    shortTab: string;
+    pos: string;
+    equip: string;
+    cue: string;
+    shortSteps: [string, string, string];
+  }
+> = {
+  'deslizamiento-del-talon': {
+    shortTab: 'Talón',
+    pos: 'Boca arriba',
+    equip: 'Cama firme',
+    cue: 'Talón apoyado',
+    shortSteps: [
+      'Deslizá lento el talón hacia el glúteo.',
+      'Flexioná hasta tu límite sin dolor.',
+      'Volvé despacio a extender.'
+    ]
+  },
+  'flexion-asistida-con-toalla': {
+    shortTab: 'Toalla',
+    pos: 'Boca arriba',
+    equip: 'Con toalla',
+    cue: 'Sin tironear',
+    shortSteps: [
+      'Pasá la toalla por el pie y deslizá el talón.',
+      'Acompañá suave con las manos.',
+      'Regresá lento controlando la rodilla.'
+    ]
+  },
+  'deslizamiento-del-pie-en-pared': {
+    shortTab: 'Pared',
+    pos: 'Boca arriba',
+    equip: 'Pared',
+    cue: 'Descenso lento',
+    shortSteps: [
+      'Apoyá el pie en la pared y dejalo bajar lento.',
+      'Flexioná de forma gradual y controlada.',
+      'Subí suave ayudándote con la otra pierna.'
+    ]
+  },
+  'flexion-activa-en-sedestacion': {
+    shortTab: 'Silla',
+    pos: 'Sentado',
+    equip: 'Silla firme',
+    cue: 'Pie hacia atrás',
+    shortSteps: [
+      'Sentate derecho con los pies apoyados.',
+      'Deslizá el pie operado hacia atrás bajo la silla.',
+      'Volvé suave hacia adelante.'
+    ]
+  },
+  'bicicleta-estatica-sin-resistencia': {
+    shortTab: 'Bici',
+    pos: 'En bici',
+    equip: 'Bicicleta fija',
+    cue: 'Sin resistencia',
+    shortSteps: [
+      'Ajustá el asiento cómodo y apoyá los pies.',
+      'Empezá con balanceos suaves de adelante a atrás.',
+      'Completá el giro sin carga si no molesta.'
+    ]
+  }
+};
 
 export const ExerciseCarousel: React.FC<ExerciseCarouselProps> = ({ exercises }) => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [activeTab, setActiveTab] = useState<'steps' | 'avoid' | 'precautions' | 'notes'>('steps');
+  const [openDrawer, setOpenDrawer] = useState<'none' | 'safety' | 'dose'>('none');
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
   useEffect(() => {
@@ -31,11 +95,22 @@ export const ExerciseCarousel: React.FC<ExerciseCarouselProps> = ({ exercises })
     }
   }, [exercises.length, activeIndex]);
 
+  useEffect(() => {
+    setOpenDrawer('none');
+  }, [activeIndex]);
+
   if (exercises.length === 0) {
     return null;
   }
 
   const currentExercise = exercises[activeIndex] || exercises[0];
+  const meta = MICRO_META[currentExercise.id] || {
+    shortTab: currentExercise.title.split(' ')[0],
+    pos: 'Controlado',
+    equip: currentExercise.equipment,
+    cue: 'Suave',
+    shortSteps: currentExercise.steps.slice(0, 3) as [string, string, string]
+  };
   const total = exercises.length;
 
   const goPrev = () => {
@@ -64,7 +139,7 @@ export const ExerciseCarousel: React.FC<ExerciseCarouselProps> = ({ exercises })
     if (touchStartX === null) return;
     const endX = e.changedTouches[0]?.clientX ?? touchStartX;
     const deltaX = endX - touchStartX;
-    if (Math.abs(deltaX) > 48) {
+    if (Math.abs(deltaX) > 44) {
       if (deltaX < 0) goNext();
       else goPrev();
     }
@@ -80,105 +155,81 @@ export const ExerciseCarousel: React.FC<ExerciseCarouselProps> = ({ exercises })
       tabIndex={0}
       onKeyDown={handleKeyDown}
       aria-roledescription="carousel"
-      aria-label="Carrusel interactivo de ejercicios 3D"
+      aria-label="Carrusel minimalista de ejercicios 3D"
     >
-      {/* Top horizontal exercise selector bar (01 - 05) */}
-      <div className="mb-4 sm:mb-6 flex items-center justify-between gap-3">
-        <div
-          role="tablist"
-          aria-label="Seleccionar ejercicio del carrusel"
-          className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1"
-        >
-          {exercises.map((item, idx) => {
-            const isSelected = idx === activeIndex;
-            const num = String(idx + 1).padStart(2, '0');
-            return (
-              <button
-                key={item.id}
-                type="button"
-                role="tab"
-                aria-selected={isSelected}
-                onClick={() => setActiveIndex(idx)}
-                className={`group inline-flex shrink-0 items-center gap-2.5 rounded-full px-3.5 py-2 text-xs font-medium transition-all duration-300 ${
-                  isSelected
-                    ? 'bg-electric-iris text-bone-white shadow-[0_0_24px_rgba(128,82,255,0.45)]'
-                    : 'bg-white/[0.03] text-ash-gray border border-white/10 hover:text-bone-white hover:border-white/25'
+      {/* Selector superior ultra-compacto (entra entero en celular) */}
+      <div
+        role="tablist"
+        aria-label="Seleccionar ejercicio"
+        className="mb-3 grid grid-cols-5 gap-1.5 sm:flex sm:items-center sm:gap-2"
+      >
+        {exercises.map((item, idx) => {
+          const isSelected = idx === activeIndex;
+          const num = String(idx + 1).padStart(2, '0');
+          const shortName = MICRO_META[item.id]?.shortTab || item.title.split(' ')[0];
+          return (
+            <button
+              key={item.id}
+              type="button"
+              role="tab"
+              aria-selected={isSelected}
+              onClick={() => setActiveIndex(idx)}
+              className={`flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 rounded-2xl sm:rounded-full px-2 py-2 sm:px-4 sm:py-2 text-center transition-all duration-200 ${
+                isSelected
+                  ? 'bg-electric-iris text-bone-white shadow-[0_0_20px_rgba(128,82,255,0.45)]'
+                  : 'bg-[#08080e] text-ash-gray border border-white/10 hover:text-bone-white hover:border-white/25'
+              }`}
+            >
+              <span
+                className={`text-[10px] font-bold tracking-wider ${
+                  isSelected ? 'text-white/90' : 'text-saffron-spark'
                 }`}
               >
-                <span
-                  className={`text-[11px] font-semibold tracking-wider ${
-                    isSelected ? 'text-bone-white' : 'text-saffron-spark'
-                  }`}
-                >
-                  {num}
-                </span>
-                <span className="truncate max-w-[140px] sm:max-w-[200px]">{item.title}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Desktop Prev / Next controls */}
-        <div className="hidden sm:flex items-center gap-2 shrink-0">
-          <button
-            type="button"
-            onClick={goPrev}
-            aria-label="Ejercicio anterior"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/[0.03] text-bone-white hover:border-electric-iris hover:bg-electric-iris/20 transition-all"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            onClick={goNext}
-            aria-label="Siguiente ejercicio"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/[0.03] text-bone-white hover:border-electric-iris hover:bg-electric-iris/20 transition-all"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        </div>
+                {num}
+              </span>
+              <span className="text-[11px] sm:text-xs font-medium truncate max-w-full">
+                {shortName}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Main 3D Carousel Stage Card (Dala Obsidian Surface on Pure Void) */}
+      {/* Contenedor dividido en bloques limpios */}
       <article
         key={currentExercise.id}
-        className="relative overflow-hidden rounded-[24px] sm:rounded-[32px] border border-white/10 bg-[#050508] shadow-[0_30px_90px_rgba(0,0,0,0.95)]"
+        className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[#050508]"
       >
-        {/* Subtle ambient chromatic glow behind active slide */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -top-28 -left-24 h-72 w-72 rounded-full bg-electric-iris/15 blur-[90px]"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -bottom-28 -right-24 h-72 w-72 rounded-full bg-deep-verdant/15 blur-[90px]"
-        />
-
-        <div className="relative grid grid-cols-1 lg:grid-cols-12 lg:items-stretch">
-          {/* LEFT / TOP COLUMN (7 cols): Interactive 3D Human Biomechanical Viewer */}
-          <div className="lg:col-span-7 flex flex-col justify-between p-3 sm:p-5 lg:p-6 lg:border-r lg:border-white/10">
-            {/* Mobile header bar inside stage */}
+        <div className="grid grid-cols-1 lg:grid-cols-12">
+          {/* BLOQUE 1 (Izquierda / Arriba): Escenario 3D en vivo */}
+          <div className="lg:col-span-7 p-3 sm:p-4 lg:p-5 lg:border-r lg:border-white/10 flex flex-col justify-between">
+            {/* Cabecera mínima de la tarjeta */}
             <div
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
-              className="mb-3 flex items-center justify-between gap-2 px-1"
+              className="mb-2.5 flex items-center justify-between gap-2 px-1"
             >
-              <div className="flex items-center gap-2">
-                <span className="dala-label text-saffron-spark">
-                  {stepNum} / {totalNum}
-                </span>
-                <span className="text-white/25">·</span>
-                <span className="text-xs font-medium text-silver-mist">
-                  {currentExercise.category}
-                </span>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-bold tracking-widest uppercase text-saffron-spark">
+                    {stepNum} / {totalNum}
+                  </span>
+                  <span className="text-white/20">·</span>
+                  <span className="text-[11px] text-ash-gray truncate">
+                    {currentExercise.category}
+                  </span>
+                </div>
+                <h3 className="dala-display text-xl sm:text-2xl text-bone-white truncate mt-0.5">
+                  {currentExercise.title}
+                </h3>
               </div>
 
-              <div className="flex items-center gap-1.5 sm:hidden">
+              <div className="flex items-center gap-1.5 shrink-0">
                 <button
                   type="button"
                   onClick={goPrev}
                   aria-label="Ejercicio anterior"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-bone-white"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-bone-white hover:border-electric-iris transition-colors"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
@@ -186,208 +237,155 @@ export const ExerciseCarousel: React.FC<ExerciseCarouselProps> = ({ exercises })
                   type="button"
                   onClick={goNext}
                   aria-label="Siguiente ejercicio"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-bone-white"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-bone-white hover:border-electric-iris transition-colors"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </button>
               </div>
             </div>
 
-            {/* 3D Articulated Demonstration Stage */}
+            {/* Visor 3D articulado */}
             <ExerciseDemonstration
               exercise={currentExercise}
               compact
               defaultPlaying
               heroStage
             />
-
-            {/* Bottom movement cue & 3D interaction hint */}
-            <div
-              onTouchStart={handleTouchStart}
-              onTouchEnd={handleTouchEnd}
-              className="mt-3 flex flex-wrap items-center justify-between gap-2 px-1 text-xs text-ash-gray"
-            >
-              <p className="font-light text-silver-mist">{currentExercise.movementCue}</p>
-              <span className="text-[11px] text-ash-gray hidden sm:inline">
-                Arrastrá el modelo 3D para rotar el ángulo
-              </span>
-            </div>
           </div>
 
-          {/* RIGHT / BOTTOM COLUMN (5 cols): Sculptural Dala Typography + Step-by-Step Tabs */}
+          {/* BLOQUE 2 (Derecha / Abajo): Micro-tarjetas divididas + 3 pasos cortos + Ocultos */}
           <div
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
-            className="lg:col-span-5 flex flex-col justify-between p-5 sm:p-7 lg:p-8"
+            className="lg:col-span-5 p-3.5 sm:p-5 flex flex-col justify-between gap-3.5"
           >
-            <div>
-              {/* Saffron Spark Category Label */}
-              <div className="flex items-center justify-between gap-2 mb-2">
-                <span className="dala-label text-saffron-spark">
-                  PASO {stepNum} · {currentExercise.category}
-                </span>
-                <Link
-                  to={`/ejercicios/${currentExercise.id}`}
-                  className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[11px] font-semibold text-silver-mist hover:border-electric-iris hover:text-bone-white transition-colors"
-                >
-                  <span>Ficha</span>
-                  <ArrowUpRight className="h-3.5 w-3.5 text-electric-iris" />
-                </Link>
-              </div>
-
-              {/* Sculptural Display Headline (Weight 400, -0.04em tracking) */}
-              <h3 className="dala-display text-2xl sm:text-3xl lg:text-[34px] text-bone-white">
-                {currentExercise.title}
-              </h3>
-
-              {/* Ultra-Light Body Copy (Weight 200, Silver Mist) */}
-              <p className="mt-2.5 text-sm sm:text-base font-extralight text-silver-mist leading-relaxed">
-                {currentExercise.goal}
-              </p>
-
-              {/* Minimal Hairline Metadata Strip */}
-              <div className="mt-4 grid grid-cols-1 gap-2 rounded-2xl border border-white/10 bg-white/[0.02] p-3.5 text-xs">
-                <div className="flex items-start gap-2.5">
-                  <UserCheck className="h-4 w-4 shrink-0 text-electric-iris mt-0.5" />
-                  <p className="text-silver-mist font-light leading-snug">
-                    <strong className="font-semibold text-bone-white">Posición: </strong>
-                    {currentExercise.initialPosition}
-                  </p>
+            <div className="space-y-3">
+              {/* 3 Micro-tarjetas divididas (Posición · Elemento · Clave) */}
+              <div className="grid grid-cols-3 gap-2">
+                <div className="rounded-2xl border border-white/10 bg-[#0a0a12] px-2.5 py-2 text-center">
+                  <span className="block text-[9px] font-bold uppercase tracking-wider text-ash-gray">
+                    Posición
+                  </span>
+                  <span className="mt-0.5 block text-xs font-medium text-bone-white truncate">
+                    {meta.pos}
+                  </span>
                 </div>
-                <div className="flex items-center gap-2.5 border-t border-white/10 pt-2">
-                  <Wrench className="h-4 w-4 shrink-0 text-saffron-spark" />
-                  <p className="text-silver-mist font-light truncate">
-                    <strong className="font-semibold text-bone-white">Elemento: </strong>
-                    {currentExercise.equipment}
-                  </p>
+
+                <div className="rounded-2xl border border-white/10 bg-[#0a0a12] px-2.5 py-2 text-center">
+                  <span className="block text-[9px] font-bold uppercase tracking-wider text-ash-gray">
+                    Elemento
+                  </span>
+                  <span className="mt-0.5 block text-xs font-medium text-bone-white truncate">
+                    {meta.equip}
+                  </span>
+                </div>
+
+                <div className="rounded-2xl border border-electric-iris/30 bg-electric-iris/10 px-2.5 py-2 text-center">
+                  <span className="block text-[9px] font-bold uppercase tracking-wider text-saffron-spark">
+                    Clave
+                  </span>
+                  <span className="mt-0.5 block text-xs font-medium text-bone-white truncate">
+                    {meta.cue}
+                  </span>
                 </div>
               </div>
 
-              {/* Interactive Clinical Tabs */}
-              <div
-                role="tablist"
-                aria-label="Guía clínica del ejercicio"
-                className="mt-5 grid grid-cols-4 gap-1 rounded-full border border-white/10 bg-white/[0.03] p-1"
-              >
+              {/* 3 Pasos cortos divididos (lectura en 3 segundos) */}
+              <div className="rounded-2xl border border-white/10 bg-[#08080e] divide-y divide-white/[0.06]">
+                {meta.shortSteps.map((step, idx) => (
+                  <div key={idx} className="flex items-center gap-2.5 px-3 py-2.5 text-xs">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-electric-iris/20 text-[10px] font-bold text-electric-iris">
+                      {idx + 1}
+                    </span>
+                    <span className="text-silver-mist font-light leading-snug">{step}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Botones ocultables ("sin tanto texto o que esté oculto") */}
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  role="tab"
-                  aria-selected={activeTab === 'steps'}
-                  onClick={() => setActiveTab('steps')}
-                  className={`flex items-center justify-center gap-1 rounded-full py-1.5 text-[11px] font-semibold transition-all ${
-                    activeTab === 'steps'
-                      ? 'bg-electric-iris text-white shadow-[0_0_16px_rgba(128,82,255,0.4)]'
-                      : 'text-ash-gray hover:text-bone-white'
+                  onClick={() =>
+                    setOpenDrawer((prev) => (prev === 'safety' ? 'none' : 'safety'))
+                  }
+                  aria-expanded={openDrawer === 'safety'}
+                  className={`flex items-center justify-between rounded-xl border px-3 py-2 text-[11px] font-semibold transition-all ${
+                    openDrawer === 'safety'
+                      ? 'border-saffron-spark/60 bg-saffron-spark/15 text-saffron-spark'
+                      : 'border-white/10 bg-white/[0.02] text-ash-gray hover:text-bone-white'
                   }`}
                 >
-                  <ListOrdered className="h-3.5 w-3.5" />
-                  <span>Pasos</span>
+                  <span className="inline-flex items-center gap-1.5 truncate">
+                    <ShieldAlert className="h-3.5 w-3.5 shrink-0 text-saffron-spark" />
+                    <span>Evitar y cuidados</span>
+                  </span>
+                  {openDrawer === 'safety' ? (
+                    <ChevronUp className="h-3.5 w-3.5 shrink-0" />
+                  ) : (
+                    <ChevronDown className="h-3.5 w-3.5 shrink-0" />
+                  )}
                 </button>
 
                 <button
                   type="button"
-                  role="tab"
-                  aria-selected={activeTab === 'avoid'}
-                  onClick={() => setActiveTab('avoid')}
-                  className={`flex items-center justify-center gap-1 rounded-full py-1.5 text-[11px] font-semibold transition-all ${
-                    activeTab === 'avoid'
-                      ? 'bg-saffron-spark text-void'
-                      : 'text-ash-gray hover:text-bone-white'
+                  onClick={() => setOpenDrawer((prev) => (prev === 'dose' ? 'none' : 'dose'))}
+                  aria-expanded={openDrawer === 'dose'}
+                  className={`flex items-center justify-between rounded-xl border px-3 py-2 text-[11px] font-semibold transition-all ${
+                    openDrawer === 'dose'
+                      ? 'border-electric-iris bg-electric-iris/20 text-bone-white'
+                      : 'border-white/10 bg-white/[0.02] text-ash-gray hover:text-bone-white'
                   }`}
                 >
-                  <AlertCircle className="h-3.5 w-3.5" />
-                  <span>Evitar</span>
-                </button>
-
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeTab === 'precautions'}
-                  onClick={() => setActiveTab('precautions')}
-                  className={`flex items-center justify-center gap-1 rounded-full py-1.5 text-[11px] font-semibold transition-all ${
-                    activeTab === 'precautions'
-                      ? 'bg-rose-500 text-white'
-                      : 'text-ash-gray hover:text-bone-white'
-                  }`}
-                >
-                  <ShieldAlert className="h-3.5 w-3.5" />
-                  <span>Cuidados</span>
-                </button>
-
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeTab === 'notes'}
-                  onClick={() => setActiveTab('notes')}
-                  className={`flex items-center justify-center gap-1 rounded-full py-1.5 text-[11px] font-semibold transition-all ${
-                    activeTab === 'notes'
-                      ? 'bg-deep-verdant text-white'
-                      : 'text-ash-gray hover:text-bone-white'
-                  }`}
-                >
-                  <SlidersHorizontal className="h-3.5 w-3.5" />
-                  <span>Dosis</span>
+                  <span className="inline-flex items-center gap-1.5 truncate">
+                    <SlidersHorizontal className="h-3.5 w-3.5 shrink-0 text-electric-iris" />
+                    <span>Mi pauta</span>
+                  </span>
+                  {openDrawer === 'dose' ? (
+                    <ChevronUp className="h-3.5 w-3.5 shrink-0" />
+                  ) : (
+                    <ChevronDown className="h-3.5 w-3.5 shrink-0" />
+                  )}
                 </button>
               </div>
 
-              {/* Active Tab Panel */}
-              <div className="mt-3.5 min-h-[170px] rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-xs sm:text-sm">
-                {activeTab === 'steps' && (
-                  <ol className="space-y-2.5">
-                    {currentExercise.steps.map((step, idx) => (
-                      <li key={idx} className="flex items-start gap-3 text-silver-mist font-light">
-                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-electric-iris/20 border border-electric-iris/40 text-[11px] font-semibold text-bone-white mt-0.5">
-                          {idx + 1}
-                        </span>
-                        <span className="leading-relaxed">{step}</span>
-                      </li>
-                    ))}
-                  </ol>
-                )}
-
-                {activeTab === 'avoid' && (
-                  <ul className="space-y-2 text-silver-mist font-light">
-                    {currentExercise.commonMistakes.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5">
-                        <span className="font-bold text-saffron-spark">✕</span>
-                        <span className="leading-relaxed">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-
-                {activeTab === 'precautions' && (
-                  <div className="space-y-2.5 text-silver-mist font-light">
-                    <ul className="space-y-1.5">
-                      {currentExercise.precautions.map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-2">
-                          <span className="font-bold text-rose-400">•</span>
-                          <span className="leading-relaxed">{item}</span>
+              {/* Panel oculto 1: Qué evitar y cuidados (solo se ve al tocar) */}
+              {openDrawer === 'safety' && (
+                <div className="rounded-2xl border border-white/10 bg-[#0a0a12] p-3 text-xs space-y-2">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-saffron-spark">
+                      Evitar
+                    </span>
+                    <ul className="mt-1 space-y-1 text-silver-mist font-light">
+                      {currentExercise.commonMistakes.slice(0, 3).map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-1.5">
+                          <span className="text-saffron-spark font-bold">✕</span>
+                          <span>{item}</span>
                         </li>
                       ))}
                     </ul>
-                    <p className="pt-2 border-t border-white/10 text-xs text-ash-gray">
-                      <strong className="text-rose-400 font-semibold">Detener si aparece:</strong>{' '}
-                      {currentExercise.stopConditions.join(' ')}
-                    </p>
                   </div>
-                )}
+                  <div className="pt-2 border-t border-white/10 text-[11px] text-ash-gray">
+                    <strong className="text-rose-400">Frenar si hay:</strong>{' '}
+                    {currentExercise.stopConditions.slice(0, 2).join(' · ')}
+                  </div>
+                </div>
+              )}
 
-                {activeTab === 'notes' && (
-                  <div>
-                    <ExerciseInstructions
-                      exerciseId={currentExercise.id}
-                      exerciseTitle={currentExercise.title}
-                    />
-                  </div>
-                )}
-              </div>
+              {/* Panel oculto 2: Pauta personal */}
+              {openDrawer === 'dose' && (
+                <div className="rounded-2xl border border-white/10 bg-[#0a0a12] p-3">
+                  <ExerciseInstructions
+                    exerciseId={currentExercise.id}
+                    exerciseTitle={currentExercise.title}
+                  />
+                </div>
+              )}
             </div>
 
-            {/* Carousel Bottom Navigation Bar: Dala #8052ff Indicator Dots + Next Exercise Pill */}
-            <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between gap-4">
-              {/* Dala Carousel Indicator Dots (8px circular #8052ff active) */}
-              <div className="flex items-center gap-2" role="tablist" aria-label="Indicador de diapositiva">
+            {/* Pie del carrusel: Puntos Dala #8052ff + Ficha + Siguiente */}
+            <div className="pt-2.5 border-t border-white/10 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5" role="tablist" aria-label="Diapositivas">
                 {exercises.map((item, idx) => {
                   const active = idx === activeIndex;
                   return (
@@ -396,25 +394,34 @@ export const ExerciseCarousel: React.FC<ExerciseCarouselProps> = ({ exercises })
                       type="button"
                       onClick={() => setActiveIndex(idx)}
                       aria-label={`Ir al ejercicio ${idx + 1}: ${item.title}`}
-                      aria-current={active ? 'true' : undefined}
-                      className={`h-2.5 rounded-full transition-all duration-300 ${
+                      className={`h-2 rounded-full transition-all duration-300 ${
                         active
-                          ? 'w-7 bg-electric-iris shadow-[0_0_12px_#8052ff]'
-                          : 'w-2.5 bg-white/20 hover:bg-white/40'
+                          ? 'w-6 bg-electric-iris shadow-[0_0_10px_#8052ff]'
+                          : 'w-2 bg-white/20 hover:bg-white/40'
                       }`}
                     />
                   );
                 })}
               </div>
 
-              <button
-                type="button"
-                onClick={goNext}
-                className="inline-flex items-center gap-2 rounded-full bg-electric-iris px-4 py-2 text-xs font-semibold text-bone-white shadow-[0_0_24px_rgba(128,82,255,0.4)] hover:bg-[#9168ff] transition-all"
-              >
-                <span>Siguiente</span>
-                <ChevronRight className="h-4 w-4" />
-              </button>
+              <div className="flex items-center gap-2">
+                <Link
+                  to={`/ejercicios/${currentExercise.id}`}
+                  className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[11px] font-medium text-silver-mist hover:text-bone-white"
+                >
+                  <span>Ficha</span>
+                  <ArrowUpRight className="h-3 w-3 text-electric-iris" />
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={goNext}
+                  className="inline-flex items-center gap-1 rounded-full bg-electric-iris px-3.5 py-1.5 text-[11px] font-semibold text-bone-white shadow-[0_0_18px_rgba(128,82,255,0.4)] hover:bg-[#9168ff] transition-all"
+                >
+                  <span>Siguiente</span>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
