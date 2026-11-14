@@ -8,13 +8,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        void: '#000000',
+        void: '#061523',
         'bone-white': '#ffffff',
-        'ash-gray': '#9a9a9a',
-        'silver-mist': '#bdbdbd',
-        'electric-iris': '#8052ff',
-        'saffron-spark': '#ffb829',
-        'deep-verdant': '#15846e',
+        'ash-gray': '#a3c9dc',
+        'silver-mist': '#e6f6fa',
+        'electric-iris': '#22b8cf',
+        'saffron-spark': '#67e8f9',
+        'deep-verdant': '#0ea5e9',
         brand: {
           navy: 'var(--color-navy)',
           teal: 'var(--color-teal)',
@@ -31,13 +31,13 @@ export default {
         sans: ['PPNeueMontreal', 'Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
       borderRadius: {
-        'card': '1.5rem',
+        'card': '1.25rem',
         'card-lg': '1.5rem',
         '3xl': '1.5rem',
       },
       boxShadow: {
-        'soft': 'none',
-        'soft-lg': 'none',
+        'soft': '0 10px 30px -10px rgba(2, 12, 24, 0.6)',
+        'soft-lg': '0 18px 40px -12px rgba(2, 12, 24, 0.75)',
       }
     },
   },

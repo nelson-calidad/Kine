@@ -3,112 +3,67 @@
 @tailwind utilities;
 
 :root {
-  /* Dala Design System Tokens — Constellation Floating on Black Velvet */
-  --color-void: #000000;
+  /* Paleta Clínica Premium: Azul Marino Oscuro + Celeste/Turquesa Luminoso + Blanco Puro */
+  --color-void: #061523;
   --color-bone-white: #ffffff;
-  --color-ash-gray: #9a9a9a;
-  --color-silver-mist: #bdbdbd;
-  --color-electric-iris: #8052ff;
-  --color-saffron-spark: #ffb829;
-  --color-deep-verdant: #15846e;
+  --color-ash-gray: #a3c9dc;
+  --color-silver-mist: #e6f6fa;
+  --color-electric-iris: #22b8cf;
+  --color-saffron-spark: #67e8f9;
+  --color-deep-verdant: #0ea5e9;
 
-  /* Mapped Brand Tokens for Seamless Dark-Void Experience across all routes */
+  /* Variables semánticas de alta legibilidad */
   --color-navy: #ffffff;
-  --color-teal: #8052ff;
-  --color-turquoise-soft: rgba(128, 82, 255, 0.14);
-  --color-bg-main: #000000;
-  --color-white: #070709;
+  --color-teal: #38d9d6;
+  --color-turquoise-soft: rgba(56, 217, 214, 0.16);
+  --color-bg-main: #061523;
+  --color-white: #0c2236;
   --color-text-main: #ffffff;
-  --color-text-secondary: #9a9a9a;
-  --color-warning: #ffb829;
-  --color-danger: #ff5c6c;
+  --color-text-secondary: #b5d6e6;
+  --color-warning: #fbbf24;
+  --color-danger: #fb7185;
 
-  /* Typography — Font Families */
   --font-ppneuemontreal: 'PPNeueMontreal', 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-
-  /* Typography — Scale */
-  --text-caption: 12px;
-  --leading-caption: 1.5;
-  --text-nav-label: 14px;
-  --leading-nav-label: 1.2;
-  --tracking-nav-label: 0.35px;
-  --text-body: 18px;
-  --leading-body: 1.5;
-  --text-heading-2xs: 24px;
-  --leading-heading-2xs: 1.25;
-  --tracking-heading-2xs: -0.48px;
-  --text-heading-xs: 27px;
-  --leading-heading-xs: 1;
-  --text-subheading: 36px;
-  --leading-subheading: 1.2;
-  --text-heading-sm: 42px;
-  --leading-heading-sm: 1.2;
-  --tracking-heading-sm: -1.68px;
-  --text-heading: 48px;
-  --leading-heading: 1.1;
-  --tracking-heading: -1.68px;
-  --text-heading-lg: 78px;
-  --leading-heading-lg: 1.1;
-  --tracking-heading-lg: -3.12px;
-  --text-display: 113px;
-  --leading-display: 1.1;
-  --tracking-display: -4.52px;
-
-  /* Spacing */
-  --spacing-unit: 6px;
-  --spacing-6: 6px;
-  --spacing-12: 12px;
-  --spacing-18: 18px;
-  --spacing-24: 24px;
-  --spacing-30: 30px;
-  --spacing-36: 36px;
-  --spacing-60: 60px;
-  --spacing-96: 96px;
-  --spacing-120: 120px;
-
-  /* Radii */
-  --radius-3xl: 24px;
-  --radius-full: 9999px;
 }
 
 html {
   font-family: var(--font-ppneuemontreal);
-  background-color: var(--color-void);
-  color: var(--color-bone-white);
+  background-color: #061523;
+  color: #ffffff;
   scroll-behavior: smooth;
-  font-feature-settings: "ss01" on;
 }
 
 body {
-  background-color: #000000;
+  background: radial-gradient(circle at 50% 0%, #0d2b45 0%, #061523 65%, #040e18 100%);
+  background-color: #061523;
   color: #ffffff;
   overflow-x: hidden;
 }
 
-/* Sculptural Weight-400 Display Headlines & Ultra-Light Weight-200 Copy */
 h1, h2, h3, h4 {
   font-family: var(--font-ppneuemontreal);
-  font-weight: 400;
-  letter-spacing: -0.04em;
+  font-weight: 600;
+  letter-spacing: -0.03em;
   color: #ffffff;
 }
 
 .dala-display {
-  font-weight: 400;
-  letter-spacing: -0.04em;
-  line-height: 1.02;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+  color: #ffffff;
 }
 
 .dala-body {
-  font-weight: 200;
-  line-height: 1.5;
-  color: #bdbdbd;
+  font-weight: 300;
+  line-height: 1.55;
+  color: #e6f6fa;
 }
 
 .dala-label {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -122,19 +77,56 @@ html.large-text li {
   line-height: 1.75;
 }
 
-/* Accesibilidad: foco visible en Electric Iris */
+/* Accesibilidad: foco visible en Celeste/Turquesa */
 :focus-visible {
-  outline: 2px solid var(--color-electric-iris);
+  outline: 2px solid #38d9d6;
   outline-offset: 3px;
 }
 
-/* Unify legacy inner-page surfaces onto pure black void */
-.bg-white {
-  background-color: #050508 !important;
+/* Garantizar que NINGUNA tarjeta o botón quede blanco sobre blanco en páginas internas */
+.bg-white,
+.bg-white\/95,
+.bg-white\/90,
+.bg-white\/85,
+.bg-white\/80,
+.bg-white\/60 {
+  background-color: #0c2236 !important;
+  color: #ffffff !important;
 }
-.bg-brand-bg {
-  background-color: #000000 !important;
+
+.bg-brand-bg,
+.bg-brand-bg\/60,
+.bg-brand-bg\/70,
+.bg-brand-bg\/80,
+.bg-slate-50,
+.bg-slate-100,
+.bg-slate-100\/90 {
+  background-color: #091b2c !important;
+  color: #e6f6fa !important;
 }
+
+/* Evitar botones blancos con texto blanco cuando usan bg-brand-navy text-white */
+.bg-brand-navy {
+  background-color: #1ca8b8 !important;
+  color: #ffffff !important;
+}
+.bg-brand-navy:hover {
+  background-color: #22b8cf !important;
+}
+
+.text-brand-navy {
+  color: #ffffff !important;
+}
+.text-brand-text {
+  color: #f0f9ff !important;
+}
+.text-brand-muted {
+  color: #b5d6e6 !important;
+}
+.text-brand-teal {
+  color: #38d9d6 !important;
+}
+
 .border-slate-200,
 .border-slate-200\/60,
 .border-slate-200\/70,
@@ -142,20 +134,40 @@ html.large-text li {
 .border-slate-200\/80,
 .border-slate-200\/85,
 .border-slate-200\/90,
-.border-slate-100 {
-  border-color: rgba(255, 255, 255, 0.08) !important;
+.border-slate-100,
+.border-slate-300 {
+  border-color: rgba(103, 232, 249, 0.18) !important;
 }
+
 .bg-amber-50,
 .bg-amber-50\/45,
+.bg-amber-50\/60,
 .bg-amber-50\/70,
 .bg-amber-50\/90 {
-  background-color: rgba(255, 184, 41, 0.08) !important;
+  background-color: rgba(251, 191, 36, 0.12) !important;
+  color: #fef3c7 !important;
 }
+
 .bg-rose-50,
 .bg-rose-50\/40,
+.bg-rose-50\/50,
 .bg-rose-50\/70,
 .bg-rose-50\/80 {
-  background-color: rgba(255, 92, 108, 0.09) !important;
+  background-color: rgba(251, 113, 133, 0.14) !important;
+  color: #ffe4e6 !important;
+}
+
+/* Inputs, selects y textareas en páginas como Seguimiento y Pautas */
+input,
+select,
+textarea {
+  background-color: #071624 !important;
+  color: #ffffff !important;
+  border-color: rgba(103, 232, 249, 0.28) !important;
+}
+input::placeholder,
+textarea::placeholder {
+  color: #7da5bc !important;
 }
 
 /* Respeto por prefers-reduced-motion */
@@ -196,15 +208,15 @@ html.large-text li {
   scrollbar-width: none;
 }
 
-/* 3D Exercise Stage on Void Velvet */
+/* Escenario 3D de Ejercicios en Azul Marino Profundo + Luz Celeste/Turquesa */
 .exercise-card {
   align-self: start;
 }
 .exercise-demonstration {
-  background: radial-gradient(circle at 50% 42%, rgba(128, 82, 255, 0.14) 0%, rgba(21, 132, 110, 0.06) 45%, #030305 100%);
-  border-radius: 24px;
+  background: radial-gradient(circle at 50% 42%, rgba(56, 217, 214, 0.22) 0%, rgba(14, 165, 233, 0.1) 48%, #071726 100%);
+  border-radius: 20px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(103, 232, 249, 0.22);
 }
 
 .exercise-stage {

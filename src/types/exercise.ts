@@ -15,6 +15,8 @@ export interface ExerciseDemoFrame {
 export interface Exercise {
   id: string;
   title: string;
+  section?: 'flexion' | 'complementario';
+  isSupervisedOnly?: boolean;
   category: string;
   filterCategory: Exclude<ExerciseFilterCategory, 'todos'>;
   goal: string;

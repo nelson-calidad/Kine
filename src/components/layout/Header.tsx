@@ -48,57 +48,54 @@ export const Header: React.FC<HeaderProps> = ({
   }, [location.pathname]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-black/85 backdrop-blur-xl no-print">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-3 sm:px-6">
-        {/* Marca Dala: Prisma Geométrico (#8052ff -> #15846e) + Tipografía Escultural */}
+    <header className="sticky top-0 z-40 border-b border-cyan-300/20 bg-[#061523]/95 backdrop-blur-xl no-print">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-2.5 sm:px-6">
         <Link
           to="/"
-          className="flex items-center gap-3 rounded-xl py-1 pr-2 focus-visible:outline-electric-iris"
+          className="flex items-center gap-2.5 rounded-xl py-1 pr-2 focus-visible:outline-[#38d9d6]"
           aria-label="Ir a Mis ejercicios — Tu rodilla, paso a paso"
         >
-          <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.04] border border-white/15">
+          <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#0d2840] border border-[#38d9d6]/40">
             <svg className="h-5 w-5" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-              <defs>
-                <linearGradient id="dalaPrismGrad" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stopColor="#8052ff" />
-                  <stop offset="55%" stopColor="#ffb829" />
-                  <stop offset="100%" stopColor="#15846e" />
-                </linearGradient>
-              </defs>
-              <polygon
-                points="16,4 28,25 4,25"
-                stroke="url(#dalaPrismGrad)"
-                strokeWidth="2.2"
-                fill="rgba(128,82,255,0.16)"
+              <path
+                d="M12 6C12 6 13 11 13.5 13C14 14.5 18 14.5 18.5 13C19 11 20 6 20 6"
+                stroke="#67e8f9"
+                strokeWidth="2.5"
+                strokeLinecap="round"
               />
-              <circle cx="16" cy="17" r="2.8" fill="#ffffff" />
+              <path
+                d="M13.5 19C13 21 12 26 12 26M18.5 19C19 21 20 26 20 26"
+                stroke="#67e8f9"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
+              <circle cx="16" cy="16" r="3" fill="#38d9d6" stroke="#ffffff" strokeWidth="1.5" />
             </svg>
           </div>
           <div className="leading-tight">
-            <span className="block text-sm sm:text-base font-normal text-bone-white tracking-[-0.03em]">
+            <span className="block text-sm sm:text-base font-bold text-white tracking-tight">
               Tu rodilla, paso a paso
             </span>
-            <span className="hidden sm:block text-[11px] font-semibold uppercase tracking-wider text-ash-gray">
-              LCA (HTH) · 3D Studio
+            <span className="hidden sm:block text-[11px] font-medium text-sky-200">
+              Rehabilitación posoperatoria LCA (HTH)
             </span>
           </div>
         </Link>
 
-        {/* Navegación rápida en escritorio (Dala 12px-13px Uppercase Weight 600 #9a9a9a -> #ffffff) */}
-        <nav className="hidden lg:flex items-center gap-6" aria-label="Navegación principal">
+        <nav className="hidden lg:flex items-center gap-5" aria-label="Navegación principal">
           <Link
             to="/"
-            className={`text-xs font-semibold uppercase tracking-wider transition-colors ${
-              isExercisesActive ? 'text-bone-white' : 'text-ash-gray hover:text-bone-white'
+            className={`text-xs font-bold uppercase tracking-wider transition-colors ${
+              isExercisesActive ? 'text-[#67e8f9]' : 'text-sky-100 hover:text-white'
             }`}
           >
-            Ejercicios 3D
+            Ejercicios
           </Link>
           <NavLink
             to="/cuidados"
             className={({ isActive }) =>
-              `text-xs font-semibold uppercase tracking-wider transition-colors ${
-                isActive ? 'text-bone-white' : 'text-ash-gray hover:text-bone-white'
+              `text-xs font-bold uppercase tracking-wider transition-colors ${
+                isActive ? 'text-[#67e8f9]' : 'text-sky-100 hover:text-white'
               }`
             }
           >
@@ -107,8 +104,8 @@ export const Header: React.FC<HeaderProps> = ({
           <NavLink
             to="/que-evitar"
             className={({ isActive }) =>
-              `text-xs font-semibold uppercase tracking-wider transition-colors ${
-                isActive ? 'text-bone-white' : 'text-ash-gray hover:text-bone-white'
+              `text-xs font-bold uppercase tracking-wider transition-colors ${
+                isActive ? 'text-[#67e8f9]' : 'text-sky-100 hover:text-white'
               }`
             }
           >
@@ -117,8 +114,8 @@ export const Header: React.FC<HeaderProps> = ({
           <NavLink
             to="/seguimiento"
             className={({ isActive }) =>
-              `text-xs font-semibold uppercase tracking-wider transition-colors ${
-                isActive ? 'text-bone-white' : 'text-ash-gray hover:text-bone-white'
+              `text-xs font-bold uppercase tracking-wider transition-colors ${
+                isActive ? 'text-[#67e8f9]' : 'text-sky-100 hover:text-white'
               }`
             }
           >
@@ -127,8 +124,8 @@ export const Header: React.FC<HeaderProps> = ({
           <NavLink
             to="/preguntas"
             className={({ isActive }) =>
-              `text-xs font-semibold uppercase tracking-wider transition-colors ${
-                isActive ? 'text-bone-white' : 'text-ash-gray hover:text-bone-white'
+              `text-xs font-bold uppercase tracking-wider transition-colors ${
+                isActive ? 'text-[#67e8f9]' : 'text-sky-100 hover:text-white'
               }`
             }
           >
@@ -136,14 +133,13 @@ export const Header: React.FC<HeaderProps> = ({
           </NavLink>
         </nav>
 
-        {/* Controles siempre visibles */}
         <div className="flex items-center gap-2">
           <Link
             to="/alertas"
-            className="inline-flex min-h-[38px] items-center gap-1.5 rounded-full bg-rose-500/15 px-3.5 py-1.5 text-xs font-semibold text-rose-300 border border-rose-500/35 hover:bg-rose-500/25 transition-colors"
+            className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-rose-500/20 px-3 py-1.5 text-xs font-bold text-rose-200 border border-rose-400/45 hover:bg-rose-500/30 transition-colors"
             title="Ver señales de alarma médica"
           >
-            <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-rose-400" aria-hidden="true" />
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-rose-300" aria-hidden="true" />
             <span>Alertas</span>
           </Link>
 
@@ -151,10 +147,10 @@ export const Header: React.FC<HeaderProps> = ({
             type="button"
             onClick={onToggleLargeText}
             aria-pressed={largeText}
-            className={`inline-flex min-h-[38px] items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all ${
+            className={`inline-flex min-h-[36px] items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all ${
               largeText
-                ? 'bg-electric-iris text-white border-electric-iris'
-                : 'bg-white/[0.03] text-silver-mist border-white/15 hover:text-bone-white hover:border-white/30'
+                ? 'bg-[#1db8c4] text-white border-[#38d9d6]'
+                : 'bg-[#0a1e30] text-sky-100 border-cyan-300/25 hover:text-white hover:border-[#38d9d6]'
             }`}
             title={largeText ? 'Desactivar modo de texto grande' : 'Activar modo de texto grande'}
             aria-label={
@@ -170,7 +166,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => setMenuOpen((prev) => !prev)}
             aria-expanded={menuOpen}
             aria-controls="accessible-drawer-menu"
-            className="inline-flex min-h-[38px] min-w-[38px] items-center justify-center rounded-full border border-white/15 bg-white/[0.03] text-bone-white hover:border-electric-iris transition-colors"
+            className="inline-flex min-h-[36px] min-w-[36px] items-center justify-center rounded-full border border-cyan-300/25 bg-[#0a1e30] text-white hover:border-[#38d9d6] transition-colors"
             aria-label={menuOpen ? 'Cerrar menú de secciones' : 'Abrir menú de secciones'}
           >
             {menuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -178,23 +174,22 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Menú desplegable sobre terciopelo negro */}
       {menuOpen && (
         <div
           id="accessible-drawer-menu"
-          className="border-t border-white/10 bg-[#050508]/95 backdrop-blur-2xl"
+          className="border-t border-cyan-300/20 bg-[#071828]/98 backdrop-blur-2xl"
           role="region"
           aria-label="Menú completo de la guía"
         >
-          <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6">
+          <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6">
             <div className="mb-3 flex items-center justify-between">
-              <p className="dala-label text-saffron-spark">
-                TODAS LAS SECCIONES DE LA GUÍA
+              <p className="text-xs font-extrabold uppercase tracking-wider text-[#67e8f9]">
+                Todas las secciones de la guía
               </p>
               <button
                 type="button"
                 onClick={onToggleLargeText}
-                className="text-xs font-semibold text-electric-iris underline"
+                className="text-xs font-bold text-[#38d9d6] underline"
               >
                 {largeText
                   ? 'Volver a tamaño de letra estándar'
@@ -210,12 +205,12 @@ export const Header: React.FC<HeaderProps> = ({
                     to={item.to}
                     end={item.to === '/'}
                     className={({ isActive }) =>
-                      `flex min-h-[46px] items-center gap-3 rounded-2xl px-4 py-2.5 text-sm font-medium transition-all border ${
+                      `flex min-h-[44px] items-center gap-3 rounded-2xl px-4 py-2 text-sm font-semibold transition-all border ${
                         item.danger
-                          ? 'bg-rose-950/30 text-rose-300 border-rose-500/30 hover:border-rose-400'
+                          ? 'bg-rose-950/40 text-rose-200 border-rose-400/40 hover:border-rose-300'
                           : isActive
-                          ? 'bg-electric-iris text-bone-white border-electric-iris shadow-[0_0_20px_rgba(128,82,255,0.4)]'
-                          : 'bg-white/[0.02] text-silver-mist border-white/10 hover:border-white/25 hover:text-bone-white'
+                          ? 'bg-[#1db8c4] text-white border-[#38d9d6]'
+                          : 'bg-[#0b2135] text-sky-100 border-cyan-300/20 hover:border-cyan-300/50 hover:text-white'
                       }`
                     }
                   >

@@ -158,14 +158,14 @@ export const ExerciseDemonstration: React.FC<{
       <div
         ref={stageRef}
         className={`exercise-stage ${
-          heroStage ? '!min-h-[225px] sm:!min-h-[340px] lg:!min-h-[390px]' : ''
+          heroStage ? '!min-h-[225px] sm:!min-h-[330px] lg:!min-h-[380px]' : ''
         }`}
         role="img"
         aria-label={`${exercise.title}. ${
           finalPose ? exercise.endImageCaption : exercise.startImageCaption
         }`}
       >
-        {/* 2D fallback / print illustration (hidden on screen when 3D is active) */}
+        {/* 2D fallback / print illustration */}
         <div className={show3D && hasEnteredView ? 'hidden print:block' : 'block'}>
           <img
             src={exercise.startImage}
@@ -197,14 +197,14 @@ export const ExerciseDemonstration: React.FC<{
           </div>
         )}
 
-        {/* Subtle top status pill & 3D/2D switch */}
-        <div className="pointer-events-none absolute left-3 right-3 top-3 flex items-center justify-between gap-2 no-print">
-          <span className="inline-flex items-center gap-2 rounded-full bg-black/70 backdrop-blur-md px-3 py-1 text-[11px] font-semibold tracking-wider uppercase text-bone-white border border-white/10">
+        {/* Top status pill & 3D/2D switch (High-contrast White on Deep Navy) */}
+        <div className="pointer-events-none absolute left-2.5 right-2.5 top-2.5 flex items-center justify-between gap-2 no-print">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#061523]/85 backdrop-blur-md px-3 py-1 text-[11px] font-semibold tracking-wide text-white border border-cyan-300/25">
             <span
               className={`h-2 w-2 rounded-full ${
                 playing
-                  ? 'bg-electric-iris shadow-[0_0_10px_#8052ff] animate-pulse'
-                  : 'bg-saffron-spark'
+                  ? 'bg-[#38d9d6] shadow-[0_0_8px_#38d9d6] animate-pulse'
+                  : 'bg-sky-300'
               }`}
             />
             {playing
@@ -222,28 +222,28 @@ export const ExerciseDemonstration: React.FC<{
               onClick={() => setUse3D((v) => !v)}
               aria-pressed={use3D}
               title={use3D ? 'Ver esquema 2D' : 'Ver demostración 3D'}
-              className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full bg-black/70 backdrop-blur-md px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-bone-white border border-white/15 hover:border-electric-iris hover:text-white transition-colors"
+              className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-[#061523]/85 backdrop-blur-md px-2.5 py-1 text-[11px] font-bold text-white border border-cyan-300/30 hover:border-[#38d9d6] transition-colors"
             >
-              {use3D ? <Box size={12} className="text-electric-iris" /> : <ImageIcon size={12} />}
+              {use3D ? <Box size={12} className="text-[#38d9d6]" /> : <ImageIcon size={12} />}
               <span>{use3D ? '3D' : '2D'}</span>
             </button>
           )}
         </div>
       </div>
 
-      {/* Unified docked control bar (Dala Dark Void style) */}
-      <div className="flex items-center justify-between gap-2 border-t border-white/10 bg-[#050508]/95 backdrop-blur-md px-3 py-2.5 sm:px-4 no-print">
-        <div className="inline-flex items-center rounded-full bg-white/[0.05] border border-white/10 p-0.5">
+      {/* Unified docked control bar (Deep Navy + Celeste/Turquoise + White) */}
+      <div className="flex items-center justify-between gap-2 border-t border-cyan-300/20 bg-[#081b2d] px-3 py-2 sm:px-4 no-print">
+        <div className="inline-flex items-center rounded-full bg-[#05111d] border border-cyan-300/20 p-0.5">
           {[false, true].map((value) => (
             <button
               key={String(value)}
               type="button"
               aria-pressed={!playing && finalPose === value}
               onClick={() => selectPose(value)}
-              className={`min-h-[30px] rounded-full px-3 text-[11px] sm:text-xs font-semibold transition-all ${
+              className={`min-h-[28px] rounded-full px-3 text-[11px] sm:text-xs font-bold transition-all ${
                 !playing && finalPose === value
-                  ? 'bg-bone-white text-void shadow-sm'
-                  : 'text-ash-gray hover:text-bone-white'
+                  ? 'bg-[#38d9d6] text-[#041421] shadow-sm'
+                  : 'text-sky-200 hover:text-white'
               }`}
             >
               {value ? 'Final' : 'Inicio'}
@@ -262,10 +262,10 @@ export const ExerciseDemonstration: React.FC<{
               aria-pressed={slowMode}
               aria-label={slowMode ? 'Velocidad normal' : 'Repetición lenta'}
               title={slowMode ? 'Volver a velocidad normal' : 'Repetición lenta (0.5x)'}
-              className={`inline-flex min-h-[32px] items-center gap-1 rounded-full px-3 text-[11px] sm:text-xs font-semibold transition-all border ${
+              className={`inline-flex min-h-[30px] items-center gap-1 rounded-full px-2.5 text-[11px] font-semibold transition-all border ${
                 slowMode
-                  ? 'bg-saffron-spark/20 border-saffron-spark text-saffron-spark'
-                  : 'bg-white/[0.04] border-white/10 text-silver-mist hover:text-bone-white hover:border-white/25'
+                  ? 'bg-[#38d9d6]/25 border-[#38d9d6] text-white'
+                  : 'bg-[#05111d] border-cyan-300/20 text-sky-100 hover:border-cyan-300/50'
               }`}
             >
               <Gauge size={13} aria-hidden="true" />
@@ -278,9 +278,9 @@ export const ExerciseDemonstration: React.FC<{
             onClick={handleRestart}
             aria-label="Reiniciar movimiento"
             title="Reiniciar desde el inicio"
-            className="inline-flex h-[32px] w-[32px] items-center justify-center rounded-full bg-white/[0.04] border border-white/10 text-silver-mist hover:text-bone-white hover:border-white/25 transition-colors"
+            className="inline-flex h-[30px] w-[30px] items-center justify-center rounded-full bg-[#05111d] border border-cyan-300/20 text-sky-100 hover:text-white hover:border-cyan-300/50 transition-colors"
           >
-            <RotateCcw size={14} />
+            <RotateCcw size={13} />
           </button>
 
           {!reduced && (
@@ -290,17 +290,17 @@ export const ExerciseDemonstration: React.FC<{
               title={playing ? 'Pausar demostración' : 'Reproducir demostración'}
               aria-pressed={playing}
               onClick={togglePlayback}
-              className="inline-flex min-h-[34px] items-center gap-1.5 rounded-full bg-electric-iris px-4 py-1.5 text-[11px] sm:text-xs font-semibold text-white shadow-[0_0_20px_rgba(128,82,255,0.45)] hover:bg-[#9168ff] transition-all"
+              className="inline-flex min-h-[32px] items-center gap-1.5 rounded-full bg-[#1db8c4] px-3.5 py-1 text-[11px] sm:text-xs font-bold text-white shadow-[0_0_18px_rgba(56,217,214,0.35)] hover:bg-[#28cbd6] transition-all"
             >
               {playing ? <Pause size={13} /> : <Play size={13} />}
-              <span>{playing ? 'Pausar' : 'Animar 3D'}</span>
+              <span>{playing ? 'Pausar' : 'Animar'}</span>
             </button>
           )}
         </div>
       </div>
 
       {!compact && (
-        <p className="border-t border-white/10 px-4 py-3 text-xs sm:text-sm font-light text-silver-mist bg-[#07070c]">
+        <p className="border-t border-cyan-300/15 px-4 py-2.5 text-xs sm:text-sm text-sky-100 bg-[#071828]">
           {exercise.movementCue}
         </p>
       )}
