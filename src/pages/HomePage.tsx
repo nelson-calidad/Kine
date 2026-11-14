@@ -6,7 +6,6 @@ import {
   ClipboardList,
   AlertTriangle,
   HelpCircle,
-  BookOpen,
   ChevronRight,
   CheckCircle2,
   OctagonAlert,
@@ -27,8 +26,7 @@ type ClinicalModuleTab =
   | 'evitar'
   | 'seguimiento'
   | 'preguntas'
-  | 'alertas'
-  | 'fuentes';
+  | 'alertas';
 
 const CARE_CARDS = [
   {
@@ -278,8 +276,7 @@ export const HomePage: React.FC = () => {
               { id: 'evitar', label: 'Qué evitar', icon: Ban },
               { id: 'seguimiento', label: 'Seguimiento', icon: ClipboardList },
               { id: 'preguntas', label: 'Preguntas', icon: HelpCircle },
-              { id: 'alertas', label: 'Señales de alarma', icon: AlertTriangle },
-              { id: 'fuentes', label: 'Fuentes', icon: BookOpen }
+              { id: 'alertas', label: 'Señales de alarma', icon: AlertTriangle }
             ] as const
           ).map((tab) => {
             const Icon = tab.icon;
@@ -523,46 +520,6 @@ export const HomePage: React.FC = () => {
                   </div>
                 </div>
               </div>
-            </div>
-          )}
-
-          {activeModule === 'fuentes' && (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <Link
-                to="/fuentes"
-                className="group rounded-xl border border-[#1E394B] bg-[#10283A] p-4 flex items-center justify-between hover:border-[#25C8CC] transition-colors"
-              >
-                <div>
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-[#25C8CC]">
-                    Respaldo académico
-                  </span>
-                  <h3 className="text-base font-semibold text-[#F1F7FA] mt-0.5">
-                    Bibliografía y fundamentos científicos
-                  </h3>
-                  <p className="text-xs text-[#A7B9C6] mt-1">
-                    Guías clínicas y protocolos internacionales de rehabilitación de LCA.
-                  </p>
-                </div>
-                <ChevronRight className="h-4 w-4 text-[#25C8CC] shrink-0" />
-              </Link>
-
-              <Link
-                to="/mi-cirugia"
-                className="group rounded-xl border border-[#1E394B] bg-[#10283A] p-4 flex items-center justify-between hover:border-[#25C8CC] transition-colors"
-              >
-                <div>
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-[#82E5E4]">
-                    Educación anatómica
-                  </span>
-                  <h3 className="text-base font-semibold text-[#F1F7FA] mt-0.5">
-                    ¿En qué consiste la cirugía LCA (HTH)?
-                  </h3>
-                  <p className="text-xs text-[#A7B9C6] mt-1">
-                    Explicación del autoinjerto hueso–tendón–hueso rotuliano y sus tiempos biológicos.
-                  </p>
-                </div>
-                <ChevronRight className="h-4 w-4 text-[#25C8CC] shrink-0" />
-              </Link>
             </div>
           )}
         </div>

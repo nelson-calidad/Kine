@@ -12,8 +12,7 @@ import {
   Footprints,
   ClipboardList,
   HelpCircle,
-  Stethoscope,
-  BookOpen
+  Stethoscope
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -40,7 +39,6 @@ const DRAWER_ITEMS = [
   { to: '/preguntas', label: 'Preguntas frecuentes', icon: HelpCircle },
   { to: '/actividades', label: 'Actividades de la vida diaria', icon: Footprints },
   { to: '/mi-cirugia', label: 'Cirugía LCA (Injerto HTH)', icon: Stethoscope },
-  { to: '/fuentes', label: 'Fuentes científicas', icon: BookOpen },
   { to: '/alertas', label: 'Señales de alarma', icon: AlertTriangle, danger: true }
 ];
 
