@@ -14,9 +14,9 @@ export const BottomNavigation: React.FC = () => {
   return (
     <nav
       aria-label="Navegación principal móvil"
-      className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#244154] bg-[#061522]/95 backdrop-blur-md lg:hidden no-print"
+      className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#1E394B] bg-[#061522]/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)] lg:hidden no-print"
     >
-      <div className="mx-auto grid max-w-lg grid-cols-5 px-1.5 py-1 gap-1">
+      <div className="mx-auto grid max-w-lg grid-cols-5 px-2 py-1">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           return (
@@ -25,15 +25,20 @@ export const BottomNavigation: React.FC = () => {
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                `flex min-h-[46px] flex-col items-center justify-center rounded-xl py-1 text-[10px] font-semibold transition-colors ${
-                  isActive
-                    ? 'bg-[#10283A] text-[#25C8CC] border border-[#244154]'
-                    : 'text-[#A7B9C6] hover:text-[#F1F7FA]'
+                `relative flex min-h-[44px] flex-col items-center justify-center py-1 text-[10px] font-medium transition-colors ${
+                  isActive ? 'text-[#25C8CC]' : 'text-[#A7B9C6] hover:text-[#F1F7FA]'
                 }`
               }
             >
-              <Icon className="h-4 w-4 mb-0.5" aria-hidden="true" />
-              <span>{item.label}</span>
+              {({ isActive }) => (
+                <>
+                  {isActive && (
+                    <span className="absolute top-0 h-0.5 w-6 rounded-full bg-[#25C8CC]" />
+                  )}
+                  <Icon className="h-4 w-4 mb-0.5" aria-hidden="true" />
+                  <span>{item.label}</span>
+                </>
+              )}
             </NavLink>
           );
         })}
