@@ -1,449 +1,426 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { ContactShadows, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
+import { RotateCcw, Eye, Pause, Play } from 'lucide-react';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
-const PARTICLE_COUNT = 2200;
-
-// Celeste, Turquoise, Ice-Blue & Pure White Palette
-const PALETTE = [
-  '#38d9d6', // Bright Turquoise
-  '#7dd3fc', // Luminous Celeste / Sky Blue
-  '#ffffff', // Crisp Pure White
-  '#0ea5e9', // Deep Cyan Blue
-  '#a5f3fc', // Ice Cyan
-  '#2dd4bf'  // Clinical Teal
-];
-
-function seededRandom(seed: number): number {
-  const x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
-  return x - Math.floor(x);
-}
-
-function generateConstellations(count: number) {
-  const brainPositions = new Float32Array(count * 3);
-  const kneePositions = new Float32Array(count * 3);
-  const colors = new Float32Array(count * 3);
-  const scales = new Float32Array(count);
-  const phases = new Float32Array(count);
-
-  const colorObjs = PALETTE.map((hex) => new THREE.Color(hex));
-
-  for (let i = 0; i < count; i++) {
-    const r1 = seededRandom(i * 3 + 1);
-    const r2 = seededRandom(i * 3 + 2);
-    const r3 = seededRandom(i * 3 + 3);
-    const r4 = seededRandom(i * 3 + 4);
-    const r5 = seededRandom(i * 3 + 5);
-
-    // -----------------------------------------------------------------
-    // 1. 3D CORTICAL BRAIN CONSTELLATION (Two Defined Hemispheres + Gyri)
-    // -----------------------------------------------------------------
-    const isRightHemi = i % 2 === 0;
-    const hemiSign = isRightHemi ? 1 : -1;
-
-    const u = r1 * Math.PI * 2;
-    const v = Math.acos(2 * r2 - 1);
-    // Surface-concentrated shell so the brain outline is super crisp
-    const shellRadius = 0.88 + 0.12 * Math.pow(r3, 0.35);
-
-    let bx = shellRadius * Math.sin(v) * Math.cos(u) * 0.56;
-    let by = shellRadius * Math.sin(v) * Math.sin(u) * 0.78;
-    let bz = shellRadius * Math.cos(v) * 1.08;
-
-    // Cortical gyri/sulci ridges so it looks unmistakably like a brain
-    const ridge =
-      Math.sin(bz * 8.5 + by * 4.0) * 0.055 +
-      Math.cos(bx * 9.0 - by * 6.0) * 0.04;
-    bx += hemiSign * (0.2 + Math.abs(bx) * 0.32) + ridge * hemiSign;
-
-    if (by < -0.15) {
-      by *= 0.65;
-    }
-
-    // Cerebellum & descending motor tract at back-bottom
-    if (i > count * 0.84) {
-      const stemT = (i - count * 0.84) / (count * 0.16);
-      bx = (r1 - 0.5) * 0.24;
-      by = -0.45 - stemT * 0.85;
-      bz = -0.18 - Math.sin(stemT * Math.PI) * 0.15 + (r2 - 0.5) * 0.16;
-    }
-
-    brainPositions[i * 3] = bx;
-    brainPositions[i * 3 + 1] = by + 0.12;
-    brainPositions[i * 3 + 2] = bz;
-
-    // -----------------------------------------------------------------
-    // 2. 3D ANATOMICAL KNEE (LCA HTH) SURFACE CONSTELLATION
-    // -----------------------------------------------------------------
-    let kx = 0;
-    let ky = 0;
-    let kz = 0;
-
-    if (i < count * 0.38) {
-      // Distal Femur & Dual Femoral Condyles (Clear anatomical silhouette)
-      const t = i / (count * 0.38);
-      const angle = r1 * Math.PI * 2;
-      if (t < 0.62) {
-        const yPos = 0.25 + (t / 0.62) * 0.92;
-        const radius = 0.22 + (1 - t / 0.62) * 0.12;
-        kx = Math.cos(angle) * radius;
-        ky = yPos;
-        kz = Math.sin(angle) * radius;
-      } else {
-        const condyleSign = i % 2 === 0 ? 1 : -1;
-        kx = condyleSign * 0.2 + Math.cos(angle) * 0.17;
-        ky = 0.14 + Math.sin(angle) * 0.18;
-        kz = (r2 - 0.5) * 0.34;
-      }
-    } else if (i < count * 0.74) {
-      // Proximal Tibia, Tibial Plateau & Fibula Head
-      const t = (i - count * 0.38) / (count * 0.36);
-      const angle = r1 * Math.PI * 2;
-      if (t < 0.28) {
-        // Wide Tibial Plateau
-        kx = (r1 - 0.5) * 0.68;
-        ky = -0.14 - t * 0.25;
-        kz = (r2 - 0.5) * 0.44;
-      } else {
-        const yPos = -0.22 - ((t - 0.28) / 0.72) * 0.95;
-        const radius = 0.2 * (1 - (t - 0.28) * 0.22);
-        kx = Math.cos(angle) * radius;
-        ky = yPos;
-        kz = Math.sin(angle) * radius;
-      }
-    } else if (i < count * 0.88) {
-      // Patella (Rótula) + Injerto HTH (Hueso-Tendón-Hueso Rotuliano) in front
-      const t = (i - count * 0.74) / (count * 0.14);
-      const angle = r1 * Math.PI * 2;
-      if (t < 0.5) {
-        // Patella shield
-        kx = Math.cos(angle) * 0.17;
-        ky = 0.12 + Math.sin(angle) * 0.16;
-        kz = 0.34 + (r2 - 0.5) * 0.06;
-      } else {
-        // Patellar tendon (HTH) descending to tibial tuberosity
-        const lt = (t - 0.5) / 0.5;
-        kx = (r1 - 0.5) * 0.1;
-        ky = 0.04 - lt * 0.36;
-        kz = 0.33 - lt * 0.08;
-      }
-    } else {
-      // Glowing Reconstructed ACL Graft (LCA) crossing diagonal inside the notch
-      const t = (i - count * 0.88) / (count * 0.12);
-      kx = -0.12 + t * 0.24 + (r1 - 0.5) * 0.05;
-      ky = 0.22 - t * 0.42 + (r2 - 0.5) * 0.05;
-      kz = -0.12 + t * 0.26 + (r3 - 0.5) * 0.05;
-    }
-
-    kneePositions[i * 3] = kx;
-    kneePositions[i * 3 + 1] = ky;
-    kneePositions[i * 3 + 2] = kz;
-
-    // Color assignment: highlight ACL & Patellar HTH in Pure White & Bright Turquoise
-    let colorIdx = Math.floor(r4 * colorObjs.length);
-    if (i >= count * 0.74) {
-      colorIdx = i % 2 === 0 ? 0 : 2; // #38d9d6 Turquoise & #ffffff White
-    }
-    const c = colorObjs[colorIdx];
-    colors[i * 3] = c.r;
-    colors[i * 3 + 1] = c.g;
-    colors[i * 3 + 2] = c.b;
-
-    scales[i] = 0.65 + r5 * 0.85;
-    phases[i] = r1 * Math.PI * 2;
+/**
+ * Generates a smooth, anatomically proportioned 3D bone shaft + condylar flare
+ * using LatheGeometry + gentle anteroposterior sculpting.
+ */
+function createFemurGeometry(): THREE.BufferGeometry {
+  const points: THREE.Vector2[] = [];
+  const steps = 32;
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps; // 0 = condylar base (y=0.05), 1 = proximal shaft (y=1.18)
+    const y = 0.08 + t * 1.1;
+    // Smooth metaphyseal flare towards the femoral condyles at the bottom
+    const flare = Math.exp(-t * 4.2) * 0.14;
+    const shaft = 0.135 + 0.015 * Math.sin(t * Math.PI);
+    const r = (shaft + flare) * (i === steps ? 0.92 : 1);
+    points.push(new THREE.Vector2(r, y));
   }
-
-  return { brainPositions, kneePositions, colors, scales, phases };
+  const geom = new THREE.LatheGeometry(points, 36);
+  geom.computeVertexNormals();
+  return geom;
 }
 
-interface ConstellationCloudProps {
-  mode: 'auto' | 'brain' | 'knee';
+function createTibiaGeometry(): THREE.BufferGeometry {
+  const points: THREE.Vector2[] = [];
+  const steps = 32;
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps; // 0 = distal shaft (y=-1.18), 1 = tibial plateau (y=-0.06)
+    const y = -1.16 + t * 1.1;
+    // Smooth flare up to the broad tibial plateau at t = 1
+    const flare = Math.pow(t, 3.2) * 0.16;
+    const shaft = 0.115 + 0.015 * t;
+    const r = shaft + flare;
+    points.push(new THREE.Vector2(r, y));
+  }
+  const geom = new THREE.LatheGeometry(points, 36);
+  geom.computeVertexNormals();
+  return geom;
 }
 
-const ConstellationCloud: React.FC<ConstellationCloudProps> = ({ mode }) => {
-  const meshRef = useRef<THREE.InstancedMesh>(null);
-  const groupRef = useRef<THREE.Group>(null);
-  const kneeMeshGroupRef = useRef<THREE.Group>(null);
-  const tibiaGroupRef = useRef<THREE.Group>(null);
-  const brainShellRef = useRef<THREE.Group>(null);
-  // Start directly showing the 3D Knee (morph = 1) so it's immediately clear
-  const morphRef = useRef(1);
+interface AnatomicalKneeJointProps {
+  playing: boolean;
+  highlightHTH: boolean;
+}
 
-  const { brainPositions, kneePositions, colors, scales, phases } = useMemo(
-    () => generateConstellations(PARTICLE_COUNT),
+const AnatomicalKneeJoint: React.FC<AnatomicalKneeJointProps> = ({
+  playing,
+  highlightHTH
+}) => {
+  const rootGroupRef = useRef<THREE.Group>(null);
+  const tibiaAssemblyRef = useRef<THREE.Group>(null);
+  const patellaAssemblyRef = useRef<THREE.Group>(null);
+  const aclGraftRef = useRef<THREE.Mesh>(null);
+  const phaseRef = useRef(0.2);
+
+  const femurShaftGeom = useMemo(() => createFemurGeometry(), []);
+  const tibiaShaftGeom = useMemo(() => createTibiaGeometry(), []);
+
+  // Realistic clinical materials: Ivory Bone, Hyaline Cartilage, Turquoise Graft
+  const boneMaterial = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: '#EFECE6',
+        roughness: 0.52,
+        metalness: 0.04
+      }),
     []
   );
 
-  const triangleGeometry = useMemo(() => {
-    const geom = new THREE.BufferGeometry();
-    const s = 0.02;
-    const vertices = new Float32Array([
-      0, s, 0,
-      -s * 0.866, -s * 0.5, 0,
-      s * 0.866, -s * 0.5, 0
-    ]);
-    geom.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-    geom.computeVertexNormals();
-    return geom;
-  }, []);
+  const cartilageMaterial = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: '#CBE4E8',
+        roughness: 0.28,
+        metalness: 0.05
+      }),
+    []
+  );
 
-  const dummyObj = useMemo(() => new THREE.Object3D(), []);
-  const colorAttrInitialized = useRef(false);
+  const meniscusMaterial = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: '#8CBCC4',
+        roughness: 0.35,
+        metalness: 0.05
+      }),
+    []
+  );
 
-  useFrame((state, delta) => {
-    const mesh = meshRef.current;
-    if (!mesh) return;
-
-    if (!colorAttrInitialized.current) {
-      const c = new THREE.Color();
-      for (let i = 0; i < PARTICLE_COUNT; i++) {
-        c.setRGB(colors[i * 3], colors[i * 3 + 1], colors[i * 3 + 2]);
-        mesh.setColorAt(i, c);
-      }
-      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-      colorAttrInitialized.current = true;
+  useFrame((_, delta) => {
+    const clampedDelta = Math.min(delta, 0.05);
+    if (playing) {
+      phaseRef.current += clampedDelta * 0.38;
     }
 
-    const t = state.clock.getElapsedTime();
+    // Smooth physiological knee flexion-extension cycle (0° to ~68°)
+    const rawCycle = 0.5 - 0.5 * Math.cos(phaseRef.current * Math.PI * 2);
+    const flexAngle = THREE.MathUtils.smoothstep(rawCycle, 0.05, 0.95) * 1.15;
 
-    // Target morph: 0 = Brain, 1 = Knee (in 'auto', spends 70% on Knee and 30% on Brain)
-    let targetMorph = 1;
-    if (mode === 'knee') {
-      targetMorph = 1;
-    } else if (mode === 'brain') {
-      targetMorph = 0;
-    } else {
-      const cycle = Math.cos(t * 0.45);
-      targetMorph = THREE.MathUtils.smoothstep(cycle, -0.55, 0.15);
+    if (tibiaAssemblyRef.current) {
+      // In our anatomical joint: +Z is Anterior, -Z is Posterior.
+      // Flexing the knee bends the distal tibia posteriorly (-Z), which is a positive rotation around X.
+      tibiaAssemblyRef.current.rotation.x = flexAngle;
     }
 
-    morphRef.current += (targetMorph - morphRef.current) * Math.min(1, delta * 3.0);
-    const m = morphRef.current;
-
-    if (groupRef.current) {
-      groupRef.current.rotation.y = Math.sin(t * 0.35) * 0.45 + state.pointer.x * 0.35;
-      groupRef.current.rotation.x = Math.sin(t * 0.25) * 0.06 - state.pointer.y * 0.18;
+    if (patellaAssemblyRef.current) {
+      // Patella glides inferiorly and posteriorly along the femoral trochlea as knee flexes
+      const patellaY = 0.16 - flexAngle * 0.14;
+      const patellaZ = 0.31 - flexAngle * 0.075;
+      patellaAssemblyRef.current.position.set(0, patellaY, patellaZ);
+      patellaAssemblyRef.current.rotation.x = flexAngle * 0.52;
     }
 
-    // Gentle anatomical knee flexion in real time
-    const kneeFlexAngle = (0.5 - 0.5 * Math.cos(t * 1.35)) * 0.52 * m;
-    const cosFlex = Math.cos(kneeFlexAngle);
-    const sinFlex = Math.sin(kneeFlexAngle);
-
-    if (kneeMeshGroupRef.current) {
-      kneeMeshGroupRef.current.visible = m > 0.05;
-      kneeMeshGroupRef.current.scale.setScalar(Math.max(0.001, m));
-    }
-    if (tibiaGroupRef.current) {
-      tibiaGroupRef.current.rotation.x = kneeFlexAngle;
-    }
-    if (brainShellRef.current) {
-      brainShellRef.current.visible = 1 - m > 0.05;
-      brainShellRef.current.scale.setScalar(Math.max(0.001, 1 - m));
+    if (aclGraftRef.current) {
+      // ACL runs from posteromedial aspect of lateral femoral condyle to anteromedial tibial spine
+      aclGraftRef.current.rotation.x = -0.52 + flexAngle * 0.38;
+      aclGraftRef.current.position.set(0, 0.01 - flexAngle * 0.02, 0.02 - flexAngle * 0.03);
     }
 
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      const idx = i * 3;
-      const phase = phases[i];
-
-      const bx = brainPositions[idx];
-      const by = brainPositions[idx + 1];
-      const bz = brainPositions[idx + 2];
-
-      const kx = kneePositions[idx];
-      let ky = kneePositions[idx + 1];
-      let kz = kneePositions[idx + 2];
-
-      if (ky < -0.05) {
-        const dy = ky + 0.05;
-        const dz = kz;
-        ky = -0.05 + dy * cosFlex - dz * sinFlex;
-        kz = dz * cosFlex + dy * sinFlex;
-      }
-
-      const x = THREE.MathUtils.lerp(bx, kx, m) + Math.sin(t * 1.4 + phase) * 0.012;
-      const y = THREE.MathUtils.lerp(by, ky, m) + Math.cos(t * 1.2 + phase) * 0.012;
-      const z = THREE.MathUtils.lerp(bz, kz, m) + Math.sin(t * 1.5 + phase * 0.7) * 0.012;
-
-      dummyObj.position.set(x, y, z);
-      dummyObj.rotation.set(
-        t * 0.7 + phase,
-        t * 0.5 + phase * 1.3,
-        t * 0.4 + phase * 0.7
-      );
-      const pulse = 0.88 + 0.25 * Math.sin(t * 2.2 + phase);
-      dummyObj.scale.setScalar(scales[i] * pulse);
-      dummyObj.updateMatrix();
-      mesh.setMatrixAt(i, dummyObj.matrix);
+    if (rootGroupRef.current && playing) {
+      // Subtle 3/4 clinical oblique presentation so both Patella/HTH and intra-articular LCA are visible
+      rootGroupRef.current.rotation.y = -0.58 + Math.sin(phaseRef.current * Math.PI) * 0.18;
     }
-
-    mesh.instanceMatrix.needsUpdate = true;
   });
 
+  const graftColor = '#25C8CC';
+  const graftEmissive = highlightHTH ? '#25C8CC' : '#12787B';
+  const graftEmissiveIntensity = highlightHTH ? 0.55 : 0.22;
+
   return (
-    <group ref={groupRef}>
-      {/* Instanced 3D Celestial Particles */}
-      <instancedMesh
-        ref={meshRef}
-        args={[triangleGeometry, undefined, PARTICLE_COUNT]}
-        frustumCulled={false}
-      >
-        <meshBasicMaterial
-          side={THREE.DoubleSide}
-          toneMapped={false}
-          transparent
-          opacity={0.94}
-        />
-      </instancedMesh>
+    <group ref={rootGroupRef} rotation={[0.04, -0.55, 0]} position={[0, -0.04, 0]}>
+      {/* ================================================================= */}
+      {/* 1. FÉMUR DISTAL (Hueso Marfil + Cóndilos Femorales + Cartílago)   */}
+      {/* ================================================================= */}
+      <group>
+        <mesh geometry={femurShaftGeom} material={boneMaterial} castShadow receiveShadow />
 
-      {/* HOLOGRAPHIC 3D ANATOMICAL KNEE CORE (Makes the Knee 100% Recognizable!) */}
-      <group ref={kneeMeshGroupRef}>
-        {/* Distal Femur Shaft & Condyles */}
-        <mesh position={[0, 0.65, 0]}>
-          <cylinderGeometry args={[0.19, 0.23, 0.85, 20]} />
-          <meshStandardMaterial
-            color="#0ea5e9"
-            emissive="#38d9d6"
-            emissiveIntensity={0.25}
-            transparent
-            opacity={0.28}
-            wireframe={false}
-          />
-        </mesh>
-        <mesh position={[-0.17, 0.16, 0]}>
-          <sphereGeometry args={[0.17, 20, 20]} />
-          <meshStandardMaterial
-            color="#38d9d6"
-            emissive="#38d9d6"
-            emissiveIntensity={0.3}
-            transparent
-            opacity={0.32}
-          />
-        </mesh>
-        <mesh position={[0.17, 0.16, 0]}>
-          <sphereGeometry args={[0.17, 20, 20]} />
-          <meshStandardMaterial
-            color="#38d9d6"
-            emissive="#38d9d6"
-            emissiveIntensity={0.3}
-            transparent
-            opacity={0.32}
-          />
+        {/* Proximal cross-section cap */}
+        <mesh position={[0, 1.18, 0]} material={boneMaterial}>
+          <SphereCap radius={0.125} />
         </mesh>
 
-        {/* Glowing Reconstructed ACL (LCA) Graft inside the joint */}
-        <mesh position={[0, 0.0, 0.04]} rotation={[0.45, 0, -0.35]}>
-          <cylinderGeometry args={[0.036, 0.036, 0.36, 16]} />
-          <meshBasicMaterial color="#ffffff" />
+        {/* Medial & Lateral Femoral Condyles */}
+        <mesh
+          position={[-0.145, 0.11, -0.03]}
+          scale={[0.88, 1.05, 1.32]}
+          material={boneMaterial}
+          castShadow
+          receiveShadow
+        >
+          <sphereGeometry args={[0.165, 32, 32]} />
+        </mesh>
+        <mesh
+          position={[0.145, 0.11, -0.03]}
+          scale={[0.88, 1.05, 1.32]}
+          material={boneMaterial}
+          castShadow
+          receiveShadow
+        >
+          <sphereGeometry args={[0.165, 32, 32]} />
         </mesh>
 
-        {/* Patella (Rótula) */}
-        <mesh position={[0, 0.14, 0.32]}>
-          <sphereGeometry args={[0.13, 18, 18]} />
-          <meshStandardMaterial
-            color="#7dd3fc"
-            emissive="#38d9d6"
-            emissiveIntensity={0.45}
-            transparent
-            opacity={0.65}
-          />
+        {/* Anterior Trochlear Groove Bridge */}
+        <mesh
+          position={[0, 0.14, 0.1]}
+          scale={[1.25, 0.9, 0.85]}
+          material={cartilageMaterial}
+          receiveShadow
+        >
+          <sphereGeometry args={[0.14, 28, 28]} />
         </mesh>
 
-        {/* Articulated Tibia + Patellar Tendon (HTH Graft) */}
-        <group ref={tibiaGroupRef} position={[0, -0.05, 0]}>
-          {/* Tibial Plateau */}
-          <mesh position={[0, -0.1, 0]}>
-            <cylinderGeometry args={[0.28, 0.22, 0.14, 24]} />
-            <meshStandardMaterial
-              color="#38d9d6"
-              emissive="#0ea5e9"
-              emissiveIntensity={0.3}
-              transparent
-              opacity={0.34}
-            />
-          </mesh>
-          {/* Tibial Shaft */}
-          <mesh position={[0, -0.58, 0]}>
-            <cylinderGeometry args={[0.19, 0.14, 0.85, 20]} />
-            <meshStandardMaterial
-              color="#0ea5e9"
-              emissive="#38d9d6"
-              emissiveIntensity={0.22}
-              transparent
-              opacity={0.28}
-            />
-          </mesh>
-          {/* Glowing HTH Patellar Tendon Graft Band */}
-          <mesh position={[0, -0.05, 0.3]} rotation={[0.18, 0, 0]}>
-            <boxGeometry args={[0.075, 0.32, 0.025]} />
-            <meshBasicMaterial color="#38d9d6" transparent opacity={0.85} />
-          </mesh>
-        </group>
-
-        {/* Orbital Holographic Biomechanical Ring around Knee */}
-        <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.48, 0.5, 48]} />
-          <meshBasicMaterial color="#38d9d6" transparent opacity={0.45} side={THREE.DoubleSide} />
+        {/* Smooth Hyaline Articular Cartilage Layers on Condyles */}
+        <mesh
+          position={[-0.145, 0.085, -0.02]}
+          scale={[0.9, 0.95, 1.34]}
+          material={cartilageMaterial}
+        >
+          <sphereGeometry args={[0.166, 28, 28]} />
+        </mesh>
+        <mesh
+          position={[0.145, 0.085, -0.02]}
+          scale={[0.9, 0.95, 1.34]}
+          material={cartilageMaterial}
+        >
+          <sphereGeometry args={[0.166, 28, 28]} />
         </mesh>
       </group>
 
-      {/* HOLOGRAPHIC 3D BRAIN CORTEX CORE (Visible in Brain mode) */}
-      <group ref={brainShellRef} position={[0, 0.12, 0]}>
-        <mesh position={[-0.26, 0, 0]} scale={[0.55, 0.72, 0.98]}>
-          <sphereGeometry args={[0.85, 20, 20]} />
+      {/* ================================================================= */}
+      {/* 2. LIGAMENTO CRUZADO ANTERIOR RECONSTRUIDO (LCA EN TURQUESA)      */}
+      {/* ================================================================= */}
+      <mesh ref={aclGraftRef} position={[0, 0.01, 0.02]} rotation={[-0.52, 0, 0.24]} castShadow>
+        <cylinderGeometry args={[0.036, 0.04, 0.28, 24]} />
+        <meshStandardMaterial
+          color={graftColor}
+          emissive={graftEmissive}
+          emissiveIntensity={graftEmissiveIntensity + 0.12}
+          roughness={0.3}
+        />
+      </mesh>
+
+      {/* Ligamento Cruzado Posterior (Referencia anatómica en tono neutro) */}
+      <mesh position={[0.02, 0.0, -0.06]} rotation={[0.48, 0, -0.22]}>
+        <cylinderGeometry args={[0.028, 0.03, 0.25, 20]} />
+        <meshStandardMaterial color="#9BB2BE" roughness={0.55} />
+      </mesh>
+
+      {/* ================================================================= */}
+      {/* 3. RÓTULA (PATELLA) + TENDÓN CUADRICIPITAL                        */}
+      {/* ================================================================= */}
+      <group ref={patellaAssemblyRef} position={[0, 0.16, 0.31]}>
+        {/* Rótula ósea */}
+        <mesh scale={[1.05, 1.12, 0.58]} material={boneMaterial} castShadow receiveShadow>
+          <sphereGeometry args={[0.135, 28, 28]} />
+        </mesh>
+
+        {/* Bloque óseo rotuliano del injerto HTH (resaltado cuando se activa HTH) */}
+        <mesh position={[0, -0.04, 0.055]}>
+          <boxGeometry args={[0.065, 0.11, 0.045]} />
           <meshStandardMaterial
-            color="#38d9d6"
-            emissive="#0ea5e9"
-            emissiveIntensity={0.35}
-            transparent
-            opacity={0.24}
-            wireframe
+            color={highlightHTH ? '#82E5E4' : '#DFDCD4'}
+            emissive={highlightHTH ? '#25C8CC' : '#000000'}
+            emissiveIntensity={highlightHTH ? 0.55 : 0}
+            roughness={0.4}
           />
         </mesh>
-        <mesh position={[0.26, 0, 0]} scale={[0.55, 0.72, 0.98]}>
-          <sphereGeometry args={[0.85, 20, 20]} />
+
+        {/* Tendón cuadricipital superior (suave transición hacia el muslo) */}
+        <mesh position={[0, 0.28, -0.04]} rotation={[0.18, 0, 0]}>
+          <cylinderGeometry args={[0.085, 0.095, 0.36, 20]} />
+          <meshStandardMaterial color="#D5DEE2" roughness={0.55} transparent opacity={0.75} />
+        </mesh>
+      </group>
+
+      {/* ================================================================= */}
+      {/* 4. TIBIA PROXIMAL, MENISCOS, PERONÉ E INJERTO ROTULIANO (HTH)     */}
+      {/* ================================================================= */}
+      <group ref={tibiaAssemblyRef} position={[0, -0.02, 0]}>
+        <mesh geometry={tibiaShaftGeom} material={boneMaterial} castShadow receiveShadow />
+
+        {/* Tibial Plateau Condylar Caps */}
+        <mesh
+          position={[0, -0.07, -0.01]}
+          scale={[1.18, 0.32, 0.92]}
+          material={boneMaterial}
+          receiveShadow
+        >
+          <cylinderGeometry args={[0.26, 0.23, 0.18, 32]} />
+        </mesh>
+
+        {/* Medial & Lateral Menisci (Anatomical C-shaped fibrocartilage rings) */}
+        <mesh
+          position={[-0.135, -0.035, -0.01]}
+          rotation={[Math.PI / 2, 0, 0]}
+          material={meniscusMaterial}
+        >
+          <torusGeometry args={[0.115, 0.024, 16, 32]} />
+        </mesh>
+        <mesh
+          position={[0.135, -0.035, -0.01]}
+          rotation={[Math.PI / 2, 0, 0]}
+          material={meniscusMaterial}
+        >
+          <torusGeometry args={[0.115, 0.024, 16, 32]} />
+        </mesh>
+
+        {/* Tuberosidad Anterior de la Tibia (Inserción distal del injerto HTH) */}
+        <mesh position={[0, -0.27, 0.21]} scale={[0.9, 1.2, 0.8]} material={boneMaterial}>
+          <sphereGeometry args={[0.075, 20, 20]} />
+        </mesh>
+
+        {/* Bloque óseo tibial del injerto HTH */}
+        <mesh position={[0, -0.26, 0.245]}>
+          <boxGeometry args={[0.065, 0.11, 0.045]} />
           <meshStandardMaterial
-            color="#38d9d6"
-            emissive="#0ea5e9"
-            emissiveIntensity={0.35}
-            transparent
-            opacity={0.24}
-            wireframe
+            color={highlightHTH ? '#82E5E4' : '#DFDCD4'}
+            emissive={highlightHTH ? '#25C8CC' : '#000000'}
+            emissiveIntensity={highlightHTH ? 0.55 : 0}
+            roughness={0.4}
           />
         </mesh>
+
+        {/* Tendón Rotuliano — Injerto HTH (Hueso-Tendón-Hueso) en Turquesa Clínico */}
+        <mesh position={[0, -0.08, 0.275]} rotation={[-0.14, 0, 0]} castShadow>
+          <boxGeometry args={[0.082, 0.34, 0.032]} />
+          <meshStandardMaterial
+            color={graftColor}
+            emissive={graftEmissive}
+            emissiveIntensity={graftEmissiveIntensity}
+            roughness={0.32}
+          />
+        </mesh>
+
+        {/* Peroné (Fibula — lateral anatomical landmark) */}
+        <group position={[-0.24, -0.22, -0.08]}>
+          <mesh material={boneMaterial} castShadow>
+            <sphereGeometry args={[0.075, 20, 20]} />
+          </mesh>
+          <mesh position={[0.01, -0.48, 0]} material={boneMaterial} castShadow>
+            <cylinderGeometry args={[0.045, 0.038, 0.92, 20]} />
+          </mesh>
+        </group>
       </group>
     </group>
   );
 };
 
+const SphereCap: React.FC<{ radius: number }> = ({ radius }) => (
+  <sphereGeometry args={[radius, 24, 16]} />
+);
+
 export interface ConstellationHero3DProps {
   mode?: 'auto' | 'brain' | 'knee';
 }
 
-export const ConstellationHero3D: React.FC<ConstellationHero3DProps> = ({
-  mode = 'knee'
-}) => {
+export const ConstellationHero3D: React.FC<ConstellationHero3DProps> = () => {
+  const [playing, setPlaying] = useState(true);
+  const [highlightHTH, setHighlightHTH] = useState(true);
+  const controlsRef = useRef<OrbitControlsImpl | null>(null);
+
+  const handleResetCamera = () => {
+    if (controlsRef.current) {
+      controlsRef.current.reset();
+    }
+  };
+
   return (
-    <div className="relative w-full h-full">
-      <Canvas
-        dpr={[1, 1.75]}
-        camera={{ position: [0, 0.05, 2.95], fov: 40, near: 0.1, far: 20 }}
-        gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-        style={{ width: '100%', height: '100%' }}
-      >
-        <ambientLight intensity={1.1} />
-        <directionalLight position={[2, 3, 2]} intensity={1.4} color="#ffffff" />
-        <directionalLight position={[-2, -1, 2]} intensity={0.8} color="#38d9d6" />
-        <ConstellationCloud mode={mode} />
-        <OrbitControls
-          enableZoom={false}
-          enablePan={false}
-          rotateSpeed={0.65}
-          minPolarAngle={Math.PI * 0.25}
-          maxPolarAngle={Math.PI * 0.75}
-        />
-      </Canvas>
+    <div className="relative w-full h-full flex flex-col justify-between rounded-2xl bg-[#081A28] border border-[#244154] overflow-hidden">
+      {/* Discreet top anatomical legend */}
+      <div className="pointer-events-none absolute top-3 left-3 right-3 z-10 flex items-center justify-between gap-2">
+        <span className="inline-flex items-center gap-2 rounded-full bg-[#061522]/85 backdrop-blur-md border border-[#244154] px-3 py-1 text-[11px] font-medium text-[#F1F7FA]">
+          <span className="h-2 w-2 rounded-full bg-[#25C8CC]" />
+          <span>Anatomía 3D · LCA + Injerto HTH</span>
+        </span>
+      </div>
+
+      <div className="w-full h-full">
+        <Canvas
+          shadows
+          dpr={[1, 1.75]}
+          camera={{ position: [0, 0.06, 2.85], fov: 36, near: 0.1, far: 15 }}
+          gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+          style={{ width: '100%', height: '100%' }}
+        >
+          <ambientLight intensity={0.95} />
+          <hemisphereLight args={['#F1F7FA', '#10283A', 0.65]} />
+          <directionalLight
+            position={[2.2, 2.8, 2.6]}
+            intensity={1.25}
+            color="#FFFFFF"
+            castShadow
+          />
+          <directionalLight position={[-2.2, 1.2, 1.5]} intensity={0.55} color="#82E5E4" />
+          <directionalLight position={[0, -1.5, -2.0]} intensity={0.35} color="#25C8CC" />
+
+          <AnatomicalKneeJoint playing={playing} highlightHTH={highlightHTH} />
+
+          <ContactShadows
+            position={[0, -1.22, 0]}
+            opacity={0.35}
+            scale={2.4}
+            blur={2.4}
+            far={1.6}
+            color="#030B12"
+          />
+
+          <OrbitControls
+            ref={controlsRef}
+            enableZoom={false}
+            enablePan={false}
+            rotateSpeed={0.6}
+            minPolarAngle={Math.PI * 0.28}
+            maxPolarAngle={Math.PI * 0.68}
+            minAzimuthAngle={-Math.PI * 0.45}
+            maxAzimuthAngle={Math.PI * 0.45}
+          />
+        </Canvas>
+      </div>
+
+      {/* Discreet bottom medical viewer controls */}
+      <div className="absolute bottom-2.5 left-3 right-3 z-10 flex items-center justify-between gap-2">
+        <button
+          type="button"
+          onClick={() => setHighlightHTH((prev) => !prev)}
+          aria-pressed={highlightHTH}
+          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium border transition-colors ${
+            highlightHTH
+              ? 'bg-[#25C8CC]/20 border-[#25C8CC] text-[#F1F7FA]'
+              : 'bg-[#061522]/85 border-[#244154] text-[#A7B9C6] hover:text-[#F1F7FA]'
+          }`}
+        >
+          <Eye className="h-3.5 w-3.5 text-[#25C8CC]" />
+          <span>Resaltar injerto HTH</span>
+        </button>
+
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={handleResetCamera}
+            title="Restablecer vista 3D"
+            aria-label="Restablecer vista 3D"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#061522]/85 border border-[#244154] text-[#A7B9C6] hover:text-[#F1F7FA] hover:border-[#25C8CC] transition-colors"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setPlaying((prev) => !prev)}
+            aria-label={playing ? 'Pausar flexión 3D' : 'Reproducir flexión 3D'}
+            className="inline-flex items-center gap-1 rounded-full bg-[#061522]/85 border border-[#244154] px-2.5 py-1 text-[11px] font-medium text-[#F1F7FA] hover:border-[#25C8CC] transition-colors"
+          >
+            {playing ? <Pause className="h-3 w-3 text-[#25C8CC]" /> : <Play className="h-3 w-3 text-[#25C8CC]" />}
+            <span>{playing ? 'Pausar' : 'Animar'}</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

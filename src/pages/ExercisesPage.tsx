@@ -19,22 +19,22 @@ export const ExercisesPage: React.FC = () => {
   );
 
   return (
-    <div className="space-y-8 sm:space-y-12">
+    <div className="space-y-8 sm:space-y-10">
       <SectionHeader
-        badge="Rehabilitación posoperatoria LCA (HTH) · Semanas 1 a 3"
+        badge="Semanas 1–3 · Según indicación profesional"
         title="Biblioteca de ejercicios 3D"
-        subtitle="Sección A (5 ejercicios del banner académico) y Sección B (4 ejercicios complementarios de movilidad y activación)."
+        subtitle="Módulo A (5 ejercicios del banner académico) y Módulo B (4 ejercicios complementarios de movilidad y activación)."
         rightSlot={
           <div className="flex items-center gap-2">
-            <div className="inline-flex items-center rounded-full border border-cyan-300/25 bg-[#081b2d] p-0.5">
+            <div className="inline-flex items-center rounded-xl border border-[#244154] bg-[#0B2030] p-0.5">
               <button
                 type="button"
                 onClick={() => setViewMode('carousel')}
                 aria-pressed={viewMode === 'carousel'}
-                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold transition-all ${
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
                   viewMode === 'carousel'
-                    ? 'bg-[#1db8c4] text-white'
-                    : 'text-sky-200 hover:text-white'
+                    ? 'bg-[#25C8CC] text-[#061522]'
+                    : 'text-[#A7B9C6] hover:text-[#F1F7FA]'
                 }`}
               >
                 <Layers className="h-3.5 w-3.5" />
@@ -44,36 +44,36 @@ export const ExercisesPage: React.FC = () => {
                 type="button"
                 onClick={() => setViewMode('grid')}
                 aria-pressed={viewMode === 'grid'}
-                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold transition-all ${
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
                   viewMode === 'grid'
-                    ? 'bg-[#1db8c4] text-white'
-                    : 'text-sky-200 hover:text-white'
+                    ? 'bg-[#25C8CC] text-[#061522]'
+                    : 'text-[#A7B9C6] hover:text-[#F1F7FA]'
                 }`}
               >
                 <LayoutGrid className="h-3.5 w-3.5" />
-                <span>Tarjetas</span>
+                <span>Lista completa</span>
               </button>
             </div>
 
             <button
               type="button"
               onClick={() => window.print()}
-              className="inline-flex min-h-[34px] items-center gap-1.5 rounded-full border border-cyan-300/25 bg-[#081b2d] px-3 py-1 text-xs font-bold text-white hover:border-[#38d9d6] transition-colors"
+              className="inline-flex min-h-[34px] items-center gap-1.5 rounded-xl border border-[#244154] bg-[#0B2030] px-3 py-1.5 text-xs font-semibold text-[#F1F7FA] hover:border-[#25C8CC] transition-colors"
             >
-              <Printer className="h-3.5 w-3.5 text-[#38d9d6]" aria-hidden="true" />
+              <Printer className="h-3.5 w-3.5 text-[#25C8CC]" aria-hidden="true" />
               <span>Imprimir</span>
             </button>
           </div>
         }
       />
 
-      {/* SECCIÓN A: RECUPERACIÓN DE LA FLEXIÓN */}
+      {/* MÓDULO A: RECUPERACIÓN DE LA FLEXIÓN */}
       <section aria-labelledby="exercises-flexion-heading" className="space-y-4">
         <div>
-          <span className="inline-flex items-center rounded-full bg-[#38d9d6]/20 border border-[#38d9d6]/40 px-3 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#67e8f9] mb-1">
-            Sección A · Banner Académico (1 al 5)
+          <span className="inline-flex items-center rounded-full bg-[#10283A] border border-[#244154] px-3 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#25C8CC] mb-1.5">
+            Módulo A · Ejercicios principales del banner (1 al 5)
           </span>
-          <h2 id="exercises-flexion-heading" className="dala-display text-2xl sm:text-3xl text-white">
+          <h2 id="exercises-flexion-heading" className="text-xl sm:text-2xl font-bold text-[#F1F7FA]">
             Recuperación de la flexión
           </h2>
         </div>
@@ -91,35 +91,31 @@ export const ExercisesPage: React.FC = () => {
         <div
           className={
             viewMode === 'grid'
-              ? 'grid grid-cols-1 gap-4 lg:grid-cols-2'
+              ? 'grid grid-cols-1 gap-4'
               : 'hidden print:grid print:grid-cols-1 print:gap-4'
           }
         >
-          {flexionExercises.map((exercise, idx) => {
-            const isOddLast =
-              flexionExercises.length % 2 === 1 && idx === flexionExercises.length - 1;
-            return (
-              <ExerciseCard
-                key={exercise.id}
-                exercise={exercise}
-                indexNumber={idx + 1}
-                featured={isOddLast}
-              />
-            );
-          })}
+          {flexionExercises.map((exercise, idx) => (
+            <ExerciseCard
+              key={exercise.id}
+              exercise={exercise}
+              indexNumber={idx + 1}
+              featured={true}
+            />
+          ))}
         </div>
       </section>
 
-      {/* SECCIÓN B: MOVILIDAD Y ACTIVACIÓN COMPLEMENTARIA */}
+      {/* MÓDULO B: MOVILIDAD Y ACTIVACIÓN COMPLEMENTARIA */}
       <section
         aria-labelledby="exercises-comp-heading"
-        className="pt-6 border-t border-cyan-300/20 space-y-4"
+        className="pt-6 border-t border-[#244154] space-y-4"
       >
         <div>
-          <span className="inline-flex items-center rounded-full bg-sky-500/20 border border-sky-400/40 px-3 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-sky-200 mb-1">
-            Sección B · Semanas 1 a 3 (6 al 9)
+          <span className="inline-flex items-center rounded-full bg-[#10283A] border border-[#244154] px-3 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#82E5E4] mb-1.5">
+            Módulo B · Semanas 1 a 3 (6 al 9)
           </span>
-          <h2 id="exercises-comp-heading" className="dala-display text-2xl sm:text-3xl text-white">
+          <h2 id="exercises-comp-heading" className="text-xl sm:text-2xl font-bold text-[#F1F7FA]">
             Movilidad y activación complementaria
           </h2>
         </div>
@@ -137,7 +133,7 @@ export const ExercisesPage: React.FC = () => {
         <div
           className={
             viewMode === 'grid'
-              ? 'grid grid-cols-1 gap-4 lg:grid-cols-2'
+              ? 'grid grid-cols-1 gap-4'
               : 'hidden print:grid print:grid-cols-1 print:gap-4'
           }
         >
@@ -146,7 +142,7 @@ export const ExercisesPage: React.FC = () => {
               key={exercise.id}
               exercise={exercise}
               indexNumber={idx + 6}
-              featured={false}
+              featured={true}
             />
           ))}
         </div>

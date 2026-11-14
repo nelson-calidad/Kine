@@ -8,13 +8,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        void: '#061523',
-        'bone-white': '#ffffff',
-        'ash-gray': '#a3c9dc',
-        'silver-mist': '#e6f6fa',
-        'electric-iris': '#22b8cf',
-        'saffron-spark': '#67e8f9',
-        'deep-verdant': '#0ea5e9',
+        void: '#061522',
+        'bone-white': '#F1F7FA',
+        'ash-gray': '#A7B9C6',
+        'silver-mist': '#E2EEF4',
+        'electric-iris': '#25C8CC',
+        'saffron-spark': '#82E5E4',
+        'deep-verdant': '#10283A',
         brand: {
           navy: 'var(--color-navy)',
           teal: 'var(--color-teal)',
@@ -31,13 +31,13 @@ export default {
         sans: ['PPNeueMontreal', 'Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
       borderRadius: {
-        'card': '1.25rem',
-        'card-lg': '1.5rem',
-        '3xl': '1.5rem',
+        'card': '1rem',
+        'card-lg': '1.25rem',
+        '3xl': '1.25rem',
       },
       boxShadow: {
-        'soft': '0 10px 30px -10px rgba(2, 12, 24, 0.6)',
-        'soft-lg': '0 18px 40px -12px rgba(2, 12, 24, 0.75)',
+        'soft': '0 10px 28px -12px rgba(2, 10, 18, 0.55)',
+        'soft-lg': '0 16px 36px -14px rgba(2, 10, 18, 0.65)',
       }
     },
   },

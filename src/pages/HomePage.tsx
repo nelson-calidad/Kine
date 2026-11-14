@@ -6,13 +6,15 @@ import {
   ClipboardList,
   AlertTriangle,
   HelpCircle,
-  Footprints,
-  Stethoscope,
   BookOpen,
   Printer,
   ChevronRight,
   Layers,
-  LayoutGrid
+  LayoutGrid,
+  CheckCircle2,
+  OctagonAlert,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { EXERCISES_DATA } from '../data/exercises';
 import { ExerciseCarousel } from '../components/exercises/ExerciseCarousel';
@@ -22,68 +24,118 @@ const ConstellationHero3D = lazy(
   () => import('../components/exercises/three/ConstellationHero3D')
 );
 
-const SECONDARY_SECTIONS = [
+type ClinicalModuleTab =
+  | 'cuidados'
+  | 'evitar'
+  | 'seguimiento'
+  | 'preguntas'
+  | 'alertas'
+  | 'fuentes';
+
+const CARE_CARDS = [
   {
-    to: '/cuidados',
-    title: 'Cuidados',
-    summary: 'Hielo, herida y muletas',
-    icon: HeartHandshake,
-    danger: false
+    title: 'Herida quirúrgica',
+    desc: 'Mantener el vendaje limpio y seco. No retirar apósitos ni mojar la herida sin indicación médica.'
   },
   {
-    to: '/que-evitar',
-    title: 'Qué evitar',
-    summary: 'Los NO en casa',
-    icon: Ban,
-    danger: false
+    title: 'Manejo del frío local',
+    desc: 'Aplicar frío protegiendo siempre la piel con un paño para ayudar a controlar el dolor y la inflamación.'
   },
   {
-    to: '/seguimiento',
-    title: 'Seguimiento',
-    summary: 'Registro diario',
-    icon: ClipboardList,
-    danger: false
+    title: 'Muletas y apoyo',
+    desc: 'Respetar estrictamente el grado de carga y uso de inmovilizador o muletas autorizado por el equipo quirúrgico.'
   },
   {
-    to: '/alertas',
-    title: 'Alertas',
-    summary: 'Pautas urgentes',
-    icon: AlertTriangle,
-    danger: true
+    title: 'Posicionamiento',
+    desc: 'Al descansar, elevar el miembro con apoyo bajo el talón o pantorrilla distal dejando la rodilla en extensión.'
   },
   {
-    to: '/actividades',
-    title: 'Vida diaria',
-    summary: 'Caminar y dormir',
-    icon: Footprints,
-    danger: false
-  },
-  {
-    to: '/preguntas',
-    title: 'Preguntas',
-    summary: 'Dudas frecuentes',
-    icon: HelpCircle,
-    danger: false
-  },
-  {
-    to: '/mi-cirugia',
-    title: 'Cirugía HTH',
-    summary: 'Injerto rotuliano',
-    icon: Stethoscope,
-    danger: false
-  },
-  {
-    to: '/fuentes',
-    title: 'Fuentes',
-    summary: 'Base científica',
-    icon: BookOpen,
-    danger: false
+    title: 'Descanso y dosificación',
+    desc: 'Alternar períodos de reposo con los ejercicios indicados según tolerancia clínica diaria.'
   }
 ];
 
+const AVOID_CARDS = [
+  {
+    title: 'Flexiones forzadas',
+    desc: 'No empujar la rodilla más allá del rango tolerado ni forzar ante dolor intenso o bloqueo.'
+  },
+  {
+    title: 'Movimientos bruscos o giros',
+    desc: 'Evitar rotaciones sobre el pie apoyado, rebotes o cambios rápidos de dirección.'
+  },
+  {
+    title: 'Sobrecarga sin autorización',
+    desc: 'No abandonar las muletas ni cargar todo el peso corporal antes de la indicación profesional.'
+  },
+  {
+    title: 'Ejercicios avanzados no indicados',
+    desc: 'No realizar saltos, trote, sentadillas profundas ni trabajo con cargas elevadas en esta etapa.'
+  },
+  {
+    title: 'Almohada bajo la rodilla de forma sostenida',
+    desc: 'Permanecer con la rodilla semiflexionada sobre una almohada dificulta recuperar la extensión completa a 0°.'
+  }
+];
+
+const TRACKING_CARDS = [
+  {
+    title: 'Registro de dolor',
+    desc: 'Anotar el nivel de molestia antes y después de la sesión para adecuar la progresión.'
+  },
+  {
+    title: 'Registro de derrame',
+    desc: 'Observar si la hinchazón disminuye con el reposo y el hielo o si aumenta tras la actividad.'
+  },
+  {
+    title: 'Evolución del rango articular',
+    desc: 'Seguir de manera progresiva la recuperación de la extensión a 0° y la ganancia de flexión.'
+  },
+  {
+    title: 'Tolerancia a ejercicios',
+    desc: 'Identificar qué ejercicios resultan cómodos y cuáles generan fatiga o tensión anterior.'
+  },
+  {
+    title: 'Observaciones del profesional',
+    desc: 'Registrar las pautas específicas indicadas en cada control kinesiológico y médico.'
+  }
+];
+
+const HOME_FAQS = [
+  {
+    q: '¿Cuándo puedo comenzar a flexionar?',
+    a: 'El inicio y el rango de flexión dependen de la indicación de tu cirujano y kinesiólogo (por ejemplo, si hubo procedimientos meniscales asociados). Comenzá siempre de forma suave y controlada según esa pauta.'
+  },
+  {
+    q: '¿Es normal presentar inflamación?',
+    a: 'Un derrame leve a moderado es frecuente durante las primeras semanas. El reposo con pierna elevada, el frío local protegido y el bombeo de tobillo ayudan a controlarlo.'
+  },
+  {
+    q: '¿Qué hago si aumenta el dolor?',
+    a: 'Si aparece dolor intenso durante un ejercicio, detené la actividad, aplicá las medidas de reposo indicadas y consultalo con tu kinesiólogo antes de retomar.'
+  },
+  {
+    q: '¿Por qué debo recuperar la extensión?',
+    a: 'Alcanzar la extensión completa a 0° es indispensable para caminar sin renguera y permitir que el cuádriceps estabilice adecuadamente la rodilla.'
+  },
+  {
+    q: '¿Todos los pacientes hacen los mismos ejercicios?',
+    a: 'No. Esta guía es educativa; la selección de ejercicios, el momento de inicio y la dosificación se adaptan de forma individual según la evolución clínica y las indicaciones del equipo tratante.'
+  }
+];
+
+const ALARM_SIGNS = [
+  'Fiebre persistente o escalofríos.',
+  'Secreción, calor marcado o enrojecimiento progresivo en la herida quirúrgica.',
+  'Dolor intenso que empeora y no cede con el reposo ni la medicación indicada.',
+  'Hinchazón importante, tensión o dolor inusual en la pantorrilla.',
+  'Empeoramiento significativo de los síntomas o aparición de bloqueo articular.'
+];
+
 export const HomePage: React.FC = () => {
-  const [heroShape, setHeroShape] = useState<'auto' | 'brain' | 'knee'>('knee');
   const [viewMode, setViewMode] = useState<'carousel' | 'grid'>('carousel');
+  const [activeModule, setActiveModule] = useState<ClinicalModuleTab>('cuidados');
+  const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(0);
 
   const flexionExercises = useMemo(
     () => EXERCISES_DATA.filter((e) => e.section !== 'complementario'),
@@ -95,142 +147,139 @@ export const HomePage: React.FC = () => {
     []
   );
 
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
-    <div className="space-y-8 sm:space-y-12">
-      {/* 1. ENTRADA 3D HOLOGRÁFICA CELESTE/TURQUESA (RODILLA LCA HTH + CONTROL MOTOR) */}
-      <section aria-labelledby="dala-hero-heading" className="relative no-print">
-        <div className="grid grid-cols-1 lg:grid-cols-12 lg:items-center gap-3 sm:gap-6 rounded-[24px] border border-cyan-300/20 bg-[#081b2d]/90 px-4 py-4 sm:px-7 sm:py-6 shadow-soft-lg">
-          <div className="lg:col-span-5 flex flex-col justify-center">
-            <div className="inline-flex items-center gap-2 mb-1.5">
-              <span className="h-2 w-2 rounded-full bg-[#38d9d6] shadow-[0_0_8px_#38d9d6]" />
-              <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-[#67e8f9]">
-                KINEFISIATRÍA TRAUMATOLÓGICA · LCA (HTH)
-              </span>
-            </div>
+    <div className="space-y-10 sm:space-y-14">
+      {/* =================================================================== */}
+      {/* 1. PORTADA (HERO): BREVE, DIRECTA + RODILLA ANATÓMICA 3D            */}
+      {/* =================================================================== */}
+      <section aria-labelledby="hero-heading" className="no-print">
+        <div className="grid grid-cols-1 lg:grid-cols-12 lg:items-center gap-5 sm:gap-8 rounded-2xl border border-[#244154] bg-[#0B2030] p-5 sm:p-7">
+          {/* Izquierda en escritorio: Etiqueta discreta, Título, Subtítulo, Descripción breve y 2 Botones */}
+          <div className="lg:col-span-6 flex flex-col justify-center">
+            <span className="inline-flex w-fit items-center gap-2 rounded-full bg-[#10283A] border border-[#244154] px-3 py-1 text-xs font-medium text-[#82E5E4] mb-3">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#25C8CC]" />
+              <span>Semanas 1–3 · Según indicación profesional</span>
+            </span>
 
             <h1
-              id="dala-hero-heading"
-              className="dala-display text-2xl sm:text-4xl lg:text-5xl text-white"
+              id="hero-heading"
+              className="text-3xl sm:text-4xl lg:text-[42px] font-semibold text-[#F1F7FA] tracking-tight leading-tight"
             >
-              Tu rodilla,{' '}
-              <span className="text-[#67e8f9]">paso a paso.</span>
+              Tu rodilla, paso a paso.
             </h1>
 
-            <p className="mt-2 text-xs sm:text-sm text-sky-100 leading-relaxed">
-              Guía interactiva 3D para las semanas 1 a 3 posoperatorias de reconstrucción de LCA
-              con injerto HTH. Realizá únicamente los ejercicios indicados por tu kinesiólogo según
-              tolerancia y evolución clínica.
+            <p className="mt-1.5 text-base sm:text-lg font-medium text-[#82E5E4]">
+              Rehabilitación postoperatoria de LCA (HTH)
             </p>
+
+            <p className="mt-2.5 text-sm sm:text-base text-[#A7B9C6] leading-relaxed max-w-lg">
+              Guía interactiva de ejercicios y cuidados para la recuperación inicial.
+            </p>
+
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={() => scrollToSection('modulo-ejercicios-principales')}
+                className="inline-flex min-h-[42px] items-center justify-center rounded-xl bg-[#25C8CC] px-5 py-2.5 text-xs sm:text-sm font-semibold text-[#061522] hover:bg-[#82E5E4] transition-colors"
+              >
+                Ver ejercicios
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveModule('cuidados');
+                  scrollToSection('modulos-clinicos');
+                }}
+                className="inline-flex min-h-[42px] items-center justify-center rounded-xl border border-[#244154] bg-[#10283A] px-5 py-2.5 text-xs sm:text-sm font-semibold text-[#F1F7FA] hover:border-[#25C8CC] transition-colors"
+              >
+                Cuidados y recomendaciones
+              </button>
+            </div>
           </div>
 
-          <div className="lg:col-span-7 relative h-[200px] sm:h-[260px] lg:h-[290px] w-full">
+          {/* Derecha en escritorio: Rodilla Anatómica 3D */}
+          <div className="lg:col-span-6 h-[240px] sm:h-[290px] lg:h-[320px] w-full">
             <Suspense
               fallback={
-                <div className="flex h-full w-full items-center justify-center">
-                  <span className="text-xs font-bold uppercase tracking-widest text-[#67e8f9] animate-pulse">
-                    Cargando modelo 3D...
+                <div className="flex h-full w-full items-center justify-center rounded-2xl border border-[#244154] bg-[#081A28]">
+                  <span className="text-xs font-medium text-[#A7B9C6]">
+                    Cargando anatomía 3D de rodilla...
                   </span>
                 </div>
               }
             >
-              <ConstellationHero3D mode={heroShape} />
+              <ConstellationHero3D />
             </Suspense>
-
-            <div className="absolute bottom-1.5 right-1.5 flex items-center gap-1 rounded-full bg-[#05121f]/90 backdrop-blur-md border border-cyan-300/25 p-1">
-              {(
-                [
-                  { id: 'knee', label: 'Rodilla LCA 3D' },
-                  { id: 'brain', label: 'Control Motor 3D' },
-                  { id: 'auto', label: 'Ciclo 3D' }
-                ] as const
-              ).map((item) => {
-                const active = heroShape === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setHeroShape(item.id)}
-                    aria-pressed={active}
-                    className={`rounded-full px-2.5 py-1 text-[10px] font-bold transition-all ${
-                      active
-                        ? 'bg-[#1db8c4] text-white shadow-[0_0_10px_rgba(56,217,214,0.4)]'
-                        : 'text-sky-200 hover:text-white'
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                );
-              })}
-            </div>
           </div>
         </div>
       </section>
 
-      {/* SELECTOR DE VISTA GLOBAL (CARRUSEL 3D vs TARJETAS) */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-cyan-300/15 pb-3 no-print">
-        <p className="text-xs text-sky-200">
-          Elegí cómo recorrer las demostraciones 3D:
-        </p>
-
-        <div className="flex items-center gap-2">
-          <div className="inline-flex items-center rounded-full border border-cyan-300/25 bg-[#081b2d] p-0.5">
-            <button
-              type="button"
-              onClick={() => setViewMode('carousel')}
-              aria-pressed={viewMode === 'carousel'}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold transition-all ${
-                viewMode === 'carousel'
-                  ? 'bg-[#1db8c4] text-white'
-                  : 'text-sky-200 hover:text-white'
-              }`}
-            >
-              <Layers className="h-3.5 w-3.5" />
-              <span>Carrusel 3D</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('grid')}
-              aria-pressed={viewMode === 'grid'}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold transition-all ${
-                viewMode === 'grid'
-                  ? 'bg-[#1db8c4] text-white'
-                  : 'text-sky-200 hover:text-white'
-              }`}
-            >
-              <LayoutGrid className="h-3.5 w-3.5" />
-              <span>Tarjetas</span>
-            </button>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => window.print()}
-            aria-label="Imprimir cartilla"
-            className="inline-flex h-8 px-3 items-center justify-center gap-1.5 rounded-full border border-cyan-300/25 bg-[#081b2d] text-xs font-bold text-white hover:border-[#38d9d6] transition-colors"
-          >
-            <Printer className="h-3.5 w-3.5 text-[#38d9d6]" aria-hidden="true" />
-            <span className="hidden sm:inline">Imprimir</span>
-          </button>
-        </div>
-      </div>
-
       {/* =================================================================== */}
-      {/* SECCIÓN A: RECUPERACIÓN DE LA FLEXIÓN (5 EJERCICIOS DEL BANNER)     */}
+      {/* 2. MÓDULO A — EJERCICIOS PRINCIPALES (PROTAGONISTA)                 */}
       {/* =================================================================== */}
-      <section id="seccion-flexion" aria-labelledby="flexion-heading" className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+      <section
+        id="modulo-ejercicios-principales"
+        aria-labelledby="flexion-heading"
+        className="scroll-mt-20 space-y-4"
+      >
+        <div className="flex flex-wrap items-end justify-between gap-3 border-b border-[#244154] pb-3.5">
           <div>
-            <span className="inline-flex items-center rounded-full bg-[#38d9d6]/20 border border-[#38d9d6]/40 px-3 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#67e8f9] mb-1.5">
-              Sección A · 5 Ejercicios del Banner Académico
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#25C8CC] block mb-1">
+              Módulo A · 5 Ejercicios principales del banner
             </span>
-            <h2 id="flexion-heading" className="dala-display text-2xl sm:text-3xl text-white">
+            <h2 id="flexion-heading" className="text-2xl sm:text-3xl font-semibold text-[#F1F7FA]">
               Recuperación de la flexión
             </h2>
           </div>
-          <p className="text-xs text-sky-200 max-w-md">
-            Progresión de movilidad de rodilla (1 al 5). El ejercicio 5 en decúbito prono es una
-            técnica de uso exclusivo con supervisión profesional.
-          </p>
+
+          <div className="flex items-center gap-2 no-print">
+            <div className="inline-flex items-center rounded-xl border border-[#244154] bg-[#0B2030] p-1">
+              <button
+                type="button"
+                onClick={() => setViewMode('carousel')}
+                aria-pressed={viewMode === 'carousel'}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+                  viewMode === 'carousel'
+                    ? 'bg-[#25C8CC] text-[#061522]'
+                    : 'text-[#A7B9C6] hover:text-[#F1F7FA]'
+                }`}
+              >
+                <Layers className="h-3.5 w-3.5" />
+                <span>Vista protagonista</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                aria-pressed={viewMode === 'grid'}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+                  viewMode === 'grid'
+                    ? 'bg-[#25C8CC] text-[#061522]'
+                    : 'text-[#A7B9C6] hover:text-[#F1F7FA]'
+                }`}
+              >
+                <LayoutGrid className="h-3.5 w-3.5" />
+                <span>Todas las tarjetas</span>
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => window.print()}
+              aria-label="Imprimir cartilla"
+              className="inline-flex min-h-[36px] items-center justify-center gap-1.5 rounded-xl border border-[#244154] bg-[#0B2030] px-3 py-1.5 text-xs font-semibold text-[#F1F7FA] hover:border-[#25C8CC] transition-colors"
+            >
+              <Printer className="h-3.5 w-3.5 text-[#25C8CC]" aria-hidden="true" />
+              <span className="hidden sm:inline">Imprimir</span>
+            </button>
+          </div>
         </div>
 
         {viewMode === 'carousel' ? (
@@ -246,8 +295,8 @@ export const HomePage: React.FC = () => {
         <div
           className={
             viewMode === 'grid'
-              ? 'grid grid-cols-1 gap-4 lg:grid-cols-2'
-              : 'hidden print:grid print:grid-cols-1 print:gap-4'
+              ? 'grid grid-cols-1 gap-5 lg:grid-cols-2'
+              : 'hidden print:grid print:grid-cols-1 print:gap-5'
           }
         >
           {flexionExercises.map((exercise, idx) => {
@@ -266,29 +315,30 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* =================================================================== */}
-      {/* SECCIÓN B: MOVILIDAD Y ACTIVACIÓN COMPLEMENTARIA (EJERCICIOS 6 A 9) */}
+      {/* 3. MÓDULO B — EJERCICIOS COMPLEMENTARIOS (SECCIÓN SECUNDARIA)       */}
       {/* =================================================================== */}
       <section
-        id="seccion-complementaria"
+        id="modulo-ejercicios-complementarios"
         aria-labelledby="complementaria-heading"
-        className="pt-6 border-t border-cyan-300/20 space-y-4"
+        className="pt-6 border-t border-[#244154] space-y-4"
       >
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+        <div className="rounded-2xl border border-[#244154] bg-[#0B2030] p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           <div>
-            <span className="inline-flex items-center rounded-full bg-sky-500/20 border border-sky-400/40 px-3 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-sky-200 mb-1.5">
-              Sección B · Semanas 1 a 3 Posoperatorias
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#82E5E4] block mb-1">
+              Módulo B · Ejercicios complementarios (6 al 9)
             </span>
             <h2
               id="complementaria-heading"
-              className="dala-display text-2xl sm:text-3xl text-white"
+              className="text-xl sm:text-2xl font-semibold text-[#F1F7FA]"
             >
               Movilidad y activación complementaria
             </h2>
+            <p className="mt-1 text-xs sm:text-sm text-[#A7B9C6] max-w-3xl leading-relaxed">
+              La rehabilitación temprana no consiste exclusivamente en ganar flexión: también
+              requiere preservar la extensión completa a 0°, activar el cuádriceps y recuperar el
+              control muscular según indicación profesional.
+            </p>
           </div>
-          <p className="text-xs text-sky-200 max-w-md">
-            Extensión pasiva a 0°, activación de cuádriceps, retorno venoso y control motor (6 al
-            9), según autorización e individualización clínica.
-          </p>
         </div>
 
         {viewMode === 'carousel' ? (
@@ -299,81 +349,353 @@ export const HomePage: React.FC = () => {
               variant="complementary"
             />
           </div>
-        ) : null}
-
-        <div
-          className={
-            viewMode === 'grid'
-              ? 'grid grid-cols-1 gap-4 lg:grid-cols-2'
-              : 'hidden print:grid print:grid-cols-1 print:gap-4'
-          }
-        >
-          {complementaryExercises.map((exercise, idx) => (
-            <ExerciseCard
-              key={exercise.id}
-              exercise={exercise}
-              indexNumber={idx + 6}
-              featured={false}
-            />
-          ))}
-        </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            {complementaryExercises.map((exercise, idx) => (
+              <ExerciseCard
+                key={exercise.id}
+                exercise={exercise}
+                indexNumber={idx + 6}
+                featured={false}
+              />
+            ))}
+          </div>
+        )}
       </section>
 
-      {/* 3. TARJETAS COMPACTAS DE CUIDADOS Y GUÍA */}
+      {/* =================================================================== */}
+      {/* 4. MÓDULOS EDUCATIVOS ORGANIZADOS POR PESTAÑAS (CUIDADOS, EVITAR,   */}
+      {/*    SEGUIMIENTO, PREGUNTAS, SEÑALES DE ALARMA Y FUENTES)             */}
+      {/* =================================================================== */}
       <section
-        aria-labelledby="secondary-resources-heading"
-        className="pt-6 border-t border-cyan-300/20 no-print"
+        id="modulos-clinicos"
+        aria-labelledby="modulos-clinicos-heading"
+        className="pt-6 border-t border-[#244154] scroll-mt-20 space-y-4 no-print"
       >
-        <h2
-          id="secondary-resources-heading"
-          className="text-xs font-extrabold uppercase tracking-widest text-[#67e8f9] mb-3"
-        >
-          Guía clínica complementaria
-        </h2>
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#25C8CC] block mb-1">
+              Módulos educativos y de acompañamiento
+            </span>
+            <h2
+              id="modulos-clinicos-heading"
+              className="text-xl sm:text-2xl font-semibold text-[#F1F7FA]"
+            >
+              Cuidados, recomendaciones y seguimiento
+            </h2>
+          </div>
+          <p className="text-xs text-[#A7B9C6]">
+            Seleccioná un módulo para consultar sus pautas o abrir la sección completa.
+          </p>
+        </div>
 
-        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4">
-          {SECONDARY_SECTIONS.map((item) => {
-            const Icon = item.icon;
+        {/* Pestañas de selección de módulo */}
+        <div
+          role="tablist"
+          aria-label="Módulos educativos"
+          className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1"
+        >
+          {(
+            [
+              { id: 'cuidados', label: 'Cuidados', icon: HeartHandshake },
+              { id: 'evitar', label: 'Qué evitar', icon: Ban },
+              { id: 'seguimiento', label: 'Seguimiento', icon: ClipboardList },
+              { id: 'preguntas', label: 'Preguntas frecuentes', icon: HelpCircle },
+              { id: 'alertas', label: 'Señales de alarma', icon: AlertTriangle },
+              { id: 'fuentes', label: 'Fuentes', icon: BookOpen }
+            ] as const
+          ).map((tab) => {
+            const Icon = tab.icon;
+            const active = activeModule === tab.id;
+            const isAlert = tab.id === 'alertas';
             return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={`group flex items-center justify-between gap-2 rounded-2xl border px-3.5 py-3 transition-all ${
-                  item.danger
-                    ? 'bg-rose-950/35 border-rose-400/40 hover:border-rose-300'
-                    : 'bg-[#0a1e30] border-cyan-300/20 hover:border-[#38d9d6]'
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => setActiveModule(tab.id)}
+                className={`inline-flex shrink-0 items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold border transition-colors ${
+                  active
+                    ? isAlert
+                      ? 'bg-rose-500/20 border-rose-400 text-rose-100'
+                      : 'bg-[#25C8CC] border-[#25C8CC] text-[#061522]'
+                    : isAlert
+                    ? 'bg-[#0B2030] border-rose-500/35 text-rose-200 hover:border-rose-400'
+                    : 'bg-[#0B2030] border-[#244154] text-[#A7B9C6] hover:text-[#F1F7FA]'
                 }`}
               >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div
-                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border ${
-                      item.danger
-                        ? 'bg-rose-500/20 border-rose-400/40 text-rose-300'
-                        : 'bg-[#38d9d6]/15 border-[#38d9d6]/35 text-[#38d9d6]'
-                    }`}
-                  >
-                    <Icon className="h-4 w-4" aria-hidden="true" />
-                  </div>
-                  <div className="min-w-0">
-                    <h3
-                      className={`text-xs font-bold truncate ${
-                        item.danger ? 'text-rose-200' : 'text-white'
-                      }`}
-                    >
-                      {item.title}
-                    </h3>
-                    <p className="text-[11px] text-sky-200 truncate">{item.summary}</p>
-                  </div>
-                </div>
-                <ChevronRight
-                  className={`h-4 w-4 shrink-0 ${
-                    item.danger ? 'text-rose-300' : 'text-sky-200 group-hover:text-white'
-                  }`}
-                  aria-hidden="true"
-                />
-              </Link>
+                <Icon className="h-3.5 w-3.5" />
+                <span>{tab.label}</span>
+              </button>
             );
           })}
+        </div>
+
+        {/* Panel del módulo activo */}
+        <div className="rounded-2xl border border-[#244154] bg-[#0B2030] p-4 sm:p-6">
+          {/* MÓDULO C: CUIDADOS */}
+          {activeModule === 'cuidados' && (
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h3 className="text-lg font-semibold text-[#F1F7FA]">
+                    Cuidados domiciliarios esenciales
+                  </h3>
+                  <p className="text-xs text-[#A7B9C6]">
+                    Herida quirúrgica, manejo del frío, muletas, posicionamiento y descanso.
+                  </p>
+                </div>
+                <Link
+                  to="/cuidados"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#244154] bg-[#10283A] px-3.5 py-2 text-xs font-semibold text-[#82E5E4] hover:border-[#25C8CC]"
+                >
+                  <span>Abrir guía completa de cuidados</span>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {CARE_CARDS.map((card, i) => (
+                  <div
+                    key={i}
+                    className="rounded-xl border border-[#244154] bg-[#10283A] p-3.5 flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <CheckCircle2 className="h-4 w-4 text-[#25C8CC] shrink-0" />
+                        <h4 className="text-sm font-semibold text-[#F1F7FA]">{card.title}</h4>
+                      </div>
+                      <p className="text-xs text-[#A7B9C6] leading-relaxed">{card.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* MÓDULO D: QUÉ EVITAR */}
+          {activeModule === 'evitar' && (
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h3 className="text-lg font-semibold text-[#F1F7FA]">
+                    Conductas que deben evitarse en esta etapa
+                  </h3>
+                  <p className="text-xs text-[#A7B9C6]">
+                    Precauciones para proteger el injerto HTH y favorecer la recuperación.
+                  </p>
+                </div>
+                <Link
+                  to="/que-evitar"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#244154] bg-[#10283A] px-3.5 py-2 text-xs font-semibold text-[#82E5E4] hover:border-[#25C8CC]"
+                >
+                  <span>Ver detalle de restricciones</span>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {AVOID_CARDS.map((card, i) => (
+                  <div
+                    key={i}
+                    className="rounded-xl border border-[#244154] bg-[#10283A] p-3.5"
+                  >
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <Ban className="h-4 w-4 text-amber-300 shrink-0" />
+                      <h4 className="text-sm font-semibold text-[#F1F7FA]">{card.title}</h4>
+                    </div>
+                    <p className="text-xs text-[#A7B9C6] leading-relaxed">{card.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* MÓDULO E: SEGUIMIENTO */}
+          {activeModule === 'seguimiento' && (
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h3 className="text-lg font-semibold text-[#F1F7FA]">
+                    Seguimiento de evolución diaria
+                  </h3>
+                  <p className="text-xs text-[#A7B9C6]">
+                    Parámetros útiles para registrar en tu dispositivo y compartir en consulta.
+                  </p>
+                </div>
+                <Link
+                  to="/seguimiento"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#25C8CC] px-4 py-2 text-xs font-semibold text-[#061522] hover:bg-[#82E5E4]"
+                >
+                  <span>Abrir registro interactivo</span>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {TRACKING_CARDS.map((card, i) => (
+                  <div
+                    key={i}
+                    className="rounded-xl border border-[#244154] bg-[#10283A] p-3.5"
+                  >
+                    <h4 className="text-sm font-semibold text-[#F1F7FA] mb-1">{card.title}</h4>
+                    <p className="text-xs text-[#A7B9C6] leading-relaxed">{card.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* MÓDULO F: PREGUNTAS FRECUENTES */}
+          {activeModule === 'preguntas' && (
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h3 className="text-lg font-semibold text-[#F1F7FA]">
+                    Preguntas frecuentes
+                  </h3>
+                  <p className="text-xs text-[#A7B9C6]">
+                    Respuestas educativas breves y prudentes sobre la recuperación inicial.
+                  </p>
+                </div>
+                <Link
+                  to="/preguntas"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#244154] bg-[#10283A] px-3.5 py-2 text-xs font-semibold text-[#82E5E4] hover:border-[#25C8CC]"
+                >
+                  <span>Ver todas las preguntas</span>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+
+              <div className="space-y-2">
+                {HOME_FAQS.map((item, idx) => {
+                  const isOpen = openFaqIdx === idx;
+                  return (
+                    <div
+                      key={idx}
+                      className="rounded-xl border border-[#244154] bg-[#10283A] overflow-hidden"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setOpenFaqIdx(isOpen ? null : idx)}
+                        aria-expanded={isOpen}
+                        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-xs sm:text-sm font-semibold text-[#F1F7FA]"
+                      >
+                        <span>{item.q}</span>
+                        {isOpen ? (
+                          <ChevronUp className="h-4 w-4 shrink-0 text-[#25C8CC]" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4 shrink-0 text-[#25C8CC]" />
+                        )}
+                      </button>
+                      {isOpen && (
+                        <div className="border-t border-[#244154] bg-[#061522]/60 px-4 py-3 text-xs text-[#A7B9C6] leading-relaxed">
+                          {item.a}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* MÓDULO H: SEÑALES DE ALARMA */}
+          {activeModule === 'alertas' && (
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h3 className="text-lg font-semibold text-[#F1F7FA]">
+                    Señales de alarma para consulta médica
+                  </h3>
+                  <p className="text-xs text-[#A7B9C6]">
+                    Orientación informativa; esta página no es una herramienta diagnóstica.
+                  </p>
+                </div>
+                <Link
+                  to="/alertas"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-rose-400/50 bg-rose-500/20 px-3.5 py-2 text-xs font-semibold text-rose-100 hover:bg-rose-500/30"
+                >
+                  <span>Ver detalle completo de alertas</span>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 lg:grid-cols-12">
+                <div className="lg:col-span-7 rounded-xl border border-[#244154] bg-[#10283A] p-4">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-amber-300 block mb-2">
+                    Consultar al equipo tratante ante:
+                  </span>
+                  <ul className="space-y-2 text-xs sm:text-sm text-[#F1F7FA]">
+                    {ALARM_SIGNS.map((sign, i) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <AlertTriangle className="h-4 w-4 text-amber-300 shrink-0 mt-0.5" />
+                        <span>{sign}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="lg:col-span-5 rounded-xl border border-rose-500/40 bg-rose-950/25 p-4 flex flex-col justify-between">
+                  <div className="flex items-start gap-3">
+                    <OctagonAlert className="h-5 w-5 text-rose-400 shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-semibold text-rose-100">
+                        Atención médica urgente inmediata
+                      </h4>
+                      <p className="mt-1.5 text-xs text-rose-200/90 leading-relaxed">
+                        La aparición de <strong>dificultad respiratoria</strong> o{' '}
+                        <strong>dolor torácico</strong> requiere acudir o comunicarse de inmediato
+                        con un servicio de emergencias médicas.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* MÓDULO G: FUENTES Y CIRUGÍA */}
+          {activeModule === 'fuentes' && (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <Link
+                to="/fuentes"
+                className="group rounded-xl border border-[#244154] bg-[#10283A] p-4 flex items-center justify-between hover:border-[#25C8CC] transition-colors"
+              >
+                <div>
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-[#25C8CC]">
+                    Módulo G · Respaldo académico
+                  </span>
+                  <h3 className="text-base font-semibold text-[#F1F7FA] mt-0.5">
+                    Bibliografía y fundamentos científicos
+                  </h3>
+                  <p className="text-xs text-[#A7B9C6] mt-1">
+                    Guías clínicas y protocolos internacionales de rehabilitación de LCA.
+                  </p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-[#25C8CC] shrink-0" />
+              </Link>
+
+              <Link
+                to="/mi-cirugia"
+                className="group rounded-xl border border-[#244154] bg-[#10283A] p-4 flex items-center justify-between hover:border-[#25C8CC] transition-colors"
+              >
+                <div>
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-[#82E5E4]">
+                    Educación anatómica
+                  </span>
+                  <h3 className="text-base font-semibold text-[#F1F7FA] mt-0.5">
+                    ¿En qué consiste la cirugía LCA (HTH)?
+                  </h3>
+                  <p className="text-xs text-[#A7B9C6] mt-1">
+                    Explicación del autoinjerto hueso–tendón–hueso rotuliano y sus tiempos biológicos.
+                  </p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-[#25C8CC] shrink-0" />
+              </Link>
+            </div>
+          )}
         </div>
       </section>
     </div>

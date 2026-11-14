@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { ContactShadows, OrbitControls, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { clone as skeletonClone } from 'three/examples/jsm/utils/SkeletonUtils.js';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 export interface RehabExerciseSceneProps {
   exerciseId: string;
@@ -10,6 +11,7 @@ export interface RehabExerciseSceneProps {
   finalPose: boolean;
   slowMode: boolean;
   resetSignal: number;
+  cameraResetSignal?: number;
   inView: boolean;
 }
 
@@ -18,51 +20,76 @@ const CAMERA_CONFIG: Record<
   { position: [number, number, number]; target: [number, number, number]; fov: number }
 > = {
   'deslizamiento-del-talon': {
-    position: [0.06, 0.44, 1.62],
-    target: [0.06, 0.16, 0],
-    fov: 32
-  },
-  'flexion-asistida-con-toalla': {
-    position: [0.06, 0.46, 1.62],
-    target: [0.06, 0.18, 0],
-    fov: 32
-  },
-  'flexion-autoasistida-pelota-mani': {
-    position: [0.1, 0.48, 1.68],
-    target: [0.1, 0.2, 0],
-    fov: 33
-  },
-  'flexion-activa-en-sedestacion': {
-    position: [0.02, 0.56, 1.68],
-    target: [-0.02, 0.44, 0],
+    position: [0.02, 0.56, 2.26],
+    target: [0.02, 0.2, 0],
     fov: 34
   },
+  'flexion-asistida-con-toalla': {
+    position: [0.02, 0.58, 2.26],
+    target: [0.02, 0.22, 0],
+    fov: 34
+  },
+  'flexion-autoasistida-pelota-mani': {
+    position: [0.05, 0.6, 2.32],
+    target: [0.05, 0.22, 0],
+    fov: 35
+  },
+  'flexion-activa-en-sedestacion': {
+    position: [0.68, 0.72, 2.38],
+    target: [0.0, 0.56, 0],
+    fov: 36
+  },
   'flexion-asistida-prono': {
-    position: [0.14, 0.54, 1.62],
-    target: [0.1, 0.22, -0.04],
-    fov: 32
+    position: [0.1, 0.68, 2.36],
+    target: [0.08, 0.34, -0.05],
+    fov: 35
   },
   'extension-pasiva-apoyo-talon': {
-    position: [0.18, 0.42, 1.52],
-    target: [0.22, 0.14, 0.04],
-    fov: 30
+    position: [0.06, 0.54, 2.22],
+    target: [0.06, 0.18, 0],
+    fov: 34
   },
   'contraccion-isometrica-cuadriceps': {
-    position: [0.14, 0.44, 1.52],
-    target: [0.18, 0.14, 0.04],
-    fov: 30
+    position: [0.04, 0.54, 2.22],
+    target: [0.04, 0.18, 0],
+    fov: 34
   },
   'bombeo-activo-tobillo': {
-    position: [0.34, 0.4, 1.38],
-    target: [0.42, 0.14, 0.05],
-    fov: 28
+    position: [0.18, 0.52, 2.08],
+    target: [0.18, 0.18, 0],
+    fov: 32
   },
   'elevacion-pierna-extendida': {
-    position: [0.08, 0.48, 1.64],
-    target: [0.08, 0.2, 0],
-    fov: 32
+    position: [0.04, 0.58, 2.28],
+    target: [0.04, 0.22, 0],
+    fov: 34
   }
 };
+
+/**
+ * Generates a single continuous, smooth therapeutic Peanut Ball (Pelota Maní) mesh
+ * via LatheGeometry so there are no seams or deformations when rolling.
+ */
+function createPeanutBallGeometry(): THREE.BufferGeometry {
+  const points: THREE.Vector2[] = [];
+  const segments = 48;
+  const halfLen = 0.29;
+  for (let i = 0; i <= segments; i++) {
+    const u = i / segments; // 0 to 1
+    const y = (u * 2 - 1) * halfLen; // -0.29 to +0.29
+    const norm = u * 2 - 1; // -1 to +1
+    // Smooth rounded ends + peanut waist in the center (norm = 0)
+    const endEnvelope = Math.sqrt(Math.max(0, 1 - Math.pow(norm, 2)));
+    const peanutWaist = 0.125 + 0.055 * Math.sin(Math.abs(norm) * Math.PI * 0.82);
+    const radius = endEnvelope * peanutWaist;
+    points.push(new THREE.Vector2(radius, y));
+  }
+  const geom = new THREE.LatheGeometry(points, 36);
+  // Rotate so the long axis of the peanut ball lies along the Z axis (transverse to the body)
+  geom.rotateX(Math.PI / 2);
+  geom.computeVertexNormals();
+  return geom;
+}
 
 const dummyEuler = new THREE.Euler();
 const dummyQuat = new THREE.Quaternion();
@@ -149,6 +176,7 @@ const AnimatedPhysioActor: React.FC<ActorProps> = ({
   const { invalidate } = useThree();
 
   const characterGroupRef = useRef<THREE.Group>(null);
+  const physioGroupRef = useRef<THREE.Group>(null);
   const strapRightRef = useRef<THREE.Mesh>(null);
   const strapLeftRef = useRef<THREE.Mesh>(null);
   const strapLoopRef = useRef<THREE.Mesh>(null);
@@ -156,12 +184,14 @@ const AnimatedPhysioActor: React.FC<ActorProps> = ({
   const kneeBandRef = useRef<THREE.Mesh>(null);
   const peanutBallGroupRef = useRef<THREE.Group>(null);
   const quadGlowRef = useRef<THREE.Mesh>(null);
-  const physioHandRef = useRef<THREE.Group>(null);
   const ankleFlowRef = useRef<THREE.Mesh>(null);
 
   const phaseRef = useRef(0);
   const smoothTRef = useRef(finalPose ? 1 : 0);
 
+  const peanutGeometry = useMemo(() => createPeanutBallGeometry(), []);
+
+  // Patient model
   const { clonedScene, bones } = useMemo(() => {
     const clone = skeletonClone(scene) as THREE.Group;
     const boneMap: Record<string, THREE.Bone> = {};
@@ -190,6 +220,35 @@ const AnimatedPhysioActor: React.FC<ActorProps> = ({
     return { clonedScene: clone, bones: boneMap };
   }, [scene]);
 
+  // Second articulated human model for the Physiotherapist (Kinesiólogo) in Exercise 5 (Prone)
+  const { physioScene, physioBones } = useMemo(() => {
+    const clone = skeletonClone(scene) as THREE.Group;
+    const boneMap: Record<string, THREE.Bone> = {};
+
+    clone.traverse((obj) => {
+      if ((obj as THREE.Bone).isBone) {
+        const bone = obj as THREE.Bone;
+        bone.userData.restQuat = bone.quaternion.clone();
+        boneMap[bone.name] = bone;
+      }
+      if ((obj as THREE.Mesh).isMesh) {
+        const mesh = obj as THREE.Mesh;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        mesh.frustumCulled = false;
+        if (mesh.material) {
+          const mat = (mesh.material as THREE.MeshStandardMaterial).clone();
+          mat.vertexColors = true;
+          mat.color.set('#d8eef2');
+          mat.roughness = 0.65;
+          mesh.material = mat;
+        }
+      }
+    });
+
+    return { physioScene: clone, physioBones: boneMap };
+  }, [scene]);
+
   useEffect(() => {
     phaseRef.current = 0;
     smoothTRef.current = 0;
@@ -207,7 +266,7 @@ const AnimatedPhysioActor: React.FC<ActorProps> = ({
     const group = characterGroupRef.current;
     if (!group) return;
 
-    // Reset all bones to rest quaternion first
+    // Reset all patient bones to rest quaternion first
     for (const key in bones) {
       const b = bones[key];
       if (b.userData.restQuat) {
@@ -215,7 +274,7 @@ const AnimatedPhysioActor: React.FC<ActorProps> = ({
       }
     }
 
-    const breath = Math.sin(crankPhase) * 0.014;
+    const breath = Math.sin(crankPhase) * 0.012;
 
     if (
       exerciseId === 'deslizamiento-del-talon' ||
@@ -226,7 +285,7 @@ const AnimatedPhysioActor: React.FC<ActorProps> = ({
       exerciseId === 'bombeo-activo-tobillo' ||
       exerciseId === 'elevacion-pierna-extendida'
     ) {
-      // Decúbito supino sobre camilla
+      // Decúbito supino sobre camilla (superficie superior en y = 0)
       group.rotation.set(-Math.PI / 2, Math.PI / 2, 0, 'YXZ');
       group.position.set(0.85, 0.09, 0);
 
@@ -234,7 +293,7 @@ const AnimatedPhysioActor: React.FC<ActorProps> = ({
       setBoneLocalEuler(bones, 'head', 0.14, 0, 0);
       setBoneLocalEuler(bones, 'spine02', 0.04 + breath, 0, 0);
 
-      // Default relaxed arms along mat
+      // Brazos apoyados de forma natural sobre la camilla
       setBoneLocalEuler(bones, 'shoulder01R', 0, 0, 0.24);
       setBoneLocalEuler(bones, 'upperarm01R', -0.06, 0, 0.28);
       setBoneLocalEuler(bones, 'lowerarm01R', -0.78, 0, 0);
@@ -243,80 +302,91 @@ const AnimatedPhysioActor: React.FC<ActorProps> = ({
       setBoneLocalEuler(bones, 'upperarm01L', -0.06, 0, -0.28);
       setBoneLocalEuler(bones, 'lowerarm01L', -0.78, 0, 0);
 
-      // Default left leg relaxed
+      // Pierna izquierda (sana) relajada por defecto
       setBoneLocalEuler(bones, 'upperleg01L', -0.05, 0, 0.05);
       setBoneLocalEuler(bones, 'lowerleg01L', 0.06, 0, 0);
       setBoneLocalEuler(bones, 'footL', -0.05, 0, 0);
 
       if (exerciseId === 'deslizamiento-del-talon') {
-        const kneeFlex = 0.08 + t * 1.62;
-        const hipFlex = kneeFlex * 0.515 - 0.03;
-        setBoneLocalEuler(bones, 'upperleg01R', -hipFlex, 0, -0.06);
-        setBoneLocalEuler(bones, 'lowerleg01R', kneeFlex, 0, 0);
-        setBoneLocalEuler(bones, 'footR', -kneeFlex * 0.35, 0, 0);
+        // 1. Deslizamiento del talón: IK 2 huesos manteniendo el talón apoyado sobre la camilla (y = 0.073)
+        const hipX = -0.077;
+        const hipY = 0.083;
+        const targetX = 0.72 - t * 0.42;
+        const targetY = 0.075;
+        const ik = solve2BoneIK(hipX, hipY, targetX, targetY, SUPINE_THIGH_OFFSET);
+
+        setBoneLocalEuler(bones, 'upperleg01R', -ik.hipFlex, 0, -0.05);
+        setBoneLocalEuler(bones, 'lowerleg01R', ik.kneeFlex, 0, 0);
+        setBoneLocalEuler(bones, 'footR', -ik.kneeFlex * 0.36, 0, 0);
       } else if (exerciseId === 'flexion-asistida-con-toalla') {
+        // 2. Flexión autoasistida con toalla o cincha: manos acompañan suavemente mientras el talón desliza
         setBoneLocalEuler(bones, 'spine02', 0.08, 0, 0);
         setBoneLocalEuler(bones, 'spine01', 0.1, 0, 0);
 
         setBoneLocalEuler(bones, 'shoulder01R', 0, 0, 0.24);
-        setBoneLocalEuler(bones, 'upperarm01R', 0.05 - t * 0.17, 0, 0.26);
-        setBoneLocalEuler(bones, 'lowerarm01R', 0.15 + t * 0.4, 0, 0);
+        setBoneLocalEuler(bones, 'upperarm01R', 0.04 - t * 0.16, 0, 0.26);
+        setBoneLocalEuler(bones, 'lowerarm01R', 0.14 + t * 0.38, 0, 0);
 
         setBoneLocalEuler(bones, 'shoulder01L', 0, 0, -0.24);
-        setBoneLocalEuler(bones, 'upperarm01L', 0.05 - t * 0.17, 0, -0.26);
-        setBoneLocalEuler(bones, 'lowerarm01L', 0.15 + t * 0.4, 0, 0);
+        setBoneLocalEuler(bones, 'upperarm01L', 0.04 - t * 0.16, 0, -0.26);
+        setBoneLocalEuler(bones, 'lowerarm01L', 0.14 + t * 0.38, 0, 0);
 
-        const kneeFlex = 0.14 + t * 1.62;
-        const hipFlex = kneeFlex * 0.515 - 0.025;
-        setBoneLocalEuler(bones, 'upperleg01R', -hipFlex, 0, -0.06);
-        setBoneLocalEuler(bones, 'lowerleg01R', kneeFlex, 0, 0);
-        setBoneLocalEuler(bones, 'footR', -kneeFlex * 0.42 - 0.12, 0, 0);
-      } else if (exerciseId === 'flexion-autoasistida-pelota-mani') {
-        // 3. Pelota maní transversal bajo las piernas: rueda hacia los glúteos flexionando ambas rodillas
-        const ballX = 0.64 - t * 0.28;
         const hipX = -0.077;
         const hipY = 0.083;
-        const targetX = ballX - 0.02;
-        const targetY = 0.27 + t * 0.03;
+        const targetX = 0.7 - t * 0.43;
+        const targetY = 0.078;
         const ik = solve2BoneIK(hipX, hipY, targetX, targetY, SUPINE_THIGH_OFFSET);
 
-        setBoneLocalEuler(bones, 'upperleg01R', -ik.hipFlex, 0, -0.06);
+        setBoneLocalEuler(bones, 'upperleg01R', -ik.hipFlex, 0, -0.05);
         setBoneLocalEuler(bones, 'lowerleg01R', ik.kneeFlex, 0, 0);
-        setBoneLocalEuler(bones, 'footR', -0.15, 0, 0);
+        setBoneLocalEuler(bones, 'footR', -ik.kneeFlex * 0.4 - 0.1, 0, 0);
+      } else if (exerciseId === 'flexion-autoasistida-pelota-mani') {
+        // 3. Pelota maní terapéutica transversal bajo las piernas: rueda hacia el cuerpo con pelvis estable
+        const ballX = 0.65 - t * 0.3;
+        const ballRadiusCenter = 0.125;
+        const hipX = -0.077;
+        const hipY = 0.083;
+        // Tobillos/pantorrillas apoyados sobre la hendidura central superior de la pelota maní (y = 0.25)
+        const targetX = ballX - 0.02;
+        const targetY = ballRadiusCenter * 2 + 0.025;
+        const ik = solve2BoneIK(hipX, hipY, targetX, targetY, SUPINE_THIGH_OFFSET);
 
-        // Pierna sana también acompaña sobre la pelota maní
-        setBoneLocalEuler(bones, 'upperleg01L', -ik.hipFlex, 0, 0.06);
+        setBoneLocalEuler(bones, 'upperleg01R', -ik.hipFlex, 0, -0.05);
+        setBoneLocalEuler(bones, 'lowerleg01R', ik.kneeFlex, 0, 0);
+        setBoneLocalEuler(bones, 'footR', -0.18, 0, 0);
+
+        setBoneLocalEuler(bones, 'upperleg01L', -ik.hipFlex, 0, 0.05);
         setBoneLocalEuler(bones, 'lowerleg01L', ik.kneeFlex, 0, 0);
-        setBoneLocalEuler(bones, 'footL', -0.15, 0, 0);
+        setBoneLocalEuler(bones, 'footL', -0.18, 0, 0);
 
         if (peanutBallGroupRef.current) {
-          peanutBallGroupRef.current.position.set(ballX, 0.145, 0);
-          peanutBallGroupRef.current.rotation.z = t * 1.85;
+          peanutBallGroupRef.current.position.set(ballX, ballRadiusCenter, 0);
+          // Rodamiento físico coherente: al desplazarse hacia -X (hacia los glúteos), gira en +Z
+          peanutBallGroupRef.current.rotation.z = (0.65 - ballX) / ballRadiusCenter;
         }
       } else if (exerciseId === 'extension-pasiva-apoyo-talon') {
-        // 6. Extensión pasiva con rollo bajo el talón y rodilla libre descendiendo suavemente a 0°
-        const residualFlex = (1 - t) * 0.28;
-        setBoneLocalEuler(bones, 'upperleg01R', -0.08 - residualFlex * 0.45, 0, -0.05);
+        // 6. Extensión pasiva con apoyo bajo el talón y rodilla libre
+        const residualFlex = (1 - t) * 0.24;
+        setBoneLocalEuler(bones, 'upperleg01R', -0.07 - residualFlex * 0.45, 0, -0.05);
         setBoneLocalEuler(bones, 'lowerleg01R', residualFlex, 0, 0);
-        setBoneLocalEuler(bones, 'footR', 0.12, 0, 0);
+        setBoneLocalEuler(bones, 'footR', 0.1, 0, 0);
       } else if (exerciseId === 'contraccion-isometrica-cuadriceps') {
-        // 7. Contracción isométrica de cuádriceps presionando la parte posterior de la rodilla hacia la camilla
-        const relaxFlex = (1 - t) * 0.18;
-        setBoneLocalEuler(bones, 'upperleg01R', -0.02 - relaxFlex * 0.5, 0, -0.05);
+        // 7. Contracción isométrica de cuádriceps: presiona hueco poplíteo hacia la camilla sin flexionar
+        const relaxFlex = (1 - t) * 0.15;
+        setBoneLocalEuler(bones, 'upperleg01R', -0.02 - relaxFlex * 0.48, 0, -0.05);
         setBoneLocalEuler(bones, 'lowerleg01R', relaxFlex, 0, 0);
-        setBoneLocalEuler(bones, 'footR', 0.08 + t * 0.18, 0, 0);
+        setBoneLocalEuler(bones, 'footR', 0.08 + t * 0.16, 0, 0);
 
         if (quadGlowRef.current) {
           const mat = quadGlowRef.current.material as THREE.MeshBasicMaterial;
-          mat.opacity = 0.12 + t * 0.55;
-          quadGlowRef.current.scale.set(1, 1 + t * 0.12, 1 + t * 0.12);
+          mat.opacity = 0.08 + t * 0.48;
+          quadGlowRef.current.scale.set(1, 1 + t * 0.1, 1 + t * 0.1);
         }
       } else if (exerciseId === 'bombeo-activo-tobillo') {
-        // 8. Bombeo activo de tobillo: alternar dorsiflexión y flexión plantar
-        setBoneLocalEuler(bones, 'upperleg01R', -0.06, 0, -0.05);
-        setBoneLocalEuler(bones, 'lowerleg01R', 0.06, 0, 0);
-        // t = 0 -> dorsiflexión (+0.52), t = 1 -> flexión plantar (-0.58)
-        const ankleAngle = 0.52 - t * 1.1;
+        // 8. Bombeo activo de tobillo: dorsiflexión y flexión plantar lenta
+        setBoneLocalEuler(bones, 'upperleg01R', -0.05, 0, -0.05);
+        setBoneLocalEuler(bones, 'lowerleg01R', 0.05, 0, 0);
+        const ankleAngle = 0.5 - t * 1.05;
         setBoneLocalEuler(bones, 'footR', ankleAngle, 0, 0);
         setBoneLocalEuler(bones, 'toe2-1R', ankleAngle * 0.45, 0, 0);
 
@@ -324,26 +394,26 @@ const AnimatedPhysioActor: React.FC<ActorProps> = ({
           ankleFlowRef.current.position.set(0.62 - t * 0.22, 0.11, 0.095);
         }
       } else if (exerciseId === 'elevacion-pierna-extendida') {
-        // 9. Elevación de pierna extendida (SLR): pierna sana flexionada de apoyo, pierna operada sube 100% extendida
+        // 9. Elevación de pierna extendida (SLR): rodilla 100% trabada en extensión (0°)
         setBoneLocalEuler(bones, 'upperleg01L', -0.82, 0, 0.06);
         setBoneLocalEuler(bones, 'lowerleg01L', 1.52, 0, 0);
         setBoneLocalEuler(bones, 'footL', -0.62, 0, 0);
 
-        // Cuádriceps traba rodilla en 0° y eleva desde cadera
-        const slrHipLift = 0.03 + t * 0.62;
+        const slrHipLift = 0.03 + t * 0.58;
         setBoneLocalEuler(bones, 'upperleg01R', -slrHipLift, 0, -0.05);
         setBoneLocalEuler(bones, 'lowerleg01R', 0.0, 0, 0);
-        setBoneLocalEuler(bones, 'footR', 0.2, 0, 0);
+        setBoneLocalEuler(bones, 'footR', 0.18, 0, 0);
       }
     } else if (exerciseId === 'flexion-activa-en-sedestacion') {
-      // 4. Flexión autoasistida en sedestación: el pie sano asiste por delante al pie operado hacia atrás
+      // 4. Flexión autoasistida en sedestación: sentado al borde de camilla/silla alta, pie sano asiste al operado
       group.rotation.set(0, Math.PI / 2, 0, 'YXZ');
       group.position.set(-0.14, -0.435, 0);
 
-      setBoneLocalEuler(bones, 'spine04', 0.05, 0, 0);
+      setBoneLocalEuler(bones, 'spine04', 0.04, 0, 0);
       setBoneLocalEuler(bones, 'spine02', 0.02 + breath, 0, 0);
       setBoneLocalEuler(bones, 'neck01', -0.04, 0, 0);
 
+      // Manos sosteniendo los bordes del asiento para estabilidad pélvica
       setBoneLocalEuler(bones, 'shoulder01R', 0, 0, 0.24);
       setBoneLocalEuler(bones, 'upperarm01R', 0.05, 0, 0.28);
       setBoneLocalEuler(bones, 'lowerarm01R', 0.1, 0, 0);
@@ -354,25 +424,30 @@ const AnimatedPhysioActor: React.FC<ActorProps> = ({
 
       const hipX = -0.147;
       const hipY = 0.492;
-      const targetX = 0.28 - t * 0.26;
+      const targetX = 0.27 - t * 0.26;
       const targetY = 0.072;
       const ikR = solve2BoneIK(hipX, hipY, targetX, targetY, UPRIGHT_THIGH_OFFSET);
 
-      setBoneLocalEuler(bones, 'upperleg01R', -ikR.hipFlex, 0, -0.04);
+      setBoneLocalEuler(bones, 'upperleg01R', -ikR.hipFlex, 0, -0.02);
       setBoneLocalEuler(bones, 'lowerleg01R', ikR.kneeFlex, 0, 0);
       setBoneLocalEuler(bones, 'footR', ikR.shinAngle - -Math.PI / 2, 0, 0);
 
-      // El pie sano (izquierdo) se cruza suavemente para asistir al tobillo operado hacia atrás
-      const ikL = solve2BoneIK(hipX, hipY, targetX + 0.035, targetY + 0.02, UPRIGHT_THIGH_OFFSET);
-      setBoneLocalEuler(bones, 'upperleg01L', -ikL.hipFlex, 0, -0.08);
+      // El miembro sano (izquierdo) se cruza hacia la línea media para apoyar su talón sobre la cara anterior del tobillo operado y asistirlo hacia atrás
+      const ikL = solve2BoneIK(
+        hipX,
+        hipY,
+        targetX + 0.042,
+        targetY + 0.032,
+        UPRIGHT_THIGH_OFFSET
+      );
+      setBoneLocalEuler(bones, 'upperleg01L', -ikL.hipFlex, -0.08, -0.16);
       setBoneLocalEuler(bones, 'lowerleg01L', ikL.kneeFlex, 0, 0);
-      setBoneLocalEuler(bones, 'footL', ikL.shinAngle - -Math.PI / 2, 0, 0);
+      setBoneLocalEuler(bones, 'footL', ikL.shinAngle - -Math.PI / 2 + 0.12, 0, 0);
     } else if (exerciseId === 'flexion-asistida-prono') {
-      // 5. Flexión asistida en decúbito prono (boca abajo) con contracción-relajación supervisada
+      // 5. Flexión asistida en decúbito prono (supervisada por el kinesiólogo)
       group.rotation.set(Math.PI / 2, -Math.PI / 2, 0, 'YXZ');
       group.position.set(0.85, 0.11, 0);
 
-      // Brazos cómodos flexionados hacia la cabecera en prono
       setBoneLocalEuler(bones, 'shoulder01R', 0, 0, 0.25);
       setBoneLocalEuler(bones, 'upperarm01R', 0.1, 0, 0.65);
       setBoneLocalEuler(bones, 'lowerarm01R', 0.55, 0, 0);
@@ -381,26 +456,25 @@ const AnimatedPhysioActor: React.FC<ActorProps> = ({
       setBoneLocalEuler(bones, 'upperarm01L', 0.1, 0, -0.65);
       setBoneLocalEuler(bones, 'lowerarm01L', 0.55, 0, 0);
 
-      // Pierna sana extendida sobre la camilla
       setBoneLocalEuler(bones, 'upperleg01L', 0.02, 0, 0.05);
       setBoneLocalEuler(bones, 'lowerleg01L', 0.05, 0, 0);
       setBoneLocalEuler(bones, 'footL', 0.15, 0, 0);
 
-      // Tres fases clínicas:
-      // 0..0.35: lleva a ~88° (1.50 rad)
-      // 0.35..0.68: contracción isométrica de cuádriceps contra resistencia manual (8-15 s)
-      // 0.68..1.0: relajación y ganancia suave de flexión (~112°, 1.92 rad)
-      let proneFlex = 1.48;
-      let isIsoHold = 0;
-      if (t < 0.35) {
-        const p = THREE.MathUtils.smoothstep(t, 0, 0.35);
-        proneFlex = 0.95 + p * 0.53;
+      // Tres fases diferenciadas:
+      // 1) t < 0.32: posicionamiento a ~90° (1.52 rad)
+      // 2) 0.32 <= t < 0.68: contracción isométrica de cuádriceps SIN movimiento articular (8–15 s)
+      // 3) t >= 0.68: relajación y ganancia suave de flexión acompañada por el profesional
+      let proneFlex = 1.52;
+      let isIsoHold = false;
+      if (t < 0.32) {
+        const p = THREE.MathUtils.smoothstep(t, 0, 0.32);
+        proneFlex = 1.05 + p * 0.47;
       } else if (t < 0.68) {
-        proneFlex = 1.48 + Math.sin((t - 0.35) * 30) * 0.015;
-        isIsoHold = 1;
+        proneFlex = 1.52; // Contracción isométrica: sin desplazamiento angular
+        isIsoHold = true;
       } else {
         const p = THREE.MathUtils.smoothstep(t, 0.68, 1.0);
-        proneFlex = 1.48 + p * 0.44;
+        proneFlex = 1.52 + p * 0.38;
       }
 
       setBoneLocalEuler(bones, 'upperleg01R', 0.02, 0, -0.05);
@@ -409,13 +483,37 @@ const AnimatedPhysioActor: React.FC<ActorProps> = ({
 
       if (quadGlowRef.current) {
         const mat = quadGlowRef.current.material as THREE.MeshBasicMaterial;
-        mat.opacity = isIsoHold ? 0.65 : 0.12;
+        mat.opacity = isIsoHold ? 0.58 : 0.08;
+      }
+
+      // Pose del Kinesiólogo de pie junto al extremo distal de la camilla acompañando la pierna
+      if (physioGroupRef.current) {
+        for (const key in physioBones) {
+          const b = physioBones[key];
+          if (b.userData.restQuat) {
+            b.quaternion.copy(b.userData.restQuat);
+          }
+        }
+        physioGroupRef.current.position.set(0.56, -0.38, -0.44);
+        physioGroupRef.current.rotation.set(0, -0.35, 0);
+
+        const reachAdjust = (proneFlex - 1.52) * 0.22;
+        setBoneLocalEuler(physioBones, 'spine02', 0.18, 0, 0);
+        setBoneLocalEuler(physioBones, 'neck01', 0.15, 0, 0);
+
+        setBoneLocalEuler(physioBones, 'shoulder01R', 0, 0, 0.2);
+        setBoneLocalEuler(physioBones, 'upperarm01R', 0.72 + reachAdjust, 0, 0.18);
+        setBoneLocalEuler(physioBones, 'lowerarm01R', 0.35 - reachAdjust * 0.5, 0, 0);
+
+        setBoneLocalEuler(physioBones, 'shoulder01L', 0, 0, -0.2);
+        setBoneLocalEuler(physioBones, 'upperarm01L', 0.68 + reachAdjust, 0, -0.18);
+        setBoneLocalEuler(physioBones, 'lowerarm01L', 0.32 - reachAdjust * 0.5, 0, 0);
       }
     }
 
     group.updateMatrixWorld(true);
 
-    // Position smooth 3D knee band directly on operated right knee (lowerleg01R)
+    // Posicionar banda de rodilla en el miembro operado (lowerleg01R)
     const kneeBone = getBone(bones, 'lowerleg01R');
     if (kneeBone && kneeBandRef.current) {
       tempVecA.setFromMatrixPosition(kneeBone.matrixWorld);
@@ -424,19 +522,13 @@ const AnimatedPhysioActor: React.FC<ActorProps> = ({
       kneeBandRef.current.quaternion.copy(dummyQuat);
     }
 
-    // Update live 3D heel/foot indicator & physiotherapist support
     const footBone = getBone(bones, 'footR');
-    if (footBone) {
+    if (footBone && heelMarkerRef.current) {
       tempVecA.setFromMatrixPosition(footBone.matrixWorld);
-      if (heelMarkerRef.current) {
-        if (exerciseId === 'flexion-activa-en-sedestacion') {
-          heelMarkerRef.current.position.set(tempVecA.x + 0.05, 0.006, tempVecA.z);
-        } else {
-          heelMarkerRef.current.position.set(tempVecA.x, 0.006, tempVecA.z);
-        }
-      }
-      if (physioHandRef.current && exerciseId === 'flexion-asistida-prono') {
-        physioHandRef.current.position.copy(tempVecA);
+      if (exerciseId === 'flexion-activa-en-sedestacion') {
+        heelMarkerRef.current.position.set(tempVecA.x + 0.05, 0.006, tempVecA.z);
+      } else {
+        heelMarkerRef.current.position.set(tempVecA.x, 0.006, tempVecA.z);
       }
     }
 
@@ -492,12 +584,12 @@ const AnimatedPhysioActor: React.FC<ActorProps> = ({
 
   useFrame((_, delta) => {
     const clampedDelta = Math.min(delta, 0.05);
-    const speedFactor = slowMode ? 0.2 : 0.42;
+    const speedFactor = slowMode ? 0.18 : 0.38;
 
     if (playing) {
       phaseRef.current += clampedDelta * speedFactor;
       const rawT = 0.5 - 0.5 * Math.cos(phaseRef.current * Math.PI * 2);
-      const t = THREE.MathUtils.smoothstep(rawT, 0.06, 0.94);
+      const t = THREE.MathUtils.smoothstep(rawT, 0.05, 0.95);
       smoothTRef.current = t;
       const crankAngle = -phaseRef.current * Math.PI * 2;
       applyPose(t, crankAngle);
@@ -519,32 +611,39 @@ const AnimatedPhysioActor: React.FC<ActorProps> = ({
 
   return (
     <group>
-      {/* Articulated MakeHuman Character */}
+      {/* Paciente Articulado */}
       <group ref={characterGroupRef}>
         <primitive object={clonedScene} />
       </group>
 
-      {/* Smooth 3D Knee Support Band on Operated Right Knee (Luminous Celeste/Turquoise) */}
+      {/* Kinesiólogo supervisando en Ejercicio 5 (Decúbito Prono) */}
+      {exerciseId === 'flexion-asistida-prono' && (
+        <group ref={physioGroupRef}>
+          <primitive object={physioScene} />
+        </group>
+      )}
+
+      {/* Banda identificatoria en la rodilla operada (Turquesa Clínico #25C8CC) */}
       <mesh ref={kneeBandRef} castShadow>
         <cylinderGeometry args={[0.062, 0.055, 0.075, 32]} />
         <meshStandardMaterial
-          color="#38d9d6"
-          emissive="#38d9d6"
-          emissiveIntensity={0.28}
-          roughness={0.35}
+          color="#25C8CC"
+          emissive="#25C8CC"
+          emissiveIntensity={0.2}
+          roughness={0.4}
         />
       </mesh>
 
-      {/* Rehabilitation Plinth / Mat + Head Pillow */}
+      {/* Camilla Clínica + Almohada */}
       {isPlinthExercise && (
         <group>
           <mesh position={[0.04, -0.03, 0]} receiveShadow castShadow>
-            <boxGeometry args={[1.84, 0.06, 0.72]} />
-            <meshStandardMaterial color="#132d46" roughness={0.65} metalness={0.12} />
+            <boxGeometry args={[1.86, 0.06, 0.74]} />
+            <meshStandardMaterial color="#152E42" roughness={0.68} metalness={0.08} />
           </mesh>
           <mesh position={[0.04, -0.075, 0]} receiveShadow>
-            <boxGeometry args={[1.86, 0.03, 0.74]} />
-            <meshStandardMaterial color="#0b1d2e" roughness={0.5} metalness={0.25} />
+            <boxGeometry args={[1.88, 0.03, 0.76]} />
+            <meshStandardMaterial color="#0D2030" roughness={0.55} metalness={0.2} />
           </mesh>
           <mesh
             position={[-0.68, exerciseId === 'flexion-asistida-prono' ? 0.015 : 0.022, 0]}
@@ -552,109 +651,76 @@ const AnimatedPhysioActor: React.FC<ActorProps> = ({
             castShadow
           >
             <boxGeometry args={[0.28, 0.045, 0.42]} />
-            <meshStandardMaterial color="#21496b" roughness={0.6} />
+            <meshStandardMaterial color="#244660" roughness={0.65} />
           </mesh>
         </group>
       )}
 
-      {/* 1 & 2: Linear Heel Slide Track Indicator on Mat */}
+      {/* 1 & 2: Guía de Deslizamiento del Talón */}
       {(exerciseId === 'deslizamiento-del-talon' ||
         exerciseId === 'flexion-asistida-con-toalla') && (
         <group>
-          <mesh position={[0.61, 0.002, 0.125]} rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[0.42, 0.038]} />
-            <meshBasicMaterial color="#38d9d6" transparent opacity={0.45} />
+          <mesh position={[0.52, 0.002, 0.125]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[0.46, 0.034]} />
+            <meshBasicMaterial color="#25C8CC" transparent opacity={0.38} />
           </mesh>
-          <mesh ref={heelMarkerRef} position={[0.76, 0.006, 0.125]} rotation={[-Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[0.026, 0.045, 28]} />
-            <meshBasicMaterial color="#ffffff" transparent opacity={0.9} side={THREE.DoubleSide} />
+          <mesh ref={heelMarkerRef} position={[0.72, 0.006, 0.125]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.024, 0.042, 28]} />
+            <meshBasicMaterial color="#82E5E4" transparent opacity={0.85} side={THREE.DoubleSide} />
           </mesh>
         </group>
       )}
 
-      {/* 2: Non-elastic Rehabilitation Towel / Cincha */}
+      {/* 2: Toalla o Cincha de Autoasistencia */}
       {exerciseId === 'flexion-asistida-con-toalla' && (
         <group>
           <mesh ref={strapRightRef} castShadow>
-            <boxGeometry args={[0.025, 0.008, 1]} />
-            <meshStandardMaterial
-              color="#38d9d6"
-              emissive="#38d9d6"
-              emissiveIntensity={0.22}
-              roughness={0.4}
-            />
+            <boxGeometry args={[0.024, 0.007, 1]} />
+            <meshStandardMaterial color="#25C8CC" roughness={0.45} />
           </mesh>
           <mesh ref={strapLeftRef} castShadow>
-            <boxGeometry args={[0.025, 0.008, 1]} />
-            <meshStandardMaterial
-              color="#38d9d6"
-              emissive="#38d9d6"
-              emissiveIntensity={0.22}
-              roughness={0.4}
-            />
+            <boxGeometry args={[0.024, 0.007, 1]} />
+            <meshStandardMaterial color="#25C8CC" roughness={0.45} />
           </mesh>
           <mesh ref={strapLoopRef} rotation={[0, Math.PI / 2, 0]}>
-            <torusGeometry args={[0.043, 0.009, 12, 24]} />
-            <meshStandardMaterial color="#ffffff" roughness={0.3} />
+            <torusGeometry args={[0.042, 0.008, 12, 24]} />
+            <meshStandardMaterial color="#F1F7FA" roughness={0.35} />
           </mesh>
         </group>
       )}
 
-      {/* 3: Pelota Maní Terapéutica Transversal (Peanut Ball) */}
+      {/* 3: Pelota Maní Terapéutica continua (eje largo transversal al cuerpo) */}
       {exerciseId === 'flexion-autoasistida-pelota-mani' && (
-        <group ref={peanutBallGroupRef} position={[0.56, 0.145, 0]}>
-          {/* Left lobe of peanut ball */}
-          <mesh position={[0, 0, -0.15]} castShadow receiveShadow>
-            <sphereGeometry args={[0.145, 28, 28]} />
+        <group ref={peanutBallGroupRef} position={[0.56, 0.125, 0]}>
+          <mesh geometry={peanutGeometry} castShadow receiveShadow>
             <meshStandardMaterial
-              color="#28b8c8"
-              emissive="#0ea5e9"
-              emissiveIntensity={0.12}
-              roughness={0.35}
+              color="#25C8CC"
+              roughness={0.38}
+              metalness={0.05}
             />
           </mesh>
-          {/* Central saddle bridge of peanut ball */}
-          <mesh rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
-            <cylinderGeometry args={[0.112, 0.112, 0.3, 28]} />
-            <meshStandardMaterial
-              color="#38d9d6"
-              emissive="#0ea5e9"
-              emissiveIntensity={0.14}
-              roughness={0.35}
-            />
+          {/* Bandas de referencia visual para percibir el rodamiento de la pelota maní */}
+          <mesh position={[0, 0, 0.14]} rotation={[0, Math.PI / 2, 0]}>
+            <torusGeometry args={[0.168, 0.004, 8, 36]} />
+            <meshBasicMaterial color="#F1F7FA" transparent opacity={0.55} />
           </mesh>
-          {/* Right lobe of peanut ball */}
-          <mesh position={[0, 0, 0.15]} castShadow receiveShadow>
-            <sphereGeometry args={[0.145, 28, 28]} />
-            <meshStandardMaterial
-              color="#28b8c8"
-              emissive="#0ea5e9"
-              emissiveIntensity={0.12}
-              roughness={0.35}
-            />
-          </mesh>
-          {/* White grip ribs so rotation is clearly visible */}
-          <mesh position={[0, 0, 0.15]} rotation={[0, Math.PI / 2, 0]}>
-            <torusGeometry args={[0.146, 0.005, 8, 32]} />
-            <meshBasicMaterial color="#ffffff" transparent opacity={0.65} />
-          </mesh>
-          <mesh position={[0, 0, -0.15]} rotation={[0, Math.PI / 2, 0]}>
-            <torusGeometry args={[0.146, 0.005, 8, 32]} />
-            <meshBasicMaterial color="#ffffff" transparent opacity={0.65} />
+          <mesh position={[0, 0, -0.14]} rotation={[0, Math.PI / 2, 0]}>
+            <torusGeometry args={[0.168, 0.004, 8, 36]} />
+            <meshBasicMaterial color="#F1F7FA" transparent opacity={0.55} />
           </mesh>
         </group>
       )}
 
-      {/* 4: Camilla / Silla Alta + Pista de Deslizamiento Autoasistido */}
+      {/* 4: Camilla / Silla Alta de Sedestación */}
       {exerciseId === 'flexion-activa-en-sedestacion' && (
         <group>
           <mesh position={[-0.08, 0.42, 0]} receiveShadow castShadow>
             <boxGeometry args={[0.46, 0.045, 0.48]} />
-            <meshStandardMaterial color="#15324d" roughness={0.65} />
+            <meshStandardMaterial color="#163247" roughness={0.65} />
           </mesh>
           <mesh position={[-0.29, 0.68, 0]} rotation={[0, 0, 0.05]} receiveShadow castShadow>
             <boxGeometry args={[0.04, 0.48, 0.46]} />
-            <meshStandardMaterial color="#15324d" roughness={0.65} />
+            <meshStandardMaterial color="#163247" roughness={0.65} />
           </mesh>
           {[
             [-0.26, 0.205, 0.19],
@@ -664,45 +730,30 @@ const AnimatedPhysioActor: React.FC<ActorProps> = ({
           ].map(([lx, ly, lz], idx) => (
             <mesh key={idx} position={[lx, ly, lz]} receiveShadow castShadow>
               <cylinderGeometry args={[0.016, 0.014, 0.41, 12]} />
-              <meshStandardMaterial color="#5882a6" roughness={0.35} metalness={0.4} />
+              <meshStandardMaterial color="#587E96" roughness={0.4} metalness={0.35} />
             </mesh>
           ))}
-          <mesh position={[0.2, 0.003, 0.075]} rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[0.36, 0.045]} />
-            <meshBasicMaterial color="#38d9d6" transparent opacity={0.45} />
+          <mesh position={[0.18, 0.003, 0.075]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[0.36, 0.042]} />
+            <meshBasicMaterial color="#25C8CC" transparent opacity={0.38} />
           </mesh>
-          <mesh ref={heelMarkerRef} position={[0.32, 0.006, 0.075]} rotation={[-Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[0.028, 0.048, 28]} />
-            <meshBasicMaterial color="#ffffff" transparent opacity={0.9} side={THREE.DoubleSide} />
+          <mesh ref={heelMarkerRef} position={[0.3, 0.006, 0.075]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.026, 0.045, 28]} />
+            <meshBasicMaterial color="#82E5E4" transparent opacity={0.85} side={THREE.DoubleSide} />
           </mesh>
         </group>
       )}
 
-      {/* 5: Decúbito Prono — Contacto Manual del Kinesiólogo + Indicador Isométrico */}
+      {/* 5: Decúbito Prono — Indicador de fase isométrica en el cuádriceps */}
       {exerciseId === 'flexion-asistida-prono' && (
-        <group>
-          <group ref={physioHandRef}>
-            <mesh rotation={[Math.PI / 2, 0, 0]}>
-              <cylinderGeometry args={[0.048, 0.048, 0.09, 24]} />
-              <meshStandardMaterial
-                color="#38d9d6"
-                emissive="#38d9d6"
-                emissiveIntensity={0.35}
-                transparent
-                opacity={0.85}
-              />
-            </mesh>
-          </group>
-          {/* Indicador luminoso de contracción isométrica del cuádriceps sobre la camilla */}
-          <mesh
-            ref={quadGlowRef}
-            position={[0.16, 0.05, -0.095]}
-            rotation={[0, 0, Math.PI / 2]}
-          >
-            <cylinderGeometry args={[0.085, 0.075, 0.28, 24]} />
-            <meshBasicMaterial color="#38d9d6" transparent opacity={0.2} />
-          </mesh>
-        </group>
+        <mesh
+          ref={quadGlowRef}
+          position={[0.16, 0.055, -0.095]}
+          rotation={[0, 0, Math.PI / 2]}
+        >
+          <cylinderGeometry args={[0.082, 0.072, 0.28, 24]} />
+          <meshBasicMaterial color="#25C8CC" transparent opacity={0.2} />
+        </mesh>
       )}
 
       {/* 6: Extensión Pasiva — Apoyo Cilíndrico Bajo el Talón y Rodilla Libre */}
@@ -710,22 +761,16 @@ const AnimatedPhysioActor: React.FC<ActorProps> = ({
         <group>
           <mesh position={[0.74, 0.042, 0.095]} rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
             <cylinderGeometry args={[0.048, 0.048, 0.22, 28]} />
-            <meshStandardMaterial
-              color="#38d9d6"
-              emissive="#0ea5e9"
-              emissiveIntensity={0.2}
-              roughness={0.4}
-            />
+            <meshStandardMaterial color="#25C8CC" roughness={0.45} />
           </mesh>
-          {/* Indicador de espacio libre bajo la rodilla (extensión a 0°) */}
           <mesh position={[0.35, 0.004, 0.095]} rotation={[-Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[0.04, 0.065, 28]} />
-            <meshBasicMaterial color="#38d9d6" transparent opacity={0.6} side={THREE.DoubleSide} />
+            <ringGeometry args={[0.038, 0.06, 28]} />
+            <meshBasicMaterial color="#82E5E4" transparent opacity={0.55} side={THREE.DoubleSide} />
           </mesh>
         </group>
       )}
 
-      {/* 7: Contracción Isométrica de Cuádriceps — Halo de Activación Muscular + Apoyo Poplíteo */}
+      {/* 7: Contracción Isométrica de Cuádriceps */}
       {exerciseId === 'contraccion-isometrica-cuadriceps' && (
         <group>
           <mesh
@@ -733,40 +778,69 @@ const AnimatedPhysioActor: React.FC<ActorProps> = ({
             position={[0.15, 0.11, 0.095]}
             rotation={[0, 0, Math.PI / 2]}
           >
-            <cylinderGeometry args={[0.082, 0.07, 0.26, 24]} />
-            <meshBasicMaterial color="#38d9d6" transparent opacity={0.35} />
+            <cylinderGeometry args={[0.08, 0.068, 0.26, 24]} />
+            <meshBasicMaterial color="#25C8CC" transparent opacity={0.3} />
           </mesh>
           <mesh position={[0.35, 0.012, 0.095]} rotation={[Math.PI / 2, 0, 0]}>
             <cylinderGeometry args={[0.022, 0.022, 0.18, 20]} />
-            <meshStandardMaterial color="#7dd3fc" roughness={0.4} />
+            <meshStandardMaterial color="#82E5E4" roughness={0.45} />
           </mesh>
         </group>
       )}
 
-      {/* 8: Bombeo Activo de Tobillo — Indicador de Retorno Venoso */}
+      {/* 8: Bombeo Activo de Tobillo */}
       {exerciseId === 'bombeo-activo-tobillo' && (
-        <group>
-          <mesh
-            ref={ankleFlowRef}
-            position={[0.55, 0.11, 0.095]}
-            rotation={[0, Math.PI / 2, 0]}
-          >
-            <torusGeometry args={[0.06, 0.008, 12, 28]} />
-            <meshBasicMaterial color="#38d9d6" transparent opacity={0.75} />
-          </mesh>
-        </group>
+        <mesh
+          ref={ankleFlowRef}
+          position={[0.55, 0.11, 0.095]}
+          rotation={[0, Math.PI / 2, 0]}
+        >
+          <torusGeometry args={[0.058, 0.007, 12, 28]} />
+          <meshBasicMaterial color="#25C8CC" transparent opacity={0.65} />
+        </mesh>
       )}
 
-      {/* 9: Elevación de Pierna Extendida (SLR) — Guía de Arco de Elevación sin Lag */}
+      {/* 9: Elevación de Pierna Extendida */}
       {exerciseId === 'elevacion-pierna-extendida' && (
-        <group>
-          <mesh position={[0.74, 0.22, 0.095]} rotation={[0, 0, 0.2]}>
-            <boxGeometry args={[0.012, 0.36, 0.012]} />
-            <meshBasicMaterial color="#38d9d6" transparent opacity={0.5} />
-          </mesh>
-        </group>
+        <mesh position={[0.74, 0.22, 0.095]} rotation={[0, 0, 0.2]}>
+          <boxGeometry args={[0.01, 0.34, 0.01]} />
+          <meshBasicMaterial color="#25C8CC" transparent opacity={0.45} />
+        </mesh>
       )}
     </group>
+  );
+};
+
+const CameraRigController: React.FC<{
+  camPosition: [number, number, number];
+  camTarget: [number, number, number];
+  cameraResetSignal: number;
+  exerciseId: string;
+}> = ({ camPosition, camTarget, cameraResetSignal, exerciseId }) => {
+  const controlsRef = useRef<OrbitControlsImpl | null>(null);
+  const { camera, invalidate } = useThree();
+
+  useEffect(() => {
+    camera.position.set(camPosition[0], camPosition[1], camPosition[2]);
+    if (controlsRef.current) {
+      controlsRef.current.target.set(camTarget[0], camTarget[1], camTarget[2]);
+      controlsRef.current.update();
+    }
+    invalidate();
+  }, [exerciseId, cameraResetSignal, camPosition, camTarget, camera, invalidate]);
+
+  return (
+    <OrbitControls
+      ref={controlsRef}
+      target={camTarget}
+      enableZoom={false}
+      enablePan={false}
+      minPolarAngle={Math.PI * 0.25}
+      maxPolarAngle={Math.PI * 0.56}
+      minAzimuthAngle={-Math.PI * 0.32}
+      maxAzimuthAngle={Math.PI * 0.32}
+      rotateSpeed={0.55}
+    />
   );
 };
 
@@ -776,6 +850,7 @@ export const RehabExerciseScene: React.FC<RehabExerciseSceneProps> = ({
   finalPose,
   slowMode,
   resetSignal,
+  cameraResetSignal = 0,
   inView
 }) => {
   const cam = CAMERA_CONFIG[exerciseId] || CAMERA_CONFIG['deslizamiento-del-talon'];
@@ -789,18 +864,18 @@ export const RehabExerciseScene: React.FC<RehabExerciseSceneProps> = ({
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
       style={{ width: '100%', height: '100%' }}
     >
-      <ambientLight intensity={1.05} />
-      <hemisphereLight args={['#ffffff', '#38d9d6', 0.75]} />
+      <ambientLight intensity={1.0} />
+      <hemisphereLight args={['#F1F7FA', '#10283A', 0.7]} />
       <directionalLight
         position={[1.8, 2.8, 2.2]}
-        intensity={1.35}
+        intensity={1.3}
         castShadow
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
         shadow-bias={-0.0005}
       />
-      <directionalLight position={[-1.8, 1.6, -1.4]} intensity={0.6} color="#7dd3fc" />
-      <directionalLight position={[0.5, 1.2, -2.0]} intensity={0.4} color="#38d9d6" />
+      <directionalLight position={[-1.8, 1.6, -1.4]} intensity={0.55} color="#82E5E4" />
+      <directionalLight position={[0.5, 1.2, -2.0]} intensity={0.35} color="#25C8CC" />
 
       <Suspense fallback={null}>
         <AnimatedPhysioActor
@@ -812,23 +887,19 @@ export const RehabExerciseScene: React.FC<RehabExerciseSceneProps> = ({
         />
         <ContactShadows
           position={[0, -0.002, 0]}
-          opacity={0.45}
+          opacity={0.4}
           scale={2.8}
           blur={2.2}
           far={1.4}
-          color="#040d17"
+          color="#040D16"
         />
       </Suspense>
 
-      <OrbitControls
-        target={cam.target}
-        enableZoom={false}
-        enablePan={false}
-        minPolarAngle={Math.PI * 0.25}
-        maxPolarAngle={Math.PI * 0.56}
-        minAzimuthAngle={-Math.PI * 0.25}
-        maxAzimuthAngle={Math.PI * 0.28}
-        rotateSpeed={0.55}
+      <CameraRigController
+        camPosition={cam.position}
+        camTarget={cam.target}
+        cameraResetSignal={cameraResetSignal}
+        exerciseId={exerciseId}
       />
     </Canvas>
   );

@@ -5,6 +5,7 @@ import {
   Menu,
   X,
   Type,
+  Home,
   Dumbbell,
   HeartHandshake,
   Ban,
@@ -22,16 +23,25 @@ interface HeaderProps {
   onToggleDarkMode?: () => void;
 }
 
-const MENU_ITEMS = [
-  { to: '/', label: 'Mis ejercicios 3D', icon: Dumbbell },
-  { to: '/cuidados', label: 'Cuidados en casa', icon: HeartHandshake },
-  { to: '/que-evitar', label: 'Qué evitar (Los NO)', icon: Ban },
-  { to: '/actividades', label: 'Actividades cotidianas', icon: Footprints },
-  { to: '/alertas', label: 'Señales de alarma', icon: AlertTriangle, danger: true },
-  { to: '/seguimiento', label: 'Mi seguimiento voluntario', icon: ClipboardList },
-  { to: '/mi-cirugia', label: 'Conocé tu cirugía (HTH)', icon: Stethoscope },
+const PRIMARY_NAV = [
+  { to: '/', label: 'Inicio', end: true },
+  { to: '/ejercicios', label: 'Ejercicios', end: false },
+  { to: '/cuidados', label: 'Cuidados', end: false },
+  { to: '/seguimiento', label: 'Seguimiento', end: false },
+  { to: '/preguntas', label: 'Preguntas', end: false }
+];
+
+const DRAWER_ITEMS = [
+  { to: '/', label: 'Inicio', icon: Home, end: true },
+  { to: '/ejercicios', label: 'Ejercicios 3D (Principales y Complementarios)', icon: Dumbbell },
+  { to: '/cuidados', label: 'Cuidados y recomendaciones', icon: HeartHandshake },
+  { to: '/que-evitar', label: 'Qué evitar en esta etapa', icon: Ban },
+  { to: '/seguimiento', label: 'Seguimiento de evolución', icon: ClipboardList },
   { to: '/preguntas', label: 'Preguntas frecuentes', icon: HelpCircle },
-  { to: '/fuentes', label: 'Fuentes y respaldo científico', icon: BookOpen }
+  { to: '/actividades', label: 'Actividades de la vida diaria', icon: Footprints },
+  { to: '/mi-cirugia', label: 'Cirugía LCA (Injerto HTH)', icon: Stethoscope },
+  { to: '/fuentes', label: 'Fuentes científicas', icon: BookOpen },
+  { to: '/alertas', label: 'Señales de alarma', icon: AlertTriangle, danger: true }
 ];
 
 export const Header: React.FC<HeaderProps> = ({
@@ -40,117 +50,91 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
-  const isExercisesActive =
-    location.pathname === '/' || location.pathname.startsWith('/ejercicios');
 
   useEffect(() => {
     setMenuOpen(false);
   }, [location.pathname]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-cyan-300/20 bg-[#061523]/95 backdrop-blur-xl no-print">
+    <header className="sticky top-0 z-40 border-b border-[#244154] bg-[#061522]/95 backdrop-blur-md no-print">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-2.5 sm:px-6">
         <Link
           to="/"
-          className="flex items-center gap-2.5 rounded-xl py-1 pr-2 focus-visible:outline-[#38d9d6]"
-          aria-label="Ir a Mis ejercicios — Tu rodilla, paso a paso"
+          className="flex items-center gap-2.5 rounded-xl py-1 pr-2 focus-visible:outline-[#25C8CC]"
+          aria-label="Ir al inicio — Tu rodilla, paso a paso"
         >
-          <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#0d2840] border border-[#38d9d6]/40">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#0B2030] border border-[#244154]">
             <svg className="h-5 w-5" viewBox="0 0 32 32" fill="none" aria-hidden="true">
               <path
                 d="M12 6C12 6 13 11 13.5 13C14 14.5 18 14.5 18.5 13C19 11 20 6 20 6"
-                stroke="#67e8f9"
-                strokeWidth="2.5"
+                stroke="#F1F7FA"
+                strokeWidth="2.4"
                 strokeLinecap="round"
               />
               <path
                 d="M13.5 19C13 21 12 26 12 26M18.5 19C19 21 20 26 20 26"
-                stroke="#67e8f9"
-                strokeWidth="2.5"
+                stroke="#F1F7FA"
+                strokeWidth="2.4"
                 strokeLinecap="round"
               />
-              <circle cx="16" cy="16" r="3" fill="#38d9d6" stroke="#ffffff" strokeWidth="1.5" />
+              <circle cx="16" cy="16" r="3" fill="#25C8CC" />
             </svg>
           </div>
           <div className="leading-tight">
-            <span className="block text-sm sm:text-base font-bold text-white tracking-tight">
+            <span className="block text-sm sm:text-base font-semibold text-[#F1F7FA] tracking-tight">
               Tu rodilla, paso a paso
             </span>
-            <span className="hidden sm:block text-[11px] font-medium text-sky-200">
-              Rehabilitación posoperatoria LCA (HTH)
+            <span className="hidden sm:block text-[11px] text-[#A7B9C6]">
+              Rehabilitación postoperatoria LCA (HTH)
             </span>
           </div>
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-5" aria-label="Navegación principal">
-          <Link
-            to="/"
-            className={`text-xs font-bold uppercase tracking-wider transition-colors ${
-              isExercisesActive ? 'text-[#67e8f9]' : 'text-sky-100 hover:text-white'
-            }`}
-          >
-            Ejercicios
-          </Link>
-          <NavLink
-            to="/cuidados"
-            className={({ isActive }) =>
-              `text-xs font-bold uppercase tracking-wider transition-colors ${
-                isActive ? 'text-[#67e8f9]' : 'text-sky-100 hover:text-white'
-              }`
-            }
-          >
-            Cuidados
-          </NavLink>
-          <NavLink
-            to="/que-evitar"
-            className={({ isActive }) =>
-              `text-xs font-bold uppercase tracking-wider transition-colors ${
-                isActive ? 'text-[#67e8f9]' : 'text-sky-100 hover:text-white'
-              }`
-            }
-          >
-            Qué evitar
-          </NavLink>
-          <NavLink
-            to="/seguimiento"
-            className={({ isActive }) =>
-              `text-xs font-bold uppercase tracking-wider transition-colors ${
-                isActive ? 'text-[#67e8f9]' : 'text-sky-100 hover:text-white'
-              }`
-            }
-          >
-            Seguimiento
-          </NavLink>
-          <NavLink
-            to="/preguntas"
-            className={({ isActive }) =>
-              `text-xs font-bold uppercase tracking-wider transition-colors ${
-                isActive ? 'text-[#67e8f9]' : 'text-sky-100 hover:text-white'
-              }`
-            }
-          >
-            Preguntas
-          </NavLink>
+        {/* Navegación principal limpia: Inicio · Ejercicios · Cuidados · Seguimiento · Preguntas */}
+        <nav className="hidden lg:flex items-center gap-1" aria-label="Navegación principal">
+          {PRIMARY_NAV.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              className={({ isActive }) =>
+                `rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+                  isActive
+                    ? 'bg-[#10283A] text-[#25C8CC] border border-[#244154]'
+                    : 'text-[#A7B9C6] hover:text-[#F1F7FA] hover:bg-[#0B2030]'
+                }`
+              }
+            >
+              {item.label}
+            </NavLink>
+          ))}
         </nav>
 
+        {/* Acceso a Señales de alarma + Texto grande + Menú */}
         <div className="flex items-center gap-2">
-          <Link
+          <NavLink
             to="/alertas"
-            className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-rose-500/20 px-3 py-1.5 text-xs font-bold text-rose-200 border border-rose-400/45 hover:bg-rose-500/30 transition-colors"
+            className={({ isActive }) =>
+              `inline-flex min-h-[36px] items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold border transition-colors ${
+                isActive
+                  ? 'bg-rose-500/25 text-rose-100 border-rose-400/60'
+                  : 'bg-[#0B2030] text-rose-200 border-rose-500/35 hover:border-rose-400/60'
+              }`
+            }
             title="Ver señales de alarma médica"
           >
-            <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-rose-300" aria-hidden="true" />
-            <span>Alertas</span>
-          </Link>
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-rose-400" aria-hidden="true" />
+            <span>Señales de alarma</span>
+          </NavLink>
 
           <button
             type="button"
             onClick={onToggleLargeText}
             aria-pressed={largeText}
-            className={`inline-flex min-h-[36px] items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all ${
+            className={`inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition-colors ${
               largeText
-                ? 'bg-[#1db8c4] text-white border-[#38d9d6]'
-                : 'bg-[#0a1e30] text-sky-100 border-cyan-300/25 hover:text-white hover:border-[#38d9d6]'
+                ? 'bg-[#25C8CC] text-[#061522] border-[#25C8CC]'
+                : 'bg-[#0B2030] text-[#A7B9C6] border-[#244154] hover:text-[#F1F7FA]'
             }`}
             title={largeText ? 'Desactivar modo de texto grande' : 'Activar modo de texto grande'}
             aria-label={
@@ -166,7 +150,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => setMenuOpen((prev) => !prev)}
             aria-expanded={menuOpen}
             aria-controls="accessible-drawer-menu"
-            className="inline-flex min-h-[36px] min-w-[36px] items-center justify-center rounded-full border border-cyan-300/25 bg-[#0a1e30] text-white hover:border-[#38d9d6] transition-colors"
+            className="inline-flex min-h-[36px] min-w-[36px] items-center justify-center rounded-lg border border-[#244154] bg-[#0B2030] text-[#F1F7FA] hover:border-[#25C8CC] transition-colors"
             aria-label={menuOpen ? 'Cerrar menú de secciones' : 'Abrir menú de secciones'}
           >
             {menuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -174,22 +158,23 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
+      {/* Menú desplegable */}
       {menuOpen && (
         <div
           id="accessible-drawer-menu"
-          className="border-t border-cyan-300/20 bg-[#071828]/98 backdrop-blur-2xl"
+          className="border-t border-[#244154] bg-[#0B2030]"
           role="region"
           aria-label="Menú completo de la guía"
         >
           <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6">
             <div className="mb-3 flex items-center justify-between">
-              <p className="text-xs font-extrabold uppercase tracking-wider text-[#67e8f9]">
-                Todas las secciones de la guía
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#82E5E4]">
+                Módulos de la guía clínica
               </p>
               <button
                 type="button"
                 onClick={onToggleLargeText}
-                className="text-xs font-bold text-[#38d9d6] underline"
+                className="text-xs font-semibold text-[#25C8CC] underline"
               >
                 {largeText
                   ? 'Volver a tamaño de letra estándar'
@@ -197,24 +182,24 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             </div>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {MENU_ITEMS.map((item) => {
+              {DRAWER_ITEMS.map((item) => {
                 const Icon = item.icon;
                 return (
                   <NavLink
                     key={item.to}
                     to={item.to}
-                    end={item.to === '/'}
+                    end={item.end}
                     className={({ isActive }) =>
-                      `flex min-h-[44px] items-center gap-3 rounded-2xl px-4 py-2 text-sm font-semibold transition-all border ${
+                      `flex min-h-[42px] items-center gap-3 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-medium transition-colors border ${
                         item.danger
-                          ? 'bg-rose-950/40 text-rose-200 border-rose-400/40 hover:border-rose-300'
+                          ? 'bg-rose-950/30 text-rose-200 border-rose-500/35 hover:border-rose-400'
                           : isActive
-                          ? 'bg-[#1db8c4] text-white border-[#38d9d6]'
-                          : 'bg-[#0b2135] text-sky-100 border-cyan-300/20 hover:border-cyan-300/50 hover:text-white'
+                          ? 'bg-[#10283A] text-[#25C8CC] border-[#25C8CC]'
+                          : 'bg-[#061522] text-[#F1F7FA] border-[#244154] hover:border-[#25C8CC]/60'
                       }`
                     }
                   >
-                    <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    <Icon className="h-4 w-4 shrink-0 text-[#25C8CC]" aria-hidden="true" />
                     <span>{item.label}</span>
                   </NavLink>
                 );
