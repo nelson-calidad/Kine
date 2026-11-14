@@ -74,11 +74,11 @@ const wv = j.bufferViews[wa.bufferView];
 
 const jointNames = j.skins[0].joints.map((idx) => j.nodes[idx].name);
 
-const navy = new Color('#1d425c');
-const shorts = new Color('#285e6d');
-const skin = new Color('#ddb9a0');
-const hair = new Color('#352f2b');
-const shoe = new Color('#e4ecf0');
+const navyTop = new Color('#19384F');
+const shortsColor = new Color('#1F4E5F');
+const skin = new Color('#DFB99F');
+const hair = new Color('#2D2724');
+const shoe = new Color('#DCE6EC');
 const tempColor = new Color();
 
 for (let i = 0; i < pa.count; i++) {
@@ -90,45 +90,62 @@ for (let i = 0; i < pa.count; i++) {
   const jo = jv.byteOffset + (ja.byteOffset || 0) + i * 4;
   const wo = wv.byteOffset + (wa.byteOffset || 0) + i * 16;
 
+  let armHandWeight = 0;
   let forearmHandWeight = 0;
-  let upperArmWeight = 0;
-  let legPelvisWeight = 0;
-  let torsoWeight = 0;
 
   for (let k = 0; k < 4; k++) {
     const jIdx = output.readUInt8(jo + k);
     const w = output.readFloatLE(wo + k * 4);
     if (w <= 0) continue;
     const jName = jointNames[jIdx] || '';
-    if (/lowerarm|wrist|metacarpal|finger/.test(jName)) forearmHandWeight += w;
-    else if (/upperarm/.test(jName)) upperArmWeight += w;
-    else if (/pelvis|upperleg|lowerleg|foot|toe/.test(jName)) legPelvisWeight += w;
-    else if (/spine|clavicle|shoulder|breast|root/.test(jName)) torsoWeight += w;
+    if (/lowerarm|wrist|metacarpal|finger/.test(jName)) {
+      forearmHandWeight += w;
+      armHandWeight += w;
+    } else if (/upperarm/.test(jName)) {
+      armHandWeight += w;
+    }
   }
 
+  // Start with natural skin tone
   tempColor.copy(skin);
 
-  if (forearmHandWeight > 0.3) {
-    tempColor.copy(skin);
-  } else if (upperArmWeight > 0.35) {
-    const sleeveBlend = smoothstep(1.255, 1.29, y) * (1 - smoothstep(0.3, 0.6, forearmHandWeight));
-    tempColor.copy(skin).lerp(navy, sleeveBlend);
-  } else if (torsoWeight >= legPelvisWeight && y > 0.94 && y < 1.46) {
-    const collarBlend = 1 - smoothstep(1.425, 1.455, y);
-    const waistBlend = smoothstep(0.94, 0.975, y);
-    tempColor.copy(shorts).lerp(navy, waistBlend);
-    tempColor.lerp(skin, 1 - collarBlend);
-  } else if (y > 0.615 && y <= 0.975 && Math.abs(x) < 0.26) {
-    const hemBlend = smoothstep(0.615, 0.65, y);
-    tempColor.copy(skin).lerp(shorts, hemBlend);
-  } else if (y < 0.105 && z > -0.09) {
-    const sockBlend = 1 - smoothstep(0.08, 0.105, y);
-    tempColor.copy(skin).lerp(shoe, sockBlend);
+  // Smooth mask that excludes forearms/hands (and excludes arms from shorts)
+  const notArmMask = 1 - smoothstep(0.15, 0.55, armHandWeight);
+  const notForearmMask = 1 - smoothstep(0.12, 0.48, forearmHandWeight);
+
+  // 1. Athletic shorts: continuous from y=0.63 up to y=0.98 (on non-arm vertices)
+  const shortsBottom = smoothstep(0.625, 0.655, y);
+  const shortsTop = 1 - smoothstep(0.955, 0.985, y);
+  const shortsMask = shortsBottom * shortsTop * notArmMask;
+  if (shortsMask > 0.001) {
+    tempColor.lerp(shortsColor, shortsMask);
   }
 
+  // 2. Athletic top (T-shirt): continuous from waist y=0.945 up to collar y=1.445,
+  // including short sleeves on upper arms above y=1.265.
+  // Because shorts go up to 0.985 and shirt starts at 0.945, the waist transition is
+  // shortsColor -> navyTop with ZERO skin gap!
+  const torsoShirtBottom = smoothstep(0.945, 0.975, y);
+  const sleeveBottom = smoothstep(1.255, 1.285, y);
+  // Blend between torso bottom and sleeve bottom based on armHandWeight
+  const effectiveBottom = torsoShirtBottom * (1 - smoothstep(0.1, 0.5, armHandWeight)) +
+                          sleeveBottom * smoothstep(0.1, 0.5, armHandWeight);
+  const collarTop = 1 - smoothstep(1.425, 1.452, y);
+  const shirtMask = effectiveBottom * collarTop * notForearmMask;
+  if (shirtMask > 0.001) {
+    tempColor.lerp(navyTop, shirtMask);
+  }
+
+  // 3. Athletic socks / footwear at bottom of feet
+  if (y < 0.115 && z > -0.09) {
+    const sockMask = 1 - smoothstep(0.088, 0.112, y);
+    tempColor.lerp(shoe, sockMask);
+  }
+
+  // 4. Hair cap
   if (y > 1.635 && (z < 0.088 || y > 1.68)) {
-    const hairBlend = smoothstep(1.635, 1.66, y);
-    tempColor.lerp(hair, hairBlend);
+    const hairMask = smoothstep(1.635, 1.662, y);
+    tempColor.lerp(hair, hairMask);
   }
 
   const co = cv.byteOffset + (ca.byteOffset || 0) + i * (cv.byteStride || (ca.type === 'VEC4' ? 16 : 12));
@@ -145,7 +162,7 @@ j.materials = [
   {
     name: 'Sportswear and skin',
     doubleSided: false,
-    pbrMetallicRoughness: { metallicFactor: 0.02, roughnessFactor: 0.82 }
+    pbrMetallicRoughness: { metallicFactor: 0.02, roughnessFactor: 0.78 }
   }
 ];
 j.asset = {
